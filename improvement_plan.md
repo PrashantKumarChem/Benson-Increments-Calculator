@@ -7,8 +7,8 @@ This document outlines suggested improvements for the code in the "Benson Increm
 - [x] Organize code into logical sections with clear headings (e.g., Data Loading, Widget Creation, Event Handlers).
 
 ## 2. Variable Naming
-- [ ] Review and update variable names for clarity and consistency.
-- [ ] Avoid abbreviations unless they are standard in chemistry or programming.
+- [x] Review and update variable names for clarity and consistency.
+- [x] Avoid abbreviations unless they are standard in chemistry or programming.
 
 ## 3. Error Handling
 - [ ] Add error handling for file loading (e.g., missing or malformed CSV files).
