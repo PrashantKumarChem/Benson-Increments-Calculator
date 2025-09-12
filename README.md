@@ -3,7 +3,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-A Jupyter Notebook-based tool for estimating the standard heat of formation of organic molecules using the Benson Group Increment method. Designed for Chemistry C450/C540 at Indiana University Bloomington.
+A Jupyter Notebook-based tool for estimating the standard heat of formation of organic molecules using the Benson Group Increment method. Designed for Chemistry C450/C540 at Indiana University Bloomington by Prashant Kumar and Dr. Nicola L. B. Pohl.
 
 ## Project Description
 
