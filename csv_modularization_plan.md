@@ -43,17 +43,17 @@ This plan outlines the steps to refactor the Benson Increments Calculator to use
 - [x] Validate that all data has been transferred correctly (row counts, values)
 
 ## Step 3: Update Notebook Code
-- [ ] Add required imports: `import os` and `import glob`
-- [ ] Modify `load_increment_data()` function:
+- [x] Add required imports: `import os` and `import glob`
+- [x] Modify `load_increment_data()` function:
   - Change parameter from `csv_path` to `folder_path`
   - Use `glob.glob()` to find all `.csv` files in the folder
   - Load and concatenate all CSV files into a single DataFrame
   - Add error handling for invalid files
-- [ ] Modify `get_value_dicts()` function:
+- [x] Modify `get_value_dicts()` function:
   - Update to iterate through DataFrame rows instead of using `zip()`
   - Use conditional checks for each category based on column presence
   - Handle potential duplicate keys (last value wins, or log warnings)
-- [ ] Update `main()` function:
+- [x] Update `main()` function:
   - Change the call to `load_increment_data('CSV_data_files/')`
   - Ensure all existing functionality remains intact
 
