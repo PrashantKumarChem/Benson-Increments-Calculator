@@ -57,16 +57,24 @@ This plan outlines the steps to refactor the Benson Increments Calculator to use
   - Change the call to `load_increment_data('CSV_data_files/')`
   - Ensure all existing functionality remains intact
 
-## Step 4: Add Enhancements
-- [ ] Add CSV validation:
-  - Check for required column pairs in each file
-  - Warn about missing or malformed data
-- [ ] Add logging/debugging features:
-  - Print loaded files and their row counts
-  - Log any data conflicts or skipped entries
-- [ ] Update UI feedback:
-  - Display loaded CSV files in the notebook for transparency
-  - Show category counts (e.g., "Loaded 25 CH groups, 15 CHO groups")
+## Step 4: Implement Fully Dynamic Category Detection
+- [x] Redesign `load_increment_data()` function:
+  - Return a dictionary `{filename: DataFrame}` instead of concatenated DataFrame
+  - Load each CSV file separately and store by filename
+- [x] Redesign `get_value_dicts()` function:
+  - Accept the dictionary of DataFrames
+  - Assume each CSV has exactly 2 columns (group names and values)
+  - Create category dictionaries dynamically from filenames
+  - Add validation to ensure CSVs have exactly 2 columns
+- [x] Update `main()` function for full dynamism:
+  - Loop through detected categories to create buttons and layouts
+  - Use predefined color palette that cycles for new categories
+  - Generate tab titles from CSV filenames (e.g., `ch_groups.csv` → "Ch Groups")
+  - Remove all hardcoded category references
+- [x] Test dynamic functionality:
+  - Verify existing CSVs work with new system
+  - Add a test CSV file to confirm automatic detection
+  - Ensure no code changes needed for new categories
 
 ## Step 5: Testing and Validation
 - [ ] Test with original data:
@@ -117,12 +125,13 @@ This plan outlines the steps to refactor the Benson Increments Calculator to use
 - [ ] Notebook loads all data from modular CSVs automatically
 - [ ] All existing functionality works identically
 - [ ] Adding new data requires no code changes
+- [ ] Adding new CSV categories requires no code changes (fully dynamic)
 - [ ] Clear documentation for contributors
 - [ ] No performance degradation
 
 ## Timeline
 - Step 1-2: 1-2 hours (data analysis and CSV creation)
-- Step 3-4: 2-3 hours (code modifications)
+- Step 3-4: 3-4 hours (code modifications and dynamic implementation)
 - Step 5: 1-2 hours (testing)
 - Step 6-7: 1 hour (documentation and deployment)
 
