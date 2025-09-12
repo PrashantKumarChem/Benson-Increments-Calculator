@@ -5,6 +5,14 @@
 
 A Jupyter Notebook-based tool for estimating the standard heat of formation of organic molecules using the Benson Group Increment method. Designed for Chemistry C450/C540 at Indiana University Bloomington.
 
+## Project Description
+
+This notebook is designed to calculate approximate heats of formation of organic molecules based on the idea of Benson Group Increments (Cohen & Benson, *Chem. Rev.* **1993**, *93*, 2419).
+
+The notebook takes values from a user-provided file titled `increment_correction_table.csv` located in the same folder as the notebook. This CSV file contains columns for Benson Group increment types and their corresponding numerical values in kJ/mol. Research is ongoing to update values and add increments to better describe a range of molecules; users can decide which increments to use in the calculator.
+
+The Benson Group Increments are rendered into compact buttons that users can click to select. The value associated with each button is automatically added to the total displayed below the buttons. Users need to decide which increments and corrections are needed based on the molecule of interest to make the entire process of estimation transparent.
+
 ## Features
 
 - **Interactive UI**: Click buttons to add Benson group increments and corrections.
@@ -34,7 +42,7 @@ A Jupyter Notebook-based tool for estimating the standard heat of formation of o
    ```
 
 3. Prepare the data file:
-   - Ensure `increment_correction_table.csv` is in the same directory as the notebook.
+   - Ensure `increment_correction_table.csv` is in the `CSV_data_files/` directory.
    - The CSV should contain columns: `CH Benson Group Increment`, `Delta_Hf kJ/mol`, `CHO Benson Group Increment`, `CHO Values`, `Correction`, `Correction Values`.
 
 4. Launch Jupyter:
