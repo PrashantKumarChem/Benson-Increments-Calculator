@@ -119,17 +119,17 @@ This plan outlines the steps to refactor the Benson Increments Calculator to use
   - Test with larger datasets if available
 
 ## Step 6: Documentation and Cleanup
-- [ ] Update README.md:
+- [x] Update README.md:
   - Document the new CSV file structure
   - Explain how to add new increment categories
   - Provide examples of CSV formats
-- [ ] Update code comments:
+- [x] Update code comments:
   - Document the new functions and their parameters
   - Explain the dynamic loading process
-- [ ] Archive old CSV:
+- [x] Archive old CSV:
   - Move `increment_correction_table.csv` to `Archives/` folder
   - Update any references in documentation
-- [ ] Create contributor guidelines:
+- [x] Create contributor guidelines:
   - Document CSV naming conventions
   - Explain how to add new categories
   - Provide templates for new CSV files
