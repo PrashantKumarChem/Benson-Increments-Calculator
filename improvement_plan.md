@@ -35,7 +35,7 @@ This document outlines suggested improvements for the code in the "Benson Increm
 - [ ] Add tooltips or help text to guide users on button functions.
 
 ## 9. Code Reusability
-- [ ] Modularize code by separating functions for data loading, widget creation, and event handling.
+- [x] Modularize code by separating functions for data loading, widget creation, and event handling.
 
 ## 10. Accessibility
 - [ ] Improve UI accessibility (keyboard navigation, color contrast, etc.).
