@@ -27,8 +27,8 @@ This document outlines suggested improvements for the code in the "Benson Increm
 - [ ] Handle missing or malformed data gracefully.
 
 ## 7. Functionality Improvements
-- [ ] Improve the undo function to handle a history of actions (not just the last value).
-- [ ] Add a "reset" button to clear all selections and totals.
+- [x] Improve the undo function to handle a history of actions (not just the last value).
+- [x] Add a "reset" button to clear all selections and totals.
 
 ## 8. User Interface
 - [ ] Make the button layout responsive to different screen sizes.
