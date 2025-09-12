@@ -35,7 +35,6 @@ The Benson Group Increments are rendered into compact buttons that users can cli
 - **Dynamic Categories**: New Benson group categories appear as tabs without code changes
 - **Interactive UI**: Click buttons to add Benson group increments and corrections
 - **Real-time Calculation**: Automatic updates of heat of formation in kJ/mol and kcal/mol
-- **Undo/Redo Functionality**: Remove last additions or reset all selections
 - **History Panel**: View and remove individual increments
 - **Professional Display**: Chemical acronyms (CH, CHO, CHNO) properly formatted in tab titles
 - **Collaborative**: Easy for contributors to add new Benson group categories
@@ -85,14 +84,6 @@ The Benson Group Increments are rendered into compact buttons that users can cli
    - Use "Undo the last addition" to remove the most recent increment.
    - Use "Reset all selections" to start over.
    - Use the "Remove" buttons in the history panel for precise control.
-
-## Example
-
-Suppose you want to calculate the heat of formation for methane (CH₄):
-
-1. Click the "CH₃" button in the CH Groups tab.
-2. The total updates to reflect the increment.
-3. The result is the estimated ΔH_f for CH₄.
 
 ## Data Format
 
@@ -170,7 +161,7 @@ We welcome contributions! The modular CSV system makes it easy for contributors 
 
 ### For Developers
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines and [CONTRIBUTOR_GUIDELINES.md](CONTRIBUTOR_GUIDELINES.md) for detailed instructions on adding new Benson group categories.
 
 ## License
 
