@@ -76,6 +76,31 @@ This plan outlines the steps to refactor the Benson Increments Calculator to use
   - Add a test CSV file to confirm automatic detection
   - Ensure no code changes needed for new categories
 
+## Step 4.5: Implement Standardized CSV Naming Convention
+- [x] Define naming convention standards:
+  - Use numbered prefixes (01_, 02_, etc.) for tab ordering
+  - Keep chemical acronyms in uppercase (CH, CHO, CHNO, etc.)
+  - Use underscores to separate words in filenames
+  - Ensure filenames match desired tab display names
+- [x] Rename existing CSV files to follow convention:
+  - `ch_groups.csv` → `01_CH_Groups.csv`
+  - `cho_groups.csv` → `02_CHO_Groups.csv`
+  - `corrections.csv` → `03_Corrections.csv`
+  - `chno_groups.csv` → `04_CHNO_Groups.csv`
+  - `cyclohexane_a_values.csv` → `05_Cyclohexane_A_Values.csv`
+- [x] Enhance title formatting code (optional):
+  - Modify `main()` function to properly handle chemical acronyms
+  - Ensure CH, CHO, CHNO remain uppercase in tab titles
+  - Add logic to capitalize chemical elements and groups appropriately
+- [x] Test naming convention:
+  - Verify renamed files are detected correctly
+  - Confirm tab titles display as expected
+  - Test with a new CSV file following the convention
+- [x] Document naming guidelines:
+  - Create clear rules for future contributors
+  - Provide examples of proper naming
+  - Explain how filenames translate to tab names
+
 ## Step 5: Testing and Validation
 - [ ] Test with original data:
   - Run notebook with new modular CSVs
@@ -126,12 +151,13 @@ This plan outlines the steps to refactor the Benson Increments Calculator to use
 - [ ] All existing functionality works identically
 - [ ] Adding new data requires no code changes
 - [ ] Adding new CSV categories requires no code changes (fully dynamic)
+- [ ] Standardized naming convention ensures consistent tab ordering and display
 - [ ] Clear documentation for contributors
 - [ ] No performance degradation
 
 ## Timeline
 - Step 1-2: 1-2 hours (data analysis and CSV creation)
-- Step 3-4: 3-4 hours (code modifications and dynamic implementation)
+- Step 3-4.5: 4-5 hours (code modifications, dynamic implementation, and naming convention)
 - Step 5: 1-2 hours (testing)
 - Step 6-7: 1 hour (documentation and deployment)
 
