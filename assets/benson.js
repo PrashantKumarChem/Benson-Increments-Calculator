@@ -37,11 +37,14 @@ export function parseValue(raw) {
 }
 
 /**
- * Parse a two-column CSV: everything before the last comma is the group name,
- * the remainder is the value. Rows that cannot be read are reported rather than
- * dropped in silence, so a bad file is visible instead of merely shorter.
+ * Split a two-column CSV into name and value text, without interpreting either.
+ *
+ * Everything before the last comma is the name and the remainder is the value,
+ * so a name may contain a comma but a value may not. The notation files in
+ * notation/ are read by the same rule, which is why it is defined here instead
+ * of being written out a second time.
  */
-export function parseCsvText(text) {
+export function parseRows(text) {
   const rows = [];
   const problems = [];
   const lines = text.replace(/^﻿/, "").split(/\r?\n/);
@@ -58,14 +61,30 @@ export function parseCsvText(text) {
       problems.push({ line: index + 2, text: line, reason: "missing group name" });
       return;
     }
-    try {
-      rows.push({ label, value: parseValue(line.slice(split + 1)) });
-    } catch (error) {
-      problems.push({ line: index + 2, text: label, reason: error.message });
-    }
+    rows.push({ label, raw: line.slice(split + 1), line: index + 2 });
   });
 
   return { rows, problems };
+}
+
+/**
+ * Parse a two-column CSV of increments. Rows that cannot be read are reported
+ * rather than dropped in silence, so a bad file is visible instead of merely
+ * shorter.
+ */
+export function parseCsvText(text) {
+  const { rows, problems } = parseRows(text);
+  const increments = [];
+
+  for (const row of rows) {
+    try {
+      increments.push({ label: row.label, value: parseValue(row.raw) });
+    } catch (error) {
+      problems.push({ line: row.line, text: row.label, reason: error.message });
+    }
+  }
+
+  return { rows: increments, problems };
 }
 
 /**

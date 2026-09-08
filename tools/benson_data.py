@@ -15,9 +15,15 @@ from dataclasses import dataclass, field
 
 CSV_DIR = "CSV_data_files"
 MANIFEST_NAME = "manifest.json"
+# What the group names are made of, and the words students use for them.
+NOTATION_DIR = "notation"
 
 # 01_CH_Groups.csv -> ordering prefix, then the category name.
 FILENAME_RE = re.compile(r"^(\d{2})_([A-Za-z0-9_]+)\.csv$")
+
+# "C", "N O2", "C2" - element symbols separated by spaces, each with an
+# optional count. assets/notation.js reads compositions by the same rule.
+COMPOSITION_RE = re.compile(r"^[A-Z][a-z]?\d*(?:\s+[A-Z][a-z]?\d*)*$")
 
 NUMBER_RE = re.compile(r"^-?\d*\.?\d+$")
 # "1.05-1.76" is a published range and is averaged. The dash is only a range
@@ -88,6 +94,23 @@ def read_category(path: str) -> Category:
     header = [c.strip() for c in raw[0]]
     rows = [tuple(c.strip() for c in row[:2]) for row in raw[1:] if row and row[0].strip()]
     return Category(path=path, columns=header, rows=rows)
+
+
+def read_pairs(path: str):
+    """Read a two-column file as (line number, key, value).
+
+    Split on the last comma, which is what assets/notation.js does, so a group
+    name may contain a comma even though a value may not.
+    """
+    with open(path, encoding="utf-8-sig") as handle:
+        for offset, line in enumerate(handle.read().splitlines()[1:]):
+            if not line.strip():
+                continue
+            key, comma, value = line.rpartition(",")
+            if not comma:
+                yield offset + 2, line.strip(), ""
+            else:
+                yield offset + 2, key.strip().strip('"'), value.strip()
 
 
 def find_categories(csv_dir: str = CSV_DIR) -> list[Category]:
