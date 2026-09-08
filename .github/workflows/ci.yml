@@ -36,11 +36,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # Value parsing and the tally arithmetic, exercised against the real CSVs.
       - name: Run tests
-        run: node --test "tools/**/*.test.mjs"
+        run: node --test tools/*.test.mjs
 
   parity:
     name: Parity with the notebook
@@ -52,7 +52,7 @@ jobs:
           python-version: '3.11'
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install the notebook's dependencies
         run: pip install -r requirements.txt

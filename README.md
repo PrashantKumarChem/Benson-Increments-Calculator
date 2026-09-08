@@ -63,8 +63,8 @@ python -m http.server 8000
 ### Tests
 
 ```bash
-node --test "tools/**/*.test.mjs"   # value parsing and the tally arithmetic
-node tools/check_parity.mjs         # every increment, notebook vs. site
+node --test tools/*.test.mjs    # value parsing and the tally arithmetic
+node tools/check_parity.mjs     # every increment, notebook vs. site
 ```
 
 `check_parity.mjs` loads all 236 increments twice — once through the notebook's
