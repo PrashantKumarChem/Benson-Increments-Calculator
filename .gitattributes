@@ -1,0 +1,20 @@
+# Keep line endings identical on every platform.
+#
+# tools/build_data.py writes manifest.json with LF endings, and CI checks the
+# committed copy is current with `git diff --exit-code`. Without this, a
+# contributor on Windows would see that check fail on line endings alone.
+
+* text=auto
+
+*.py    text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.json  text eol=lf
+*.csv   text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.cff   text eol=lf
+
+*.ipynb text eol=lf

@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Benson Increments Calculator!
 
 ### Reporting Issues
 
-- Use the [issue tracker](https://github.com/Prashant-Kumar-IU/Benson-Increments-Calculator/issues) to report bugs or request features.
+- Use the [issue tracker](https://github.com/PrashantKumarChem/Benson-Increments-Calculator/issues) to report bugs or request features.
 - Provide a clear description, steps to reproduce, and expected vs. actual behavior.
 - Include your environment details (Python version, OS, etc.).
 
