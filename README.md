@@ -20,7 +20,8 @@ inspect a structure or decide which groups a molecule needs. It presents every
 published increment as a button, and you choose the ones your molecule requires,
 so the reasoning stays visible and the arithmetic stays honest.
 
-- Search across every category, or browse them as tabs
+- Search by the shorthand you write - `CH3` finds `C-(C)(H)3`, `methylene`
+  finds `C-(C)2(H)2` - or browse the categories as tabs
 - Click a group to add it; adjust the count rather than clicking eight times
 - Running total in kJ/mol and kcal/mol, always on screen
 - Remove any single entry, undo the last addition, or reset
@@ -63,7 +64,7 @@ python -m http.server 8000
 ### Tests
 
 ```bash
-node --test tools/*.test.mjs    # value parsing and the tally arithmetic
+node --test tools/*.test.mjs    # value parsing, the tally arithmetic, the notation
 node tools/check_parity.mjs     # every increment, notebook vs. site
 ```
 
@@ -77,16 +78,37 @@ agreement on every total.
 ```
 index.html              the calculator
 assets/benson.js        reading and parsing the CSV data (no DOM)
+assets/notation.js      reading Benson notation: what a group name is made of (no DOM)
 assets/selection.js     the chosen increments and the running total (no DOM)
 assets/app.js           rendering and events
 assets/styles.css       visual styles
 CSV_data_files/         the increment data, plus the generated manifest
+notation/               what the group names mean, and the words students use
 tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```
 
-The two files without any DOM access hold everything worth testing, which is why
-the test suite needs no browser.
+The three files without any DOM access hold everything worth testing, which is
+why the test suite needs no browser.
+
+## Searching by shorthand
+
+`CH3` does not appear anywhere in `C-(C)(H)3`, so a plain text search cannot
+find a methyl group — which is the notation a student is most likely to type.
+The calculator instead reads the notation: a name gives its central atom and its
+ligands, so a carbon with three hydrogen ligands is findable as `CH3`, and
+`Cd-(H)2` answers to both `CdH2` and `CH2`.
+
+Ties are settled by the order the CSV files are written in. Seven groups match
+`CH3` exactly; the files run simplest first, so the plain methyl comes out on
+top without any code holding an opinion about which methyl matters most.
+
+Names that cannot be worked out from the notation — that `C-(C)(H)3` is called a
+methyl, that `CO-(C)2` is a ketone — live in `notation/synonyms.csv`, alongside
+small tables saying what the notation is made of. See
+[notation/README.md](notation/README.md); nothing about the chemistry is written
+into the code, so a new category of groups is searchable the moment its CSV is
+added.
 
 ## The notebook
 

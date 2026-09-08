@@ -109,10 +109,6 @@ nav.tabs .n { opacity: .6; font-size: .82em; margin-left: 6px; }
   border-radius: 12px; box-shadow: var(--shadow); padding: 15px 16px;
 }
 @media (min-width: 980px) { .tally-panel { position: sticky; top: 18px; } }
-@media (max-width: 979px) {
-  .tally-panel { position: sticky; bottom: 0; margin-top: 6px; }
-  ul.picks { max-height: 32vh; }
-}
 .kj { font-size: 1.7rem; font-weight: 640; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
 .kj span { font-size: .55em; font-weight: 500; color: var(--ink-soft); margin-left: 4px; letter-spacing: 0; }
 .kcal { color: var(--ink-soft); font-size: .92rem; font-variant-numeric: tabular-nums; margin-top: 1px; }
@@ -132,6 +128,30 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
 .stepper .n { min-width: 26px; text-align: center; font-size: .87rem; font-variant-numeric: tabular-nums; }
 .rm { width: 30px; font-size: 1.05rem; }
 .empty { color: var(--ink-faint); font-size: .87rem; margin: 14px 0 2px; }
+
+/* On a phone the panel sits at the foot of the page rather than beside the
+   grid, so it has to earn its height: the list of picks is capped to leave the
+   groups visible above it, and the counters grow to something a thumb can
+   actually hit. These come after the rules they override - as the same
+   specificity, order is what decides. */
+@media (max-width: 979px) {
+  .tally-panel { position: sticky; bottom: 0; margin-top: 6px; }
+  ul.picks { max-height: 32vh; }
+  ul.picks li { gap: 6px; }
+  ul.picks .sum { min-width: 62px; }
+  .stepper button, .rm { width: 38px; height: 38px; }
+  .rm { width: 38px; }
+  nav.tabs button { padding: 8px 14px; }
+}
+
+/* Narrower still, and a name like C-(Cd)(CB)(H)2 has no room left beside four
+   controls - it ends up one character per line. Give the name the full width
+   and let the counters sit underneath it. */
+@media (max-width: 520px) {
+  ul.picks li { flex-wrap: wrap; }
+  ul.picks .name { flex-basis: 100%; }
+  ul.picks .sum { margin-left: auto; }
+}
 
 .actions { display: flex; gap: 7px; margin-top: 14px; }
 .actions button {

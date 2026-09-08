@@ -5,6 +5,7 @@
  * data into a page and keeps the selection in sync with what is displayed.
  */
 import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
+import { buildIndex, emptyNotation, loadNotation, search } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
 
 /** The increments chosen so far; see selection.js for the rules it enforces. */
@@ -24,21 +25,24 @@ const signed = (value) => `${value > 0 ? "+" : ""}${value.toFixed(2)}`;
 /* View                                                                        */
 /* -------------------------------------------------------------------------- */
 
-const view = { categories: [], activeTab: 0, query: "" };
+const view = { categories: [], notation: emptyNotation(), index: [], activeTab: 0, query: "" };
 
-/** Increments to show: the active tab, or matches from every category while searching. */
+/**
+ * Increments to show: the active tab, or the best matches from every category
+ * while searching.
+ *
+ * Searching goes through notation.js rather than matching the printed name,
+ * because the printed name is not what a student types. `CH3` appears nowhere
+ * in `C-(C)(H)3`, and looking for it literally used to return eleven
+ * cyclohexane A-values and not one methyl group.
+ */
 function visibleIncrements() {
-  const query = view.query.toLowerCase();
-
-  if (!query) {
+  if (!view.query) {
     const category = view.categories[view.activeTab];
     return category ? category.rows.map((row) => ({ ...row, category })) : [];
   }
 
-  return view.categories.flatMap((category) =>
-    category.rows
-      .filter((row) => row.label.toLowerCase().includes(query))
-      .map((row) => ({ ...row, category })));
+  return search(view.query, view.index);
 }
 
 function renderTabs() {
@@ -60,9 +64,14 @@ function renderGrid() {
   }
 
   el("grid").innerHTML = increments
-    .map(({ label, value, category }) => {
+    .map(({ label, value, category, matchedSynonym }) => {
       const count = counts.get(keyOf(category.file, label)) ?? 0;
-      const context = view.query ? ` &middot; ${escapeHtml(category.title)}` : "";
+      // While searching, name the group in the student's own words when that is
+      // what they typed, so finding C-(C)(H)3 under "methyl" teaches the
+      // notation rather than merely producing it.
+      const context = view.query
+        ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
+        : "";
       const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
       return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
                 class="${count ? "picked" : ""}" title="${escapeHtml(label)} — ${value.toFixed(2)} kJ/mol">
@@ -178,6 +187,18 @@ const REPO_URL = "https://github.com/PrashantKumarChem/Benson-Increments-Calcula
 
 try {
   view.categories = await loadCategories({ readText: fetchText });
+
+  // The increments are the calculator; the notation files only let a group be
+  // found by the shorthand a student writes. If they cannot be read the sums
+  // must still work, so this is reported and stepped over rather than thrown -
+  // searching then falls back to the names as printed, by the same code path.
+  try {
+    view.notation = await loadNotation({ readText: fetchText });
+  } catch (error) {
+    view.notation = emptyNotation();
+    console.warn(`notation/ could not be read, so a group is only findable by its printed name: ${error.message}`);
+  }
+  view.index = buildIndex(view.categories, view.notation);
 
   const total = view.categories.reduce((sum, category) => sum + category.rows.length, 0);
   const unreadable = view.categories.flatMap((category) =>
