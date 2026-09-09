@@ -1,0 +1,11 @@
+Term,What it means
+Group increment,"The contribution one group makes to the standard enthalpy of formation. It is the number on each button in the calculator, in kJ/mol."
+Correction,"A term added once per ring or per interaction rather than once per atom. Corrections carry what group additivity cannot see on its own: ring strain, a gauche interaction, two substituents crowding each other across a double bond."
+A-value,"The free-energy cost of a substituent sitting axial rather than equatorial on a cyclohexane ring. A larger A-value means a stronger preference for the equatorial position — a tert-butyl group, at about 20 kJ/mol, is almost never axial."
+`ΔHf°`,"Standard enthalpy of formation: the enthalpy change on forming one mole of a substance from its elements in their standard states. This is what the group increments and corrections sum to."
+`ΔG°`,"Standard Gibbs free energy change. The cyclohexane A-values are free energies, not enthalpies, which is why the calculator will not head a total ΔHf° once one of them is in the sum."
+Ligand,"An atom or group written in brackets in a group name, describing what the central atom is bonded to. A ligand is not counted as an atom of the molecule; hydrogen is the exception."
+Central atom,"The polyvalent atom a group is built around — the part of the name before the dash."
+Averaged range,"A value the source published as a span rather than a single number, such as 2.51-4.35. The calculator sums the midpoint and shows the span beside it."
+`kJ/mol`,"Kilojoules per mole, the unit every value in this calculator is stored in."
+`kcal/mol`,"Kilocalories per mole. Shown alongside kJ/mol for comparison with older literature; 1 kcal = 4.184 kJ."

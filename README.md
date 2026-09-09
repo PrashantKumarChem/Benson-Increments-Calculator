@@ -69,6 +69,45 @@ The index exists because a browser cannot list a folder the way the notebook's
 a missing value, a duplicate group name, a stray comma, a stale index — and CI
 runs it on every push, so a broken contribution cannot reach the site.
 
+## The reference page
+
+`reference.html` explains the method, the notation and where the values come
+from. It is **generated** — what you edit is the files in `reference/`:
+
+```
+reference/01_The_Method.md            prose, in Markdown
+reference/03_Notation.csv             a table, in CSV
+reference/05_Glossary.csv             a table, in CSV
+```
+
+The number sets the order, the rest of the filename becomes the heading, and
+the extension picks the renderer — `.md` is prose, `.csv` is a table. Adding a
+section is adding a file; there is no list anywhere to keep in step. Then:
+
+```bash
+node tools/build_reference.mjs        # rewrite reference.html
+node tools/build_reference.mjs --check  # what CI runs
+```
+
+Markdown here is a deliberate subset — headings, paragraphs, `-` bullets,
+`[text](url)`, `` `code` ``, `**bold**`, `*italic*` — because the whole
+language would mean a dependency and this site has none. Anything else is
+shown as the characters it is made of. A line reading `{{csv: some/file.csv}}`
+includes that CSV as a table, which is how the category table on the page is
+the same `notation/categories.csv` the calculator itself reads rather than a
+second copy that could disagree.
+
+Two things worth knowing. Text in `` ` `` comes out in IBM Plex Mono, which is
+why the notation column of `reference/03_Notation.csv` is written `` `Cd` `` —
+the content decides its own typography, so the renderer never has to know
+which column holds notation. And a CSV cell containing a comma should be
+quoted, which is what a spreadsheet does on its own; these files are meant to
+survive a round trip through Excel.
+
+Do not edit `reference.html` by hand. It is regenerated from `reference/`, so
+an edit there is lost on the next build — and CI compares the two, so it is
+reported rather than merely lost.
+
 ## Running it locally
 
 The site is plain HTML, CSS and JavaScript with no build step or dependencies.
@@ -100,13 +139,20 @@ filename, not a new version string. Do not add a `?v=` to them, or there
 would be a ninth place to keep in step that nothing checks.
 
 `python tools/validate_assets.py` checks that nothing is requested unversioned,
-that every module is in the import map, and that one version is used
+that every module is in some page's import map, and that one version is used
 throughout. CI runs it.
+
+It reads every page, not just `index.html`. `reference.html` links the same
+stylesheet, and a checker that only opened `index.html` would have called that
+page fine while it shipped a version nobody had bumped. `reference.html` does
+not carry a version of its own: `tools/build_reference.mjs` reads the one in
+`index.html` and stamps it, so the two cannot drift, and the check above is
+what catches the remaining case of someone editing the generated file by hand.
 
 ### Tests
 
 ```bash
-node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing, notation
+node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing, notation, the reference renderer
 node tools/check_parity.mjs     # every increment, notebook vs. site
 ```
 
@@ -119,6 +165,7 @@ agreement on every total.
 
 ```
 index.html              the calculator
+reference.html          the reference page (generated - edit reference/)
 assets/benson.js        reading and parsing the CSV data (no DOM)
 assets/browse.js        which increments are shown, and how they group (no DOM)
 assets/format.js        how a value is written on the page (no DOM)
@@ -132,6 +179,8 @@ assets/fonts/           IBM Plex Mono, shipped with the site (see License)
 CSV_data_files/         the increment data, plus the generated manifest
 notation/               what the group names mean, the words students use, and
                         what each category of numbers is (categories.csv)
+reference/              what the reference page says: prose in .md, tables in
+                        .csv, one file per section
 tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```

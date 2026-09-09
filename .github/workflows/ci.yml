@@ -127,7 +127,9 @@ jobs:
         with:
           node-version: '22'
 
-      # Value parsing and the tally arithmetic, exercised against the real CSVs.
+      # Value parsing and the tally arithmetic, exercised against the real CSVs,
+      # and the reference page's Markdown subset against the notation that
+      # actually appears in it.
       - name: Run tests
         run: node --test tools/*.test.mjs
 
@@ -141,6 +143,12 @@ jobs:
       # goes red says so by name.
       - name: Validate the stylesheet
         run: node tools/validate_css.mjs
+
+      # reference.html is generated from reference/, so a committed copy that
+      # no longer matches its sources is a real fault: the page would show
+      # something nobody wrote any more. Same bargain as manifest.json.
+      - name: Confirm the reference page is current
+        run: node tools/build_reference.mjs --check
 
   parity:
     name: Parity with the notebook
