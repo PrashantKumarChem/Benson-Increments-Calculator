@@ -59,6 +59,11 @@
     <main>
       <div class="search">
         <label class="visually-hidden" for="filter">Search the increments</label>
+        <span class="icon" aria-hidden="true">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="7" cy="7" r="4.5"></circle><path d="M10.4 10.4 14 14"></path>
+          </svg>
+        </span>
         <input type="search" id="filter" autocomplete="off" spellcheck="false"
                placeholder="Search every category — CH3, methyl, C-(C)(H)3, cyclohexane">
         <kbd class="shortcut" id="shortcut" aria-hidden="true">Ctrl K</kbd>
@@ -84,6 +89,7 @@
       <div class="kcal" id="kcal">0.00 kcal/mol</div>
       <p class="mixed" id="mixed" hidden></p>
       <p class="empty" id="empty">Nothing chosen yet. Click a group to add it.</p>
+      <p class="picks-head" id="picks-head" hidden>Contributions</p>
       <ul class="picks" id="picks"></ul>
       <p class="band" id="band" hidden></p>
       <div class="actions">

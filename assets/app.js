@@ -58,14 +58,16 @@ function cardHtml(increment, counts) {
   // what they typed, so finding C-(C)(H)3 under "methyl" teaches the notation
   // rather than merely producing it.
   const context = view.query
-    ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
+    ? `<span class="from">&middot; ${escapeHtml(matchedSynonym ?? category.title)}</span>`
     : "";
-  const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
+  // How many are chosen, as a badge rather than as more text in the value line,
+  // where it was read as part of the number.
+  const tally = count ? `<span class="tally">&times;${count}</span>` : "";
   const hover = `${label} — ${increment.source} kJ/mol` +
     (increment.isRange ? " (published as a range; the average is used)" : "");
   return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
             class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
-            <span>${asFormula(label)}</span>
+            <span class="name">${asFormula(label)}</span>
             <span class="meta">${valueHtml(increment)}${context}${tally}</span>
           </button>`;
 }
@@ -198,6 +200,9 @@ function renderTally() {
   // to a :has() selector, so what drives the layout is visible in one place.
   el("layout").dataset.tally = isEmpty ? "empty" : "filled";
   el("empty").hidden = !isEmpty;
+  // The list is headed only once it has something in it: a heading over an
+  // empty list is a promise the panel is not yet keeping.
+  el("picks-head").hidden = isEmpty;
   el("undo").disabled = isEmpty;
   el("copy").disabled = isEmpty;
   el("reset").disabled = isEmpty;
