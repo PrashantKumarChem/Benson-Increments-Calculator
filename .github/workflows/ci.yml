@@ -11,7 +11,11 @@ jobs:
     name: Increment data
     runs-on: ubuntu-latest
     steps:
+      # Full history: the version check below compares this branch against the
+      # base of the pull request, and a shallow clone has no base to compare to.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -35,6 +39,47 @@ jobs:
       # silently, which is worse.
       - name: Confirm every asset is versioned
         run: python tools/validate_assets.py
+
+      # The step above checks that the version slots in index.html agree with
+      # each other. It cannot check the thing that actually takes the site
+      # down: that you moved them. Change a file under assets/, leave the
+      # version alone, and every check in this file passes - while a returning
+      # visitor keeps a cached copy of the old file under a string saying it is
+      # current. That is the silent half of the failure the versioning exists
+      # to prevent, and nothing here was looking for it.
+      #
+      # Only a pull request has a base to compare against, so this is skipped
+      # on a push to main, where the comparison would be against the commit
+      # that was just merged and would fail every time.
+      - name: Confirm a change under assets/ comes with a version bump
+        if: github.event_name == 'pull_request'
+        run: |
+          base="origin/${{ github.base_ref }}"
+
+          if git diff --quiet "$base" HEAD -- assets/; then
+            echo "Nothing under assets/ changed; no bump needed."
+            exit 0
+          fi
+
+          here=$(git show HEAD:index.html | grep -o '?v=[^"]*' | sort -u)
+          there=$(git show "$base":index.html | grep -o '?v=[^"]*' | sort -u)
+
+          if [ "$here" = "$there" ]; then
+            echo "These files under assets/ changed:"
+            git diff --name-only "$base" HEAD -- assets/ | sed 's/^/  /'
+            echo
+            echo "But index.html still asks for $here, the same as ${{ github.base_ref }}."
+            echo
+            echo "Bump the version in index.html - every slot, they must agree."
+            echo "It is a date; for a second release on the same day add a"
+            echo "letter (2026-09-09b), since a value already in use is not a bump."
+            echo "If reference.html exists on this branch, rerun"
+            echo "  node tools/build_reference.mjs"
+            echo "afterwards so the generated page follows."
+            exit 1
+          fi
+
+          echo "assets/ changed and the version moved: $there -> $here"
 
   calculator:
     name: Calculator behaviour
