@@ -196,58 +196,73 @@ body {
    subscript no longer stretches the row it sits in. */
 sub { font-size: .82em; line-height: 0; }
 
-/* One strip: what the page is, how to search it, and how to show it, on a
-   single line, with the category filters on the next.
+/* ---------------- app bar ---------------- */
+
+/* The edge of the application, rather than the first paragraph of the page.
+
+   Three things say so, and they are the three every application chrome uses:
+   it runs the full width of the window, it sits on a surface of its own, and a
+   hairline closes it. The band is pulled out past the body's own padding and
+   given that padding back inside, so the surface reaches both edges of the
+   screen while its contents stay in column with everything below.
 
    The description and citation used to spend 208px before anything you could
    click. They are still here, and still in the markup for anyone reading the
    page with a screen reader or a search engine - just not in front of the
-   thing you came to use.
-
-   Moving the view toggle up here is what lets all six filters sit on one row.
-   Sharing a line with the toggle, they wrapped, and wrapped around it, which
-   left a hole under the toggle wherever the last chip fell short. */
-.bar {
-  padding: var(--space-5) 0;
+   thing you came to use. */
+.appbar {
+  margin-inline: calc(-1 * var(--space-5));
+  padding-inline: var(--space-5);
+  margin-bottom: var(--space-5);
+  background: var(--layer);
+  border-bottom: 1px solid var(--line);
+}
+/* 1180px is .wrap's width, written again rather than shared, because these are
+   two boxes that happen to line up rather than one box inside another - the
+   band has to be able to reach the edges while its contents do not. */
+.appbar-inner {
+  max-width: 1180px; margin: 0 auto;
+  min-height: 3.25rem;
   display: flex; flex-wrap: wrap; align-items: center;
-  gap: var(--space-3) var(--space-4);
+  gap: var(--space-2) var(--space-4);
 }
-/* A flex item asking for the whole line gets one, so the filters start a row
-   of their own without a spacer element to say so. */
-.bar .chips { flex: 1 1 100%; margin-bottom: 0; }
-.bar .search { flex: 1 1 22rem; min-width: 14rem; margin-bottom: 0; }
-.bar .about { order: 9; }
 /* The title is the one thing here nobody needs to read twice. */
-h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
-/* Too narrow for one strip. Asking the search for most of a line rather than
-   all of it is the whole change: the title and About then keep the first line
-   to themselves, the search takes the second and the view toggle rides along
-   beside it, and the filters still get their own row. Given a full line the
-   toggle was pushed onto a fourth row of its own, which on a phone is a row
-   of chrome for one control. */
-@media (max-width: 620px) {
-  .bar { padding: var(--space-4) 0; }
-  .bar .search { flex: 1 1 60%; }
+h1 { margin: 0; font-size: 1.0625rem; letter-spacing: -.01em; font-weight: 620; }
+/* Pushed to the far end, so the bar has two ends and not one queue. Wraps to a
+   line of its own below the title when the window is too narrow to hold both,
+   which on a phone is most of them - still right-aligned there, so it reads as
+   the same group that was beside the title a moment ago. */
+.appnav {
+  margin-left: auto;
+  display: flex; align-items: center; gap: var(--space-1);
 }
-.about-toggle {
-  font: inherit; font-size: .78rem; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong);
-  padding: var(--space-1) var(--space-3);
+
+/* A control drawn with spacing and a hover rather than with a border.
+
+   The border is what a container gets - the field you type into, the toggle
+   holding two states. Spending it on every control as well is what made the
+   old strip read as five rectangles of equal weight, none of them saying
+   which mattered. These recede until they are pointed at, which is what
+   secondary means.
+
+   It is a <button> for About, which discloses a panel, and an <a> for
+   Reference, which goes to a page: one rule for both, so they sit level, and
+   the link still opens in a new tab and still works with scripting off. */
+.ghost {
+  font: inherit; font-size: .8125rem; line-height: 1.6;
+  cursor: pointer; text-decoration: none;
+  background: transparent; color: var(--ink-soft); border: 0;
+  padding: var(--space-2) var(--space-3);
 }
-.about-toggle:hover { background: var(--layer-accent); color: var(--ink); }
+.ghost:hover { background: var(--layer-accent); color: var(--ink); }
 
 /* Which theme is on is something the page already shows by being that theme,
    so this needs no label - only a target big enough to hit and a glyph saying
-   where it goes. Square, like everything else, and sized to sit level with
-   About beside it. */
+   where it goes. Square, and sized to sit level with the words beside it. */
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 1.75rem; height: 1.75rem; padding: 0; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong);
+  width: 2rem; height: 2rem; padding: 0;
 }
-.theme-toggle:hover { background: var(--layer-accent); color: var(--ink); }
 /* The same three branches the colour tokens use, so the icon is right on a
    system-dark machine whose reader has never pressed this. Light shows the
    moon, because the moon is where pressing it takes you. */
@@ -258,14 +273,38 @@ h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
 }
 :root[data-theme="dark"] .theme-toggle .moon { display: none; }
 :root[data-theme="dark"] .theme-toggle .sun { display: block; }
-/* A thumb needs more than 28px, and the row it sits in has the width to give. */
+/* A thumb needs more than 32px, and the row it sits in has the width to give. */
 @media (max-width: 859px) { .theme-toggle { width: 2.25rem; height: 2.25rem; } }
-/* The Reference link is the same control as the About button and shares its
-   rule, so the two sit level in the strip. It is an <a> and not a <button>
-   because it goes to a page: a reader can open it in a new tab, and it still
-   works with scripting off. */
-.ref-link { text-decoration: none; display: inline-block; line-height: 1.55; }
-.about { flex-basis: 100%; }
+
+/* ---------------- toolbar ---------------- */
+
+/* What acts on the increments, on the near side of the bar's hairline: what to
+   look for, and how to look at it. The filters follow on their own row, which
+   they now get by being their own element rather than by asking a flex parent
+   for a whole line.
+
+   The search is allowed to grow but not to sprawl. Given the whole row it
+   became the largest thing on the page by area - a text field out-shouting 236
+   values - so it takes the room it needs to show a long placeholder and stops.
+   Cards/Table sits at the far end rather than trailing the field, so the row
+   has two ends the way the bar above it does. */
+.toolbar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.toolbar .search { flex: 1 1 20rem; min-width: 12rem; max-width: 34rem; margin-bottom: 0; }
+.toolbar .views { flex: none; margin-left: auto; }
+/* Too narrow for the field to ask for a comfortable width and still leave room
+   beside it. Asking for most of a line rather than all of one is the whole
+   change: Cards/Table then rides along on the same row instead of being
+   pushed onto a row of its own, which on a phone is 37px of chrome for one
+   control. */
+@media (max-width: 620px) {
+  .toolbar .search { flex: 1 1 60%; }
+}
+
+.about { margin-bottom: var(--space-5); }
 .about p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
 .about .cite { margin-top: var(--space-3); color: var(--ink-helper); font-size: .8rem; }
 /* The accent, not the browser's blue. Every other link on the site is already
@@ -933,7 +972,25 @@ footer a { color: var(--ink-soft); }
    a chemistry symbol - ΔHf° is a row in the glossary - and uppercasing it
    renders ΔHF°, which is a different thing and not a real one. */
 
-.ref-bar { justify-content: space-between; border-bottom: 1px solid var(--line); }
+/* The reference page's own strip, which stands on its own layout.
+
+   It used to say only `justify-content` and `border-bottom`, and take being a
+   flex row from `.bar` alongside it - the one strip this page had before the
+   calculator was split into an app bar and a toolbar. `.bar` is gone, so the
+   two lines it was leaning on are written here.
+
+   Said out loud because reference.html is not on main: it is built on the
+   docs/reference-page branch, whose markup still reads `class="bar ref-bar"`.
+   Nothing in this repository can fail on that, so this rule is what stops that
+   branch merging into an unstyled header. When it does land, the honest
+   follow-up is to give that page the same app bar as this one rather than to
+   keep a second kind of strip alive. */
+.ref-bar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-5) 0;
+  justify-content: space-between; border-bottom: 1px solid var(--line);
+}
 .ref-back {
   font-size: .78rem; color: var(--ink-soft); text-decoration: none;
   border: 1px solid var(--line-strong); padding: var(--space-1) var(--space-3);
