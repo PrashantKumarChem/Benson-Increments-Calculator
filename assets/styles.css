@@ -1,44 +1,78 @@
 /* Benson Increments Calculator - visual styles.
+
    Colours are declared once as custom properties, then redefined for dark mode
-   and for an explicit [data-theme] choice, so nothing has a single-branch colour. */
+   and for an explicit [data-theme] choice, so nothing has a single-branch colour.
+
+   The text tokens are a hierarchy, and the order matters: --ink is content,
+   --ink-soft is context about that content, and --ink-helper is a hint that is
+   not content at all. A value on a card is content and takes --ink; the
+   category it came from is context and takes --ink-soft. Nothing that a reader
+   needs is ever set in --ink-helper, which is why it is the only text token
+   allowed to be the faintest one.
+
+   Surfaces step in the same way - --bg, then --layer, then --layer-accent -
+   rather than being separated by a shadow, which says nothing in dark mode.
+
+   Every pair below clears WCAG AA against the surface it is used on: body text
+   at 4.5:1, and boundaries and focus rings at 3:1. --line is decorative only
+   (rules between rows); anything that marks out a control uses --line-strong. */
 
 :root {
-  --bg: #fbfaf7;
-  --panel: #ffffff;
-  --ink: #1c1a17;
-  --ink-soft: #5c574f;
-  --ink-faint: #8a8378;
-  --line: #e4dfd5;
-  --line-strong: #cfc7b8;
-  --accent: #7a4a2b;
-  --accent-soft: #f4ebe3;
-  --shadow: 0 1px 2px rgba(28,26,23,.05), 0 6px 20px rgba(28,26,23,.06);
+  --bg: #e9ecee;
+  --layer: #fcfdfd;
+  --layer-accent: #d7dcdf;
+  --ink: #12181b;
+  --ink-soft: #4a545a;
+  --ink-helper: #5c676d;
+  --line: #c2c9cd;
+  --line-strong: #7d878c;
+  --accent: #0b5d63;
+  --accent-soft: #cbe8ec;
+  /* Text on a filled accent. Hardcoding #fff here is the bug that made the
+     selected tab 2.42:1 in dark mode, so it is a token like everything else. */
+  --on-accent: #ffffff;
+  /* Distinct from --accent's other job by shape - an offset ring, never a fill. */
+  --focus: #0b5d63;
+
+  /* One spacing scale, so the density pass is not fifty separate judgements. */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #14130f;
-    --panel: #1d1b17;
-    --ink: #ece7dd;
-    --ink-soft: #a9a296;
-    --ink-faint: #7d7669;
-    --line: #302c26;
-    --line-strong: #454037;
-    --accent: #d59a6e;
-    --accent-soft: #2b231c;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.28);
+    --bg: #101417;
+    --layer: #1a2024;
+    --layer-accent: #262e33;
+    --ink: #e8edef;
+    --ink-soft: #a4b0b5;
+    --ink-helper: #8b979c;
+    --line: #2c353a;
+    --line-strong: #626e74;
+    --accent: #5cc9d3;
+    --accent-soft: #15464d;
+    --on-accent: #101417;
+    --focus: #5cc9d3;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #14130f;
-  --panel: #1d1b17;
-  --ink: #ece7dd;
-  --ink-soft: #a9a296;
-  --ink-faint: #7d7669;
-  --line: #302c26;
-  --line-strong: #454037;
-  --accent: #d59a6e;
-  --accent-soft: #2b231c;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.28);
+  --bg: #101417;
+  --layer: #1a2024;
+  --layer-accent: #262e33;
+  --ink: #e8edef;
+  --ink-soft: #a4b0b5;
+  --ink-helper: #8b979c;
+  --line: #2c353a;
+  --line-strong: #626e74;
+  --accent: #5cc9d3;
+  --accent-soft: #15464d;
+  --on-accent: #101417;
+  --focus: #5cc9d3;
 }
 
 * { box-sizing: border-box; }
@@ -56,7 +90,7 @@ sub { font-size: .72em; }
 header { padding: 30px 0 20px; }
 h1 { margin: 0 0 6px; font-size: 1.5rem; letter-spacing: -.015em; font-weight: 620; }
 header p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
-header .cite { margin-top: 10px; color: var(--ink-faint); font-size: .8rem; }
+header .cite { margin-top: 10px; color: var(--ink-helper); font-size: .8rem; }
 
 .layout { display: grid; gap: 22px; align-items: start; }
 @media (min-width: 980px) { .layout { grid-template-columns: minmax(0,1fr) 366px; } }
@@ -64,18 +98,18 @@ header .cite { margin-top: 10px; color: var(--ink-faint); font-size: .8rem; }
 /* ---------------- picker ---------------- */
 .search { position: relative; margin-bottom: 14px; }
 .search input {
-  width: 100%; font: inherit; color: var(--ink); background: var(--panel);
+  width: 100%; font: inherit; color: var(--ink); background: var(--layer);
   border: 1px solid var(--line-strong); border-radius: 10px;
   padding: 11px 38px 11px 13px;
 }
-.search input::placeholder { color: var(--ink-faint); }
+.search input::placeholder { color: var(--ink-helper); }
 .search .clear {
   position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  border: 0; background: transparent; color: var(--ink-faint);
+  border: 0; background: transparent; color: var(--ink-helper);
   font: inherit; cursor: pointer; padding: 6px 8px; line-height: 1;
 }
 .search .clear:hover { color: var(--ink); }
-input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 nav.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
 nav.tabs button {
@@ -84,14 +118,14 @@ nav.tabs button {
   border: 1px solid transparent; border-radius: 999px; padding: 6px 13px;
 }
 nav.tabs button:hover { background: var(--accent-soft); color: var(--ink); }
-nav.tabs button[aria-selected="true"] { background: var(--accent); color: #fff; }
+nav.tabs button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
 nav.tabs .n { opacity: .6; font-size: .82em; margin-left: 6px; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 6px; }
 .grid button {
   font: inherit; font-size: .85rem; cursor: pointer; text-align: left;
-  background: var(--panel); color: var(--ink);
-  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--layer); color: var(--ink);
+  border: 1px solid var(--line-strong); border-radius: 9px;
   padding: 9px 11px; min-height: 50px;
   display: flex; flex-direction: column; justify-content: center; gap: 3px;
   transition: border-color .12s ease, background .12s ease;
@@ -99,14 +133,14 @@ nav.tabs .n { opacity: .6; font-size: .82em; margin-left: 6px; }
 .grid button:hover { border-color: var(--accent); }
 .grid button:active { transform: translateY(1px); }
 .grid button.picked { border-color: var(--accent); background: var(--accent-soft); }
-.grid .meta { color: var(--ink-faint); font-size: .78em; font-variant-numeric: tabular-nums; }
+.grid .meta { color: var(--ink); font-size: .82em; font-weight: 600; font-variant-numeric: tabular-nums; }
 .grid .tally { color: var(--accent); font-weight: 600; }
-.status { grid-column: 1/-1; color: var(--ink-faint); font-size: .9rem; padding: 22px 2px; }
+.status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: 22px 2px; }
 
 /* ---------------- tally ---------------- */
 .tally-panel {
-  background: var(--panel); border: 1px solid var(--line);
-  border-radius: 12px; box-shadow: var(--shadow); padding: 15px 16px;
+  background: var(--layer); border: 1px solid var(--line-strong);
+  border-radius: 12px; padding: 15px 16px;
 }
 @media (min-width: 980px) { .tally-panel { position: sticky; top: 18px; } }
 .kj { font-size: 1.7rem; font-weight: 640; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
@@ -116,7 +150,7 @@ nav.tabs .n { opacity: .6; font-size: .82em; margin-left: 6px; }
 ul.picks { list-style: none; margin: 14px 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
 ul.picks li { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-top: 1px solid var(--line); }
 ul.picks .name { flex: 1; min-width: 0; font-size: .87rem; overflow-wrap: anywhere; }
-ul.picks .each { display: block; color: var(--ink-faint); font-size: .76rem; font-variant-numeric: tabular-nums; }
+ul.picks .each { display: block; color: var(--ink-helper); font-size: .76rem; font-variant-numeric: tabular-nums; }
 ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width: 74px; text-align: right; }
 .stepper { display: flex; align-items: center; gap: 1px; }
 .stepper button, .rm {
@@ -127,7 +161,7 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
 .stepper button:hover, .rm:hover { border-color: var(--accent); color: var(--ink); }
 .stepper .n { min-width: 26px; text-align: center; font-size: .87rem; font-variant-numeric: tabular-nums; }
 .rm { width: 30px; font-size: 1.05rem; }
-.empty { color: var(--ink-faint); font-size: .87rem; margin: 14px 0 2px; }
+.empty { color: var(--ink-helper); font-size: .87rem; margin: 14px 0 2px; }
 
 /* On a phone the panel sits at the foot of the page rather than beside the
    grid, so it has to earn its height: the list of picks is capped to leave the
@@ -162,7 +196,7 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
 .actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
 .actions button:disabled { opacity: .4; cursor: default; }
 
-footer { color: var(--ink-faint); font-size: .8rem; margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); }
+footer { color: var(--ink-helper); font-size: .8rem; margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); }
 footer a { color: var(--ink-soft); }
 
 /* Visible to screen readers only - the search field's label. */
@@ -178,3 +212,13 @@ footer a { color: var(--ink-soft); }
    one that is styled and works in every browser, so hide the built-in. */
 .search input::-webkit-search-cancel-button,
 .search input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+
+/* Animation is a preference. Everything here is decorative, so it all goes. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
