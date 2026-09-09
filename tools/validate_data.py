@@ -8,6 +8,7 @@ anyone's browser. Run it locally or let CI run it on every push:
 """
 from __future__ import annotations
 
+import csv
 import json
 import os
 import sys
@@ -17,13 +18,21 @@ from benson_data import (
     COMPOSITION_RE,
     CSV_DIR,
     MANIFEST_NAME,
+    METADATA_FIELDS,
+    METADATA_NAME,
     NOTATION_DIR,
     Category,
     build_manifest_comparable,
     find_categories,
     parse_value,
+    read_metadata,
     read_pairs,
 )
+
+# A quantity symbol may be non-ASCII, and the default Windows console encoding
+# cannot print one. Reporting a problem must not itself become one.
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 
 class Report:
@@ -85,6 +94,64 @@ def check_category(category: Category, report: Report) -> None:
             report.add(name, line, f"{label or 'row'}: {exc}")
 
 
+def check_metadata(categories: list[Category], report: Report) -> None:
+    """notation/categories.csv, which says what each category's numbers are.
+
+    The file is optional and every column but the filename may be left blank -
+    a category nobody has described yet is an ordinary state, and the site
+    falls back to showing an unlabelled total rather than guessing. So the only
+    faults worth reporting are the ones that outlast an edit: a row pointing at
+    a file that no longer exists, and the same file described twice.
+
+    The first is the check that will actually fire. It is the same fault
+    synonyms.csv can develop, and it is checked here the same way, because a
+    rename is silent otherwise: the row simply stops applying and the category
+    quietly loses its heading.
+    """
+    path = os.path.join(NOTATION_DIR, METADATA_NAME)
+    if not os.path.exists(path):
+        return
+
+    known = {category.file for category in categories}
+    seen: dict[str, int] = {}
+
+    with open(path, encoding="utf-8-sig", newline="") as handle:
+        rows = list(csv.reader(handle))
+
+    if not rows:
+        report.add(METADATA_NAME, 0, "file is empty - delete it, or give it a header row")
+        return
+
+    header = [column.strip() for column in rows[0]]
+    if not header or header[0] != "File":
+        report.add(METADATA_NAME, 1, "the first column must be headed 'File'")
+        return
+
+    missing = [f.capitalize() for f in METADATA_FIELDS if f.capitalize() not in header]
+    if missing:
+        report.add(METADATA_NAME, 1,
+                   f"header is missing {', '.join(missing)} - expected File, then "
+                   + ", ".join(f.capitalize() for f in METADATA_FIELDS))
+
+    for offset, row in enumerate(rows[1:]):
+        line = offset + 2
+        if not row or not row[0].strip():
+            continue
+        name = row[0].strip()
+
+        if name not in known:
+            report.add(METADATA_NAME, line,
+                       f"{name!r} is not a category in {CSV_DIR}/ - was it renamed?")
+        if name in seen:
+            report.add(METADATA_NAME, line, f"{name!r} is already described on line {seen[name]}")
+        else:
+            seen[name] = line
+
+        if len(row) > len(header):
+            report.add(METADATA_NAME, line,
+                       f"{len(row)} columns, expected {len(header)} - an unquoted comma in the note?")
+
+
 def check_manifest(categories: list[Category], report: Report) -> None:
     """The site reads the manifest instead of scanning the folder, so it must match."""
     path = os.path.join(CSV_DIR, MANIFEST_NAME)
@@ -99,7 +166,7 @@ def check_manifest(categories: list[Category], report: Report) -> None:
             report.add(MANIFEST_NAME, 0, f"is not valid JSON ({exc.msg})")
             return
 
-    if build_manifest_comparable(categories) != build_manifest_comparable(committed):
+    if build_manifest_comparable(categories, read_metadata()) != build_manifest_comparable(committed):
         report.add(MANIFEST_NAME, 0, "does not match the CSV files on disk - "
                                      "run: python tools/build_data.py")
 
@@ -186,6 +253,7 @@ def main() -> int:
     report = Report()
     for category in categories:
         check_category(category, report)
+    check_metadata(categories, report)
     check_manifest(categories, report)
     check_notation(categories, report)
 
@@ -196,8 +264,9 @@ def main() -> int:
         return 1
 
     total = sum(len(c.rows) for c in categories)
-    print(f"OK - {len(categories)} category files, {total} increments, manifest up to date, "
-          "notation files consistent.")
+    described = sum(1 for c in categories if read_metadata().get(c.file, {}).get("quantity"))
+    print(f"OK - {len(categories)} category files ({described} described), {total} increments, "
+          "manifest up to date, notation files consistent.")
     return 0
 
 

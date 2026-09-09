@@ -115,3 +115,52 @@ is only for names that cannot be worked out from the notation.
 Every name in the first column must be a group that really exists in
 `CSV_data_files/`; `python tools/validate_data.py` checks that, so renaming a
 group cannot quietly orphan its synonym.
+
+## categories.csv
+
+What each category of numbers actually *is*. One row per increment file, and
+every column but the first may be left blank.
+
+```
+File,Quantity,Symbol,Unit,Source,Note
+01_CH_Groups.csv,standard enthalpy of formation,ΔHf°,kJ/mol,Cohen & Benson 1993,
+```
+
+- **Quantity** — what the numbers measure, spelled out.
+- **Symbol** — how to head a total made of them, e.g. `ΔHf°`.
+- **Unit** — display only. Nothing converts between units, and nothing should
+  start to: totals are summable only within one.
+- **Source** — where the values came from.
+- **Note** — anything a reader should know before using them.
+
+The file is **optional**, and so is every value in it. A category nobody has
+described still works and shows exactly what it always showed, so dropping a
+CSV into `CSV_data_files/` remains the whole of adding a category.
+
+### Why the calculator needs this
+
+The categories do not all hold the same physical quantity. A Benson group
+increment is a standard enthalpy of formation. A cyclohexane A-value is a
+conformational free-energy preference — an axial substituent penalty. Both
+belong in this tool and both are summed, exactly as the notebook sums them.
+
+But a running total headed ΔHf° that contains an A-value is claiming something
+untrue. With this file the calculator can head the total ΔHf° while every
+chosen increment is an enthalpy term, and fall back to a plain "Total" — naming
+what is in it — as soon as one is not. Without it, that heading would have to
+be either hardcoded or wrong.
+
+Where a category has declared nothing, the total is left unlabelled rather than
+guessed at. A blank here is an honest answer, not an omission.
+
+`Source` for the A-values is deliberately empty: it cannot be established from
+anything in this repository, and inventing a citation would be worse than an
+empty cell.
+
+### Why it is not in CSV_data_files/
+
+Because the notebook globs that folder and reads whatever it finds as
+increments. A six-column file there becomes a category of nonsense buttons in
+the reference implementation, and `python tools/validate_data.py` would reject
+it besides. `CSV_data_files/` is for files whose rows are values to be summed;
+this folder is for files that say what those values mean.

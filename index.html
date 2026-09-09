@@ -12,34 +12,48 @@
 
   <header>
     <h1>Benson Increments Calculator</h1>
-    <p>Estimate the standard heat of formation of an organic molecule by choosing the group increments and corrections it needs.</p>
-    <p class="cite">Chemistry C450/C540, Indiana University Bloomington &middot; Prashant Kumar and Nicola L. B. Pohl &middot;
-       values after Cohen &amp; Benson, <i>Chem. Rev.</i> <b>1993</b>, <i>93</i>, 2419.</p>
+    <button class="about-toggle" id="about-toggle" aria-expanded="false" aria-controls="about">About</button>
+    <div class="about" id="about" hidden>
+      <p>Estimate the standard heat of formation of an organic molecule by choosing the group increments and corrections it needs.</p>
+      <p class="cite">Chemistry C450/C540, Indiana University Bloomington &middot; Prashant Kumar and Nicola L. B. Pohl &middot;
+         values after Cohen &amp; Benson, <i>Chem. Rev.</i> <b>1993</b>, <i>93</i>, 2419.</p>
+    </div>
   </header>
 
-  <div class="layout">
+  <div class="layout" id="layout" data-tally="empty">
     <main>
       <div class="search">
         <label class="visually-hidden" for="filter">Search the increments</label>
         <input type="search" id="filter" autocomplete="off" spellcheck="false"
                placeholder="Search every category — CH3, methyl, C-(C)(H)3, cyclohexane">
+        <kbd class="shortcut" id="shortcut" aria-hidden="true">Ctrl K</kbd>
         <button class="clear" id="clear" hidden aria-label="Clear search">&times;</button>
       </div>
 
-      <nav class="tabs" id="tabs" role="tablist"></nav>
+      <div class="controls">
+        <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+        <div class="views" id="views" role="group" aria-label="How to show the increments">
+          <button data-mode="cards" aria-pressed="true">Cards</button>
+          <button data-mode="table" aria-pressed="false">Table</button>
+        </div>
+      </div>
 
-      <div class="grid" id="grid" role="tabpanel" aria-live="polite">
+      <div class="library" id="library" aria-live="polite">
         <p class="status">Loading increment data&hellip;</p>
       </div>
     </main>
 
     <aside class="tally-panel" aria-label="Running total">
+      <p class="tally-label" id="tally-label">Total</p>
       <div class="kj" id="kj">0.00<span>kJ/mol</span></div>
       <div class="kcal" id="kcal">0.00 kcal/mol</div>
+      <p class="mixed" id="mixed" hidden></p>
       <p class="empty" id="empty">Nothing chosen yet. Click a group to add it.</p>
       <ul class="picks" id="picks"></ul>
+      <p class="band" id="band" hidden></p>
       <div class="actions">
         <button id="undo" disabled>Undo</button>
+        <button id="copy" disabled>Copy</button>
         <button id="reset" disabled>Reset</button>
       </div>
     </aside>

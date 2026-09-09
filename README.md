@@ -21,19 +21,34 @@ published increment as a button, and you choose the ones your molecule requires,
 so the reasoning stays visible and the arithmetic stays honest.
 
 - Search by the shorthand you write - `CH3` finds `C-(C)(H)3`, `methylene`
-  finds `C-(C)2(H)2` - or browse the categories as tabs
+  finds `C-(C)2(H)2` - or scroll the whole library, grouped by category
+- Narrow to one category or several at once; choosing a molecule's groups
+  usually crosses two or three of them
 - Click a group to add it; adjust the count rather than clicking eight times
-- Running total in kJ/mol and kcal/mol, always on screen
+- Switch to the table to see each value beside its unit, quantity and source
+- Running total in kJ/mol and kcal/mol, always on screen, headed by what it is
+  a total *of* — and told plainly when it mixes two different quantities
 - Remove any single entry, undo the last addition, or reset
+- Copy the whole working out as text, for pasting into a report
+
+### Keyboard
+
+| | |
+|---|---|
+| `Ctrl`/`Cmd` + `K` | jump to the search box |
+| arrow keys | move through the increments |
+| `Enter` | add the one in focus |
+| `+` / `-` | adjust its count |
 
 ## Adding or changing increments
 
 Everything the calculator shows comes from the CSV files in `CSV_data_files/`.
 Adding a category needs no code changes:
 
-1. Create `NN_Category_Name.csv` — two digits for tab order, then the category
-   name **spelled as it should appear on the tab**. `03_CHNO_Groups.csv` becomes
-   the "CHNO Groups" tab, so capitalisation in the filename is what you get.
+1. Create `NN_Category_Name.csv` — two digits for the order it appears in, then
+   the category name **spelled as it should be displayed**. `03_CHNO_Groups.csv`
+   becomes the "CHNO Groups" section, so capitalisation in the filename is what
+   you get.
 2. Give it exactly two columns: the group name, and its value in kJ/mol.
    A published range is written `1.05-1.76` and is averaged.
 3. Regenerate the category index and check the file:
@@ -43,7 +58,11 @@ Adding a category needs no code changes:
    python tools/validate_data.py
    ```
 
-4. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`.
+4. Optionally add a row to `notation/categories.csv` saying what the numbers
+   are — the quantity, its symbol, the unit and a source. This is what lets the
+   running total head itself `ΔHf°` rather than just `Total`. It is optional,
+   and a category without a row works exactly as before.
+5. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`.
 
 The index exists because a browser cannot list a folder the way the notebook's
 `glob` could. `validate_data.py` catches the mistakes that actually happen —
@@ -64,7 +83,7 @@ python -m http.server 8000
 ### Tests
 
 ```bash
-node --test tools/*.test.mjs    # value parsing, the tally arithmetic, the notation
+node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing, notation
 node tools/check_parity.mjs     # every increment, notebook vs. site
 ```
 
@@ -78,17 +97,20 @@ agreement on every total.
 ```
 index.html              the calculator
 assets/benson.js        reading and parsing the CSV data (no DOM)
+assets/browse.js        which increments are shown, and how they group (no DOM)
+assets/format.js        how a value is written on the page (no DOM)
 assets/notation.js      reading Benson notation: what a group name is made of (no DOM)
 assets/selection.js     the chosen increments and the running total (no DOM)
 assets/app.js           rendering and events
 assets/styles.css       visual styles
 CSV_data_files/         the increment data, plus the generated manifest
-notation/               what the group names mean, and the words students use
+notation/               what the group names mean, the words students use, and
+                        what each category of numbers is (categories.csv)
 tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```
 
-The three files without any DOM access hold everything worth testing, which is
+The five files without any DOM access hold everything worth testing, which is
 why the test suite needs no browser.
 
 ## Searching by shorthand

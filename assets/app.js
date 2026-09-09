@@ -5,7 +5,12 @@
  * data into a page and keeps the selection in sync with what is displayed.
  */
 import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
-import { buildIndex, emptyNotation, loadNotation, search } from "./notation.js";
+import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "./browse.js";
+import {
+  describeTotal, formatIncrement, formatKcal, formatRange, formatSelectionAsText,
+  formatTotal, rangeSpread,
+} from "./format.js";
+import { buildIndex, emptyNotation, loadNotation } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
 
 /** The increments chosen so far; see selection.js for the rules it enforces. */
@@ -19,105 +24,214 @@ const escapeHtml = (value) =>
 /** Render trailing digits as subscripts so C-(C)2(H)2 reads like printed notation. */
 const asFormula = (name) => escapeHtml(name).replace(/([A-Za-z)\]])(\d+)/g, "$1<sub>$2</sub>");
 
-const signed = (value) => `${value > 0 ? "+" : ""}${value.toFixed(2)}`;
+/** A card's value, plus the published range when the value is an average of one. */
+function valueHtml(reading) {
+  const range = formatRange(reading);
+  return `${escapeHtml(formatIncrement(reading))}` +
+    (range ? ` <span class="range" title="published range">${escapeHtml(range)}</span>` : "");
+}
 
 /* -------------------------------------------------------------------------- */
 /* View                                                                        */
 /* -------------------------------------------------------------------------- */
 
-const view = { categories: [], notation: emptyNotation(), index: [], activeTab: 0, query: "" };
+/**
+ * What is on screen. `files` is the set of categories the chips have narrowed
+ * to; empty means all of them, since the chips narrow a complete list rather
+ * than building one up. See browse.js for the rules themselves.
+ */
+const view = {
+  categories: [], notation: emptyNotation(), index: [],
+  /** Categories by filename, for looking up what a chosen increment is a measure of. */
+  byFile: new Map(),
+  files: new Set(), query: "",
+  /** "cards" to scan by shape, "table" to compare values and read provenance. */
+  mode: "cards",
+};
+
+/** One increment, as a card. */
+function cardHtml(increment, counts) {
+  const { label, category, matchedSynonym } = increment;
+  const count = counts.get(keyOf(category.file, label)) ?? 0;
+  // While searching the section headings are gone, so a result has to say
+  // where it came from - and says it in the student's own words when that is
+  // what they typed, so finding C-(C)(H)3 under "methyl" teaches the notation
+  // rather than merely producing it.
+  const context = view.query
+    ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
+    : "";
+  const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
+  const hover = `${label} — ${increment.source} kJ/mol` +
+    (increment.isRange ? " (published as a range; the average is used)" : "");
+  return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
+            class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
+            <span>${asFormula(label)}</span>
+            <span class="meta">${valueHtml(increment)}${context}${tally}</span>
+          </button>`;
+}
 
 /**
- * Increments to show: the active tab, or the best matches from every category
- * while searching.
+ * One increment, as a table row.
  *
- * Searching goes through notation.js rather than matching the printed name,
- * because the printed name is not what a student types. `CH3` appears nowhere
- * in `C-(C)(H)3`, and looking for it literally used to return eleven
- * cyclohexane A-values and not one methyl group.
+ * The table is where a category's own description earns its place: the same
+ * value, said to come from somewhere and to measure something. Where a
+ * category has declared nothing the cells are an em dash rather than a guess.
  */
-function visibleIncrements() {
-  if (!view.query) {
-    const category = view.categories[view.activeTab];
-    return category ? category.rows.map((row) => ({ ...row, category })) : [];
-  }
-
-  return search(view.query, view.index);
+function rowHtml(increment, counts) {
+  const { label, category } = increment;
+  const count = counts.get(keyOf(category.file, label)) ?? 0;
+  const or = (text) => escapeHtml(text || "\u2014");
+  return `<tr class="${count ? "picked" : ""}">
+      <th scope="row"><button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
+        >${asFormula(label)}</button>${count ? `<span class="tally">&times; ${count}</span>` : ""}</th>
+      <td class="num">${escapeHtml(formatIncrement(increment))}</td>
+      <td class="num soft">${increment.isRange ? escapeHtml(formatRange(increment)) : "&mdash;"}</td>
+      <td class="soft">${or(category.unit)}</td>
+      <td class="soft">${or(category.quantity)}</td>
+      <td class="soft">${or(category.source)}</td>
+    </tr>`;
 }
 
-function renderTabs() {
-  el("tabs").innerHTML = view.categories
-    .map((category, index) =>
-      `<button role="tab" aria-selected="${!view.query && index === view.activeTab}" data-tab="${index}">` +
-      `${escapeHtml(category.title)}<span class="n">${category.rows.length}</span></button>`)
-    .join("");
+/**
+ * The category filter.
+ *
+ * "All" is not a sixth category but the absence of a filter, which is why it
+ * reads as chosen exactly when nothing else is. Counts follow the search, so a
+ * chip never claims 82 next to three matches.
+ */
+function renderChips() {
+  const visible = countsByCategory(visibleRows(view.index, { query: view.query }));
+  const total = [...visible.values()].reduce((sum, n) => sum + n, 0);
+
+  const chip = (file, title, count, pressed) =>
+    `<button class="chip" data-file="${escapeHtml(file)}" aria-pressed="${pressed}">` +
+    `${escapeHtml(title)}<span class="n">${count}</span></button>`;
+
+  el("chips").innerHTML = [
+    chip("", "All", total, view.files.size === 0),
+    ...view.categories.map((category) =>
+      chip(category.file, category.title, visible.get(category.file) ?? 0,
+        view.files.has(category.file))),
+  ].join("");
 }
 
-function renderGrid() {
+function renderLibrary() {
   const counts = selection.countsByKey();
-  const increments = visibleIncrements();
+  const rows = visibleRows(view.index, { query: view.query, files: view.files });
+  const sections = sectionsFor(rows, { query: view.query });
 
-  if (!increments.length) {
-    el("grid").innerHTML =
+  if (!sections.length) {
+    el("library").innerHTML =
       `<p class="status">No group matches &ldquo;${escapeHtml(view.query)}&rdquo;.</p>`;
     return;
   }
 
-  el("grid").innerHTML = increments
-    .map(({ label, value, category, matchedSynonym }) => {
-      const count = counts.get(keyOf(category.file, label)) ?? 0;
-      // While searching, name the group in the student's own words when that is
-      // what they typed, so finding C-(C)(H)3 under "methyl" teaches the
-      // notation rather than merely producing it.
-      const context = view.query
-        ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
-        : "";
-      const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
-      return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
-                class="${count ? "picked" : ""}" title="${escapeHtml(label)} — ${value.toFixed(2)} kJ/mol">
-                <span>${asFormula(label)}</span>
-                <span class="meta">${signed(value)}${context}${tally}</span>
-              </button>`;
+  el("library").innerHTML = sections
+    .map((section) => {
+      // A search is ordered by relevance rather than by file, so it gets one
+      // heading describing the result instead of a heading per category.
+      const heading = section.category
+        ? `${escapeHtml(section.category.title)}<span class="n">${section.rows.length}</span>`
+        : `${section.rows.length} ${section.rows.length === 1 ? "match" : "matches"}` +
+          `<span class="n">best first</span>`;
+      const body = view.mode === "table"
+        ? `<div class="table-wrap"><table class="table">
+             <thead><tr>
+               <th scope="col">Group</th>
+               <th scope="col" class="num">Value</th>
+               <th scope="col" class="num">Published range</th>
+               <th scope="col">Unit</th>
+               <th scope="col">Quantity</th>
+               <th scope="col">Source</th>
+             </tr></thead>
+             <tbody>${section.rows.map((row) => rowHtml(row, counts)).join("")}</tbody>
+           </table></div>`
+        : `<div class="grid">${section.rows.map((row) => cardHtml(row, counts)).join("")}</div>`;
+      return `<h2 class="section-head">${heading}</h2>${body}`;
     })
     .join("");
 }
 
 function renderTally() {
   const totalKj = selection.totalKj;
-  el("kj").innerHTML = `${totalKj.toFixed(2)}<span>kJ/mol</span>`;
-  el("kcal").textContent = `${(totalKj * KJ_TO_KCAL).toFixed(2)} kcal/mol`;
+  const entries = selection.entries;
+  el("kj").innerHTML = `${escapeHtml(formatTotal(totalKj))}<span>kJ/mol</span>`;
+  el("kcal").textContent = `${formatKcal(totalKj * KJ_TO_KCAL)} kcal/mol`;
+
+  // What the total is a total of. The categories do not all hold the same
+  // quantity - a group increment is an enthalpy of formation, a cyclohexane
+  // A-value is a conformational preference - so a heading reading dHf over a
+  // sum containing an A-value would state something untrue. Both are summed,
+  // which is settled; only the heading follows what was actually chosen.
+  const described = describeTotal(entries, view.byFile);
+  el("tally-label").textContent = described.label;
+
+  // A mixed total names what is in it rather than claiming to be any one of
+  // them. The wording comes from the data: each category says what it holds.
+  const mixed = el("mixed");
+  mixed.hidden = !described.mixed;
+  if (described.mixed) {
+    const parts = described.quantities
+      .map((quantity) => `${quantity.count} &times; <b>${escapeHtml(quantity.quantity)}</b>`)
+      .join(", ");
+    mixed.innerHTML = `This total mixes ${parts}. They are summed as published, ` +
+      "but they are not the same quantity.";
+  }
+
+  // An averaged range is a soft number, and how soft is worth saying: this is
+  // how far the total would move if every one of them were read at its bounds.
+  const spread = rangeSpread(entries);
+  const ranged = entries.filter((entry) => entry.isRange).length;
+  const band = el("band");
+  band.hidden = ranged === 0;
+  if (ranged) {
+    band.innerHTML =
+      `${ranged} ${ranged === 1 ? "value is" : "values are"} published as a range. ` +
+      `Across the full range the total runs ` +
+      `<b>${escapeHtml(formatTotal(totalKj - spread))}</b> to ` +
+      `<b>${escapeHtml(formatTotal(totalKj + spread))}</b> kJ/mol.`;
+  }
 
   const isEmpty = selection.isEmpty;
+  // The panel keeps the total on screen either way, but stops reserving a
+  // column it has nothing to put in. Stated as an attribute rather than left
+  // to a :has() selector, so what drives the layout is visible in one place.
+  el("layout").dataset.tally = isEmpty ? "empty" : "filled";
   el("empty").hidden = !isEmpty;
   el("undo").disabled = isEmpty;
+  el("copy").disabled = isEmpty;
   el("reset").disabled = isEmpty;
 
-  el("picks").innerHTML = selection.entries
+  el("picks").innerHTML = entries
     .map((entry) => `
       <li>
         <span class="name">${asFormula(entry.label)}
-          <span class="each">${escapeHtml(entry.categoryTitle)} &middot; ${signed(entry.value)} each</span>
+          <span class="each">${escapeHtml(entry.categoryTitle)} &middot; ${
+            entry.isRange
+              ? `midpoint of ${escapeHtml(formatRange(entry))}`
+              : escapeHtml(formatIncrement(entry))
+          }</span>
         </span>
         <span class="stepper">
           <button data-step="-1" data-key="${escapeHtml(entry.key)}" aria-label="One fewer ${escapeHtml(entry.label)}">&minus;</button>
           <span class="n">${entry.count}</span>
           <button data-step="1" data-key="${escapeHtml(entry.key)}" aria-label="One more ${escapeHtml(entry.label)}">+</button>
         </span>
-        <span class="sum">${signed(entry.value * entry.count)}</span>
+        <span class="sum">${escapeHtml(formatTotal(entry.value * entry.count))}</span>
         <button class="rm" data-remove="${escapeHtml(entry.key)}" aria-label="Remove ${escapeHtml(entry.label)}">&times;</button>
       </li>`)
     .join("");
 }
 
 function render() {
-  renderGrid();
+  renderChips();
+  renderLibrary();
   renderTally();
 }
 
 function setQuery(query) {
   view.query = query.trim();
   el("clear").hidden = !view.query;
-  renderTabs();
   render();
 }
 
@@ -125,28 +239,43 @@ function setQuery(query) {
 /* Events                                                                      */
 /* -------------------------------------------------------------------------- */
 
-el("tabs").addEventListener("click", (event) => {
-  const tab = event.target.closest("button[data-tab]");
-  if (!tab) return;
-  view.activeTab = Number(tab.dataset.tab);
-  el("filter").value = "";
-  setQuery("");
+el("chips").addEventListener("click", (event) => {
+  const chip = event.target.closest("button[data-file]");
+  if (!chip) return;
+  // The "All" chip carries no file: choosing it clears the filter rather than
+  // selecting a category, which is what "no filter" means here.
+  view.files = chip.dataset.file ? toggleFilter(view.files, chip.dataset.file) : new Set();
+  render();
 });
 
-el("grid").addEventListener("click", (event) => {
+el("views").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-mode]");
+  if (!button) return;
+  view.mode = button.dataset.mode;
+  for (const other of event.currentTarget.children) {
+    other.setAttribute("aria-pressed", String(other === button));
+  }
+  renderLibrary();
+});
+
+el("about-toggle").addEventListener("click", (event) => {
+  const open = el("about").hidden;
+  el("about").hidden = !open;
+  event.currentTarget.setAttribute("aria-expanded", String(open));
+});
+
+/** Add one of the increment named by a category file and a label. */
+function addIncrement(file, label) {
+  const category = view.byFile.get(file);
+  const row = category?.rows.find((candidate) => candidate.label === label);
+  if (!row) return;
+  selection.add({ ...row, categoryFile: category.file, categoryTitle: category.title });
+}
+
+el("library").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-label]");
   if (!button) return;
-
-  const category = view.categories.find((candidate) => candidate.file === button.dataset.file);
-  const row = category?.rows.find((candidate) => candidate.label === button.dataset.label);
-  if (!row) return;
-
-  selection.add({
-    categoryFile: category.file,
-    categoryTitle: category.title,
-    label: row.label,
-    value: row.value,
-  });
+  addIncrement(button.dataset.file, button.dataset.label);
   render();
 });
 
@@ -167,6 +296,99 @@ el("clear").addEventListener("click", () => {
   el("filter").value = "";
   setQuery("");
   el("filter").focus();
+});
+
+/**
+ * Copy the working out, not just the answer.
+ *
+ * What a student does next with a total is paste it into a report, and the
+ * total on its own does not show which groups produced it. The caveat about
+ * mixed quantities goes too, because a warning that does not survive being
+ * copied is not much of a warning.
+ */
+el("copy").addEventListener("click", async (event) => {
+  const totalKj = selection.totalKj;
+  const text = formatSelectionAsText(selection.entries, {
+    totalKj,
+    kcal: totalKj * KJ_TO_KCAL,
+    described: describeTotal(selection.entries, view.byFile),
+  });
+
+  const button = event.currentTarget;
+  const said = button.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = "Copied";
+  } catch {
+    // Some browsers refuse the clipboard outside a secure context. Say so
+    // rather than appearing to have worked.
+    button.textContent = "Cannot copy";
+  }
+  setTimeout(() => { button.textContent = said; }, 1500);
+});
+
+/**
+ * The keyboard path.
+ *
+ * Someone working through a molecule adds a dozen increments, and reaching for
+ * the mouse for each one is the slow part. Ctrl+K (Cmd+K on a Mac) puts the
+ * cursor in the search box from anywhere; the arrow keys walk the increments;
+ * Enter adds the focused one, which buttons already do; and + and - adjust it
+ * without leaving the keyboard.
+ *
+ * Re-rendering replaces the button that had focus, so the position is restored
+ * afterwards rather than the focus being allowed to fall back to the body.
+ */
+function focusableIncrements() {
+  return [...el("library").querySelectorAll("button[data-label]")];
+}
+
+addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    el("filter").focus();
+    el("filter").select();
+    return;
+  }
+
+  const current = document.activeElement;
+  if (!current?.matches?.("#library button[data-label]")) return;
+
+  const buttons = focusableIncrements();
+  const here = buttons.indexOf(current);
+  if (here < 0) return;
+
+  // How many share a row, so up and down move by a row rather than by one.
+  // In the table that is one per row, which falls out of the same measurement.
+  const topOf = (button) => Math.round(button.getBoundingClientRect().top);
+  const firstRowTop = topOf(buttons[0]);
+  const perRow = Math.max(1, buttons.filter((button) => topOf(button) === firstRowTop).length);
+
+  const moveTo = (index) => {
+    const target = buttons[index];
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+  };
+
+  const adjust = (delta) => {
+    event.preventDefault();
+    const key = keyOf(current.dataset.file, current.dataset.label);
+    if (delta > 0) addIncrement(current.dataset.file, current.dataset.label);
+    else selection.step(key, -1);
+    render();
+    focusableIncrements()[here]?.focus();
+  };
+
+  switch (event.key) {
+    case "ArrowRight": moveTo(here + 1); break;
+    case "ArrowLeft": moveTo(here - 1); break;
+    case "ArrowDown": moveTo(here + perRow); break;
+    case "ArrowUp": moveTo(here - perRow); break;
+    case "+": case "=": adjust(1); break;
+    case "-": adjust(-1); break;
+    default: break;
+  }
 });
 
 el("undo").addEventListener("click", () => {
@@ -199,6 +421,7 @@ try {
     console.warn(`notation/ could not be read, so a group is only findable by its printed name: ${error.message}`);
   }
   view.index = buildIndex(view.categories, view.notation);
+  view.byFile = new Map(view.categories.map((category) => [category.file, category]));
 
   const total = view.categories.reduce((sum, category) => sum + category.rows.length, 0);
   const unreadable = view.categories.flatMap((category) =>
@@ -211,10 +434,12 @@ try {
       ? `<br><strong>${unreadable.length} row(s) could not be read:</strong> ${escapeHtml(unreadable.join(", "))}`
       : "");
 
-  renderTabs();
+  // Say Cmd where that is the key, so the hint is not wrong on half the class.
+  if (/Mac|iPhone|iPad/i.test(navigator.platform ?? "")) el("shortcut").textContent = "\u2318 K";
+
   render();
 } catch (error) {
-  el("grid").innerHTML =
+  el("library").innerHTML =
     `<p class="status">Could not load the increment data: ${escapeHtml(error.message)}.<br>
      If you opened this file straight from disk, serve the folder instead — for example
      <code>python -m http.server</code> — so the browser is allowed to read the CSV files.</p>`;

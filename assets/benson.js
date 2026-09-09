@@ -20,20 +20,58 @@ const RANGE_RE = /^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$/;
 
 export class InvalidValueError extends Error {}
 
-/** Turn one cell into kJ/mol. Throws if the cell is neither a number nor a range. */
-export function parseValue(raw) {
+/** How many decimal places a written number claims. "-42" claims none. */
+const decimalsOf = (text) => (text.split(".")[1] ?? "").length;
+
+/**
+ * Read one cell: its value in kJ/mol, and how the source wrote it.
+ *
+ * The value is the only thing the arithmetic uses, and it is unchanged - a
+ * range is still averaged, a negative is still negative. What is new is that
+ * the reading also carries the source's own precision and, for a range, its
+ * two bounds, so the page can show `-42` rather than `-42.00` and can say that
+ * 3.43 is the middle of 2.51-4.35 rather than a published figure.
+ *
+ * Throws if the cell is neither a number nor a range, exactly as before, so a
+ * bad row is still reported rather than silently dropped.
+ */
+export function readValue(raw) {
   if (typeof raw === "number") {
     if (!Number.isFinite(raw)) throw new InvalidValueError("value is not finite");
-    return raw;
+    const source = String(raw);
+    return { value: raw, source, decimals: decimalsOf(source), isRange: false };
   }
   const text = String(raw).trim().replace(/^"|"$/g, "");
   if (!text) throw new InvalidValueError("empty value");
 
   const range = RANGE_RE.exec(text);
-  if (range) return (Number.parseFloat(range[1]) + Number.parseFloat(range[2])) / 2;
-  if (NUMBER_RE.test(text)) return Number.parseFloat(text);
+  if (range) {
+    const low = Number.parseFloat(range[1]);
+    const high = Number.parseFloat(range[2]);
+    return {
+      value: (low + high) / 2,
+      source: text,
+      decimals: Math.max(decimalsOf(range[1]), decimalsOf(range[2])),
+      isRange: true,
+      low,
+      high,
+    };
+  }
+  if (NUMBER_RE.test(text)) {
+    return { value: Number.parseFloat(text), source: text, decimals: decimalsOf(text), isRange: false };
+  }
 
   throw new InvalidValueError(`'${text}' is neither a number nor a range like 1.05-1.76`);
+}
+
+/**
+ * The value of one cell in kJ/mol.
+ *
+ * Defined in terms of readValue so there is one rule rather than two that can
+ * drift; tools/check_parity.mjs holds this to the notebook's own reading.
+ */
+export function parseValue(raw) {
+  return readValue(raw).value;
 }
 
 /**
@@ -78,7 +116,7 @@ export function parseCsvText(text) {
 
   for (const row of rows) {
     try {
-      increments.push({ label: row.label, value: parseValue(row.raw) });
+      increments.push({ label: row.label, ...readValue(row.raw) });
     } catch (error) {
       problems.push({ line: row.line, text: row.label, reason: error.message });
     }
