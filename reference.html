@@ -66,29 +66,32 @@
 
     <section class="ref-section" id="using-the-calculator">
       <h2><span class="ref-num">2</span>Using the Calculator<a class="ref-anchor" href="#using-the-calculator" aria-label="Link to Using the Calculator">#</a></h2>
-      <p>Click a group to add it, and click its count to take one back. The running
-      total is always on screen, in kJ/mol and kcal/mol, headed by what it is a
-      total <em>of</em>.</p>
-      <p>On a phone the total sits at the foot of the page — swipe it up, or press the
-      button beside it, to see the working out.</p>
+      <p>Click a group to add it. Click its count to take one back.</p>
+      <p>The running total stays on screen in kJ/mol and kcal/mol, headed by what it is
+      a total <em>of</em>. On a phone it sits at the foot of the page; swipe it up, or press
+      the button beside it, to see the working out.</p>
       <h3 id="finding-a-group">Finding a group</h3>
       <p>You do not have to type Benson notation. Search by the shorthand you would
-      write: <code>CH3</code> finds <code>C-(C)(H)3</code>, and <code>methylene</code> finds <code>C-(C)2(H)2</code>. You can
-      narrow to one category or several at once, which is normal — most molecules
-      need groups from two or three of them.</p>
-      <p>Switch to the table view to see every value beside its unit, quantity and
-      source.</p>
+      write instead: <code>CH3</code> finds <code>C-(C)(H)3</code>, and <code>methylene</code> finds <code>C-(C)2(H)2</code>.
+      Common names work too. <code>methyl</code>, <code>ketone</code> and <code>hydroxyl</code> all resolve to the
+      group they name, and the list of them lives in <code>notation/synonyms.csv</code>.</p>
+      <p>This works because the calculator reads the notation rather than searching the
+      text of it. A carbon carrying three hydrogen ligands is findable as <code>CH3</code> even
+      though those three characters appear nowhere in <code>C-(C)(H)3</code>.</p>
+      <p>You can narrow to one category or to several at once. Several is normal; most
+      molecules need groups from two or three of them.</p>
+      <p>The table view shows every value beside its unit, quantity and source.</p>
       <h3 id="keyboard">Keyboard</h3>
       <ul>
-      <li><code>Ctrl</code>/<code>Cmd</code> + <code>K</code> — jump to the search box</li>
-      <li>arrow keys — move through the increments</li>
-      <li><code>Enter</code> — add the one in focus</li>
-      <li><code>+</code> / <code>-</code> — adjust its count</li>
+      <li><code>Ctrl</code>/<code>Cmd</code> + <code>K</code> jumps to the search box</li>
+      <li>arrow keys move through the increments</li>
+      <li><code>Enter</code> adds the one in focus</li>
+      <li><code>+</code> and <code>-</code> adjust its count</li>
       </ul>
       <h3 id="getting-the-working-out">Getting the working out</h3>
       <p><code>Copy</code> puts the whole calculation on the clipboard as plain text, laid out as a
-      column so it lines up when pasted into a report. <code>Undo</code> takes back the last
-      addition and <code>Reset</code> clears everything.</p>
+      column so it stays lined up when pasted into a report. <code>Undo</code> takes back the
+      last addition. <code>Reset</code> clears everything.</p>
     </section>
 
     <section class="ref-section" id="the-method">
@@ -121,25 +124,20 @@
 
     <section class="ref-section" id="reading-a-group-name">
       <h2><span class="ref-num">4</span>Reading a Group Name<a class="ref-anchor" href="#reading-a-group-name" aria-label="Link to Reading a Group Name">#</a></h2>
-      <p>Every group name has the same shape: the central atom, a dash, then the
-      ligands in brackets with a count where there is more than one.</p>
-      <p><code>C-(C)2(H)2</code> is a carbon bonded to two carbons and two hydrogens — the
-      methylene of an alkane chain. <code>CO-(C)2</code> is a carbonyl carbon bonded to two
-      carbons, which is to say a ketone.</p>
+      <p>Every group name has the same shape: the central atom, a dash, then the ligands
+      in brackets with a count where there is more than one.</p>
+      <p>So <code>C-(C)2(H)2</code> is a carbon bonded to two carbons and two hydrogens, which is
+      the methylene of an alkane chain. <code>CO-(C)2</code> is a carbonyl carbon bonded to two
+      carbons. A ketone.</p>
       <h3 id="the-ligands-are-not-counted-twice">The ligands are not counted twice</h3>
-      <p>A ligand says what the central atom is bonded to. It does <strong>not</strong> contribute
-      that atom to the molecule. In <code>C-(C)3(H)</code>, the three bracketed carbons are
-      each counted by their own group; counting them here as well would give every
-      carbon one extra for each neighbour it happens to have.</p>
-      <p>Hydrogen is the exception, and today the only one. A hydrogen never has a
+      <p>A ligand says what the central atom is bonded to. It does not contribute that
+      atom to the molecule.</p>
+      <p>Take <code>C-(C)3(H)</code>. The three bracketed carbons are each counted by their own
+      group, and counting them here as well would give every carbon in the molecule
+      one extra for each neighbour it happens to have.</p>
+      <p>Hydrogen is the exception, and at present the only one. A hydrogen never has a
       group of its own, so the group it is written in is the only place it is ever
       counted.</p>
-      <h3 id="searching-by-what-you-would-write">Searching by what you would write</h3>
-      <p>You do not have to type Benson notation to find a group. The calculator reads
-      the notation, so a carbon with three hydrogen ligands is findable as <code>CH3</code>
-      even though those three characters appear nowhere in <code>C-(C)(H)3</code>. Common
-      names work too — <code>methyl</code>, <code>ketone</code>, <code>hydroxyl</code> — and are listed in
-      <code>notation/synonyms.csv</code>.</p>
     </section>
 
     <section class="ref-section" id="notation">
@@ -291,10 +289,10 @@
       <p>The calculator holds 236 values in five categories. They are not all the same
       physical quantity, which is why the running total is careful about what it
       calls itself.</p>
-      <p>The table below is not written out here — it is read directly from
-      <code>notation/categories.csv</code>, the file the calculator itself uses to decide how
-      to head a total. There is one description of a category in this repository,
-      not two that can disagree.</p>
+      <p>The table below is not written out here. It is read straight from
+      <code>notation/categories.csv</code>, the same file the calculator consults when it
+      decides how to head a total, so there is one description of a category in this
+      repository and not two that can drift apart.</p>
       <div class="ref-table-wrap">
       <table class="ref-table ref-table-wide">
       <thead><tr><th class="ref-cell">File</th><th class="ref-cell">Quantity</th><th class="ref-cell">Symbol</th><th class="ref-cell">Unit</th><th class="ref-cell">Source</th><th class="ref-cell">Note</th></tr></thead>
@@ -307,10 +305,10 @@
       </tbody>
       </table>
       </div>
-      <p>The <code>Source</code> cell for the A-values is empty on purpose. Where those values
-      came from cannot be established from anything in this repository, and an
-      invented citation would be worse than an admitted gap. If you can identify the
-      source, that empty cell is the place to put it.</p>
+      <p>The <code>Source</code> cell for the A-values is empty on purpose. Where those values came
+      from cannot be established from anything in this repository, and an invented
+      citation would be worse than an admitted gap. If you can identify the source,
+      that empty cell is where it goes.</p>
     </section>
 
     <section class="ref-section" id="sources-and-references">
