@@ -316,7 +316,12 @@ function focusedButton() {
   // would expect to land - so it is named here as the second choice.
   const keys = [focusKey(active)];
   if (active.hasAttribute("data-step-down")) keys.push(focusKey(active, "do"));
-  return { region: region.id, keys };
+
+  // Removing a contribution takes its whole row out, so neither key can match
+  // and there is no button that means the same thing any more. The position is
+  // kept as a last resort, which lands on the row that moved up into it.
+  const buttons = [...region.querySelectorAll("button")];
+  return { region: region.id, keys, index: buttons.indexOf(active) };
 }
 
 function restoreFocus(memory) {
@@ -328,6 +333,9 @@ function restoreFocus(memory) {
     // has not asked to go anywhere, and the button is where it already was.
     if (again) return again.focus({ preventScroll: true });
   }
+  // Nothing does that job any more. Take the place rather than the button, and
+  // where the region has emptied out entirely there is nothing to take.
+  buttons[Math.min(memory.index, buttons.length - 1)]?.focus({ preventScroll: true });
 }
 
 function render() {
@@ -754,6 +762,11 @@ try {
 
   render();
 } catch (error) {
+  // render() never runs on this path, so the sentence below is the only thing
+  // a screen reader is given. While the library carried aria-live itself this
+  // message was announced by being written into it; now it has to be said.
+  el("status-line").textContent =
+    `Could not load the increment data: ${error.message}.`;
   el("library").innerHTML =
     `<p class="status">Could not load the increment data: ${escapeHtml(error.message)}.<br>
      If you opened this file straight from disk, serve the folder instead — for example
