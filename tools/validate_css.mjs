@@ -220,6 +220,103 @@ export function checkBreakpoint(css, scripts = {}) {
   return problems;
 }
 
+/** The attributes a script writes and the stylesheet then selects on. */
+export const STATE_ATTRIBUTES = ["data-open", "data-tally"];
+/** Where those attributes are written a third time, as the markup ships. */
+export const MARKUP = "index.html";
+
+/** `[data-open="true"]`, in either quote or none, all of which CSS allows. */
+const selectorValuesRe = (attribute) =>
+  new RegExp(`\\[${attribute}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\]]*))\\]`, "g");
+/** `panel.dataset.open = ...` and `panel.dataset.open !== ...`, to the statement's end. */
+const datasetRe = (property) =>
+  new RegExp(`dataset\\.${property}\\s*(=(?!=)|[!=]==?)([^;\\n]*)`, "g");
+const LITERAL_RE = /"([^"]*)"|'([^']*)'/g;
+/** `data-tally="empty"` as an attribute of an element, not as prose about one. */
+const markupValueRe = (attribute) => new RegExp(`\\s${attribute}\\s*=\\s*"([^"]*)"`, "g");
+
+/** `data-open` is `dataset.open`, which is the only name the script knows it by. */
+const datasetName = (attribute) =>
+  attribute.replace(/^data-/, "").replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+
+const literalsIn = (text) =>
+  [...text.matchAll(LITERAL_RE)].map(([, double, single]) => double ?? single);
+
+/**
+ * One state, spelled the same way by everything that reads or writes it.
+ *
+ * An attribute selector cannot read a custom property any more than a media
+ * query can, so `data-open="true"` and `data-tally="empty"` are written out in
+ * the stylesheet, in the script that sets them, and in the markup they start
+ * in. Change the spelling in one and nothing anywhere complains: the selector
+ * simply stops matching, and the phone sheet stays shut with its own close
+ * transition still running, or the grid keeps a column reserved for a panel
+ * that has nothing in it. There is no error, and the page still loads.
+ *
+ * The script is the one that says what a value is, so what it writes is taken
+ * as the vocabulary and the other two are checked against it. Not the reverse:
+ * it writes "false" and "filled" as well, and neither needs a rule of its own -
+ * "not open" and "not empty" are the plain state of the page, and demanding a
+ * selector per written value would mean writing rules that do nothing.
+ *
+ * The same bargain checkBreakpoint strikes with the sheet's width: where a
+ * value cannot live in one place, it is checked to be one value.
+ */
+export function checkAttributeValues(css, scripts = {}, markup = "") {
+  const problems = [];
+  const code = withoutComments(css);
+  const html = markup.replace(/<!--[\s\S]*?-->/g, "");
+
+  for (const attribute of STATE_ATTRIBUTES) {
+    const property = datasetName(attribute);
+    const selected = new Set([...code.matchAll(selectorValuesRe(attribute))]
+      .map(([, quoted, single, bare]) => (quoted ?? single ?? bare).trim()));
+    if (selected.size === 0) {
+      problems.push(`${STYLESHEET}: nothing selects on [${attribute}], so whatever a script `
+        + "writes there changes nothing about the page");
+      continue;
+    }
+
+    for (const [path, source] of Object.entries(scripts)) {
+      const written = new Set();
+      const tested = new Set();
+      for (const [, operator, rhs] of source.matchAll(datasetRe(property))) {
+        for (const value of literalsIn(rhs)) (operator === "=" ? written : tested).add(value);
+        // String() of a boolean has exactly two spellings, and this is the one
+        // assignment that does not write its values out. Naming them here is
+        // what lets the check see a value the source never says.
+        if (operator === "=" && /\bString\(/.test(rhs)) {
+          written.add("true").add("false");
+        }
+      }
+
+      if (written.size === 0) {
+        problems.push(`${path}: never assigns dataset.${property}, so the [${attribute}] `
+          + "rules in the stylesheet are waiting for something that never arrives");
+        continue;
+      }
+      const vocabulary = [...written].map((value) => `"${value}"`).join(", ");
+
+      for (const value of selected) {
+        if (written.has(value)) continue;
+        problems.push(`${STYLESHEET}: selects on [${attribute}="${value}"], but ${path} only `
+          + `ever writes ${vocabulary} - the rule matches nothing`);
+      }
+      for (const value of tested) {
+        if (written.has(value)) continue;
+        problems.push(`${path}: compares dataset.${property} against "${value}", which it never `
+          + `writes - only ${vocabulary} - so the comparison has one answer for good`);
+      }
+      for (const [, value] of html.matchAll(markupValueRe(attribute))) {
+        if (written.has(value)) continue;
+        problems.push(`${MARKUP}: ships ${attribute}="${value}", which ${path} only ever `
+          + `replaces with ${vocabulary} - the page starts in a state nothing can return it to`);
+      }
+    }
+  }
+  return problems;
+}
+
 function read(path) {
   return readFileSync(new URL(path, ROOT), "utf8");
 }
@@ -227,11 +324,13 @@ function read(path) {
 export function main() {
   const css = read(STYLESHEET);
   const scripts = Object.fromEntries(SCRIPTS.map((path) => [path, read(path)]));
+  const markup = read(MARKUP);
 
   const problems = [
     ...checkStructure(css),
     ...checkTokens(css, scripts),
     ...checkBreakpoint(css, scripts),
+    ...checkAttributeValues(css, scripts, markup),
   ];
   if (problems.length) {
     console.error(`${problems.length} problem(s) found:\n`);

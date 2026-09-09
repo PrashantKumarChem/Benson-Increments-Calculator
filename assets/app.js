@@ -216,6 +216,10 @@ function renderTally() {
   // The panel keeps the total on screen either way, but stops reserving a
   // column it has nothing to put in. Stated as an attribute rather than left
   // to a :has() selector, so what drives the layout is visible in one place.
+  // "empty" is the word assets/styles.css selects on and index.html starts
+  // with, and tools/validate_css.mjs fails if the three stop agreeing. Only
+  // this one is spoken for: "filled" is the plain state of the page and needs
+  // no rule, so nothing anywhere has to say it twice.
   el("layout").dataset.tally = isEmpty ? "empty" : "filled";
   el("empty").hidden = !isEmpty;
   // The list is headed only once it has something in it: a heading over an
@@ -487,6 +491,17 @@ function measureSheet() {
   document.documentElement.style.setProperty("--sheet-peek", `${peek}px`);
 }
 
+/**
+ * Open or shut the sheet by saying so on the panel, and let the stylesheet
+ * animate it.
+ *
+ * String() of a boolean is "true" or "false", and "true" is the word
+ * assets/styles.css selects on to leave the sheet where it is - an attribute
+ * selector cannot read a value from here, so the word is written in both
+ * files. tools/validate_css.mjs fails if they stop agreeing; nothing else
+ * would. The button would go on flipping the attribute, aria-expanded would go
+ * on telling the truth, and the sheet would simply never move.
+ */
 function setPanelOpen(open) {
   el("tally-panel").dataset.open = String(open);
   el("panel-toggle").setAttribute("aria-expanded", String(open));

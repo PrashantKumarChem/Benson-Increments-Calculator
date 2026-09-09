@@ -292,6 +292,12 @@ main, .library, .table-wrap { min-width: 0; }
    that still leaves three columns of cards, and four once the panel collapses. */
 @media (min-width: 860px) {
   .layout { grid-template-columns: minmax(0,1fr) 23rem; }
+  /* "empty" is assets/app.js's word, and index.html's before that. An
+     attribute selector can no more read a value from a script than a media
+     query can read a token, so all three write it out and
+     tools/validate_css.mjs fails if they stop agreeing. Rename it on one side
+     alone and this rule quietly matches nothing: the wide column stays
+     reserved for a panel with nothing in it, and nothing reports a thing. */
   .layout[data-tally="empty"] { grid-template-columns: minmax(0,1fr) 11rem; }
 }
 
@@ -689,6 +695,11 @@ ul.picks .sum {
     transform: translateY(0);
     transition: transform var(--sheet-open) cubic-bezier(.05, .7, .1, 1);
   }
+  /* "true" is assets/app.js's word, written here again because a selector
+     cannot read one from a script. tools/validate_css.mjs fails if the two
+     stop agreeing, which is the only thing that would: change the spelling on
+     one side and the button still flips the attribute, the sheet still has
+     every rule it needs, and none of them apply - it just never opens. */
   .tally-panel:not([data-open="true"]) {
     transform: translateY(var(--sheet-hidden, 0px));
     transition-duration: var(--sheet-close);
