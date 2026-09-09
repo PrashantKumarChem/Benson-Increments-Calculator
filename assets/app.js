@@ -295,13 +295,17 @@ function announce() {
  */
 const FOCUS_REGIONS = "#chips, #library, #picks";
 
+/** Joins the parts below. A control character, because a label is free to
+    contain any punctuation a chemist writes - C-(Cd)(CB)(H)2 and the rest. */
+const SEPARATOR = "\u0000";
+
 /**
  * What a button does, as a string. Unique within its region, and unlike the
  * class list it survives the change that adding one makes to a card.
  */
 function focusKey(button, kind = button.hasAttribute("data-step-down") ? "less" : "do") {
   const { file = "", label = "", key = "", remove = "", step = "" } = button.dataset;
-  return [kind, file, label, key, remove, step].join(" ");
+  return [kind, file, label, key, remove, step].join(SEPARATOR);
 }
 
 function focusedButton() {
