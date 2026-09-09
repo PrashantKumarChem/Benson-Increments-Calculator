@@ -20,11 +20,19 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { checkBreakpoint, checkStructure, checkTokens, withoutComments } from "./validate_css.mjs";
+import {
+  checkAttributeValues,
+  checkBreakpoint,
+  checkStructure,
+  checkTokens,
+  withoutComments,
+  withoutScriptComments,
+} from "./validate_css.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const stylesheet = await readFile(path.join(ROOT, "assets/styles.css"), "utf8");
 const appjs = await readFile(path.join(ROOT, "assets/app.js"), "utf8");
+const markup = await readFile(path.join(ROOT, "index.html"), "utf8");
 
 /* -------------------------------------------------------------------------- */
 /* The stylesheet as it stands                                                 */
@@ -210,6 +218,169 @@ test("the other breakpoints are none of this check's business", () => {
   const css = `${agreed.css}\n@media (max-width: 520px) { .a { color: red; } }`
     + "\n@media (max-width: 620px) { .b { color: red; } }";
   assert.deepEqual(checkBreakpoint(css, { app: agreed.js }), []);
+});
+
+/* -------------------------------------------------------------------------- */
+/* The state attributes, which are written in three languages too              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Change a string, and fail the test if it was not there to change.
+ *
+ * A `replace` that matches nothing hands back the input untouched, the check
+ * passes on it, and a test written to prove the check can fail proves only
+ * that valid input passes. That is indistinguishable from a check that cannot
+ * fail at all, which is the thing this file exists not to be.
+ */
+function mutate(source, from, to) {
+  const changed = source.split(from).join(to);
+  assert.notEqual(changed, source, `nothing to change: '${from}' is not in the source`);
+  return changed;
+}
+
+/** A stylesheet, script and markup that agree, as the shipped three do. */
+const bound = {
+  css: '.layout[data-tally="empty"] .actions { display: none; }\n'
+    + '.tally-panel:not([data-open="true"]) .tally-body { visibility: hidden; }',
+  js: 'el("tally-panel").dataset.open = String(open);\n'
+    + 'setPanelOpen(el("tally-panel").dataset.open !== "true");\n'
+    + 'el("layout").dataset.tally = isEmpty ? "empty" : "filled";',
+  html: '<div class="layout" id="layout" data-tally="empty">',
+};
+
+test("the shipped stylesheet, script and markup agree about the state attributes", () => {
+  assert.deepEqual(checkAttributeValues(stylesheet, { "assets/app.js": appjs }, markup), []);
+});
+
+test("a stylesheet, script and markup that agree pass", () => {
+  assert.deepEqual(checkAttributeValues(bound.css, { app: bound.js }, bound.html), []);
+});
+
+test("renaming the value in the stylesheet and not the script is caught", () => {
+  const css = mutate(bound.css, 'data-open="true"', 'data-open="open"');
+  const problems = checkAttributeValues(css, { app: bound.js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /selects on \[data-open="open"\], but app only ever writes/);
+});
+
+test("renaming the value in the script and not the stylesheet is caught", () => {
+  const js = mutate(bound.js, '? "empty" : "filled"', '? "none" : "filled"');
+  const problems = checkAttributeValues(bound.css, { app: js }, bound.html);
+  assert.equal(problems.length, 2, "the stylesheet and the markup are both left behind");
+  assert.match(problems[0], /selects on \[data-tally="empty"\], but app only ever writes/);
+  assert.match(problems[1], /index\.html: ships data-tally="empty"/);
+});
+
+test("renaming what the script writes, and not what it tests, is caught", () => {
+  // The one that hides from a check reading only string literals: the writing
+  // side spells its values through String(), so the only "true" written down
+  // is on the reading side, and a check that pooled the two would see nothing.
+  const js = mutate(bound.js, "dataset.open = String(open)", 'dataset.open = open ? "yes" : "no"');
+  const problems = checkAttributeValues(bound.css, { app: js }, bound.html);
+  assert.equal(problems.length, 2);
+  assert.match(problems[0], /selects on \[data-open="true"\], but app only ever writes "yes", "no"/);
+  assert.match(problems[1], /compares dataset\.open against "true", which it never writes/);
+});
+
+test("markup that starts in a state the script never writes is caught", () => {
+  const html = mutate(bound.html, 'data-tally="empty"', 'data-tally="blank"');
+  const problems = checkAttributeValues(bound.css, { app: bound.js }, html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /index\.html: ships data-tally="blank"/);
+});
+
+test("a stylesheet that never selects on the attribute is caught", () => {
+  const css = mutate(bound.css, '.tally-panel:not([data-open="true"])', ".tally-panel.shut");
+  const problems = checkAttributeValues(css, { app: bound.js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /nothing selects on \[data-open\]/);
+});
+
+test("a script that never assigns the attribute is caught", () => {
+  const js = mutate(bound.js, "dataset.open = String(open)", "setAttribute(SOME_ATTR, open)");
+  const problems = checkAttributeValues(bound.css, { app: js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /never assigns dataset\.open/);
+});
+
+test("the values are what the assignment writes, not what its line happens to say", () => {
+  // el("layout") sits on the same line as the assignment; "layout" is not a
+  // state the panel can be in, and a rule selecting it is still a dead rule.
+  const css = mutate(bound.css, 'data-tally="empty"', 'data-tally="layout"');
+  const problems = checkAttributeValues(css, { app: bound.js }, bound.html);
+  assert.ok(problems.some((p) => /selects on \[data-tally="layout"\]/.test(p)));
+});
+
+/* -------------------------------------------------------------------------- */
+/* Places the value is only being talked about                                 */
+/* -------------------------------------------------------------------------- */
+
+test("the value inside a stylesheet comment is not a selector", () => {
+  const css = `/* was .tally-panel[data-open="ajar"] until 2026 */\n${bound.css}`;
+  assert.deepEqual(checkAttributeValues(css, { app: bound.js }, bound.html), []);
+});
+
+test("the value inside a markup comment is not the page's state", () => {
+  const html = `<!-- data-tally="blank" was the old spelling -->\n${bound.html}`;
+  assert.deepEqual(checkAttributeValues(bound.css, { app: bound.js }, html), []);
+});
+
+test("an attribute whose name merely starts the same is not this one", () => {
+  const css = `${bound.css}\n.x[data-openness="dim"] { opacity: .5; }`
+    + '\n.y[data-tallying="none"] { display: none; }';
+  assert.deepEqual(checkAttributeValues(css, { app: bound.js }, bound.html), []);
+});
+
+test("an unquoted attribute value reads the same as a quoted one", () => {
+  const css = mutate(bound.css, '[data-open="true"]', "[data-open=true]");
+  assert.deepEqual(checkAttributeValues(css, { app: bound.js }, bound.html), []);
+});
+
+test("a value the script only mentions in a line comment is not one it writes", () => {
+  // The hole this closes, and the dangerous direction: the comment taught the
+  // check a word, the stylesheet had genuinely drifted, and the check passed.
+  const css = mutate(bound.css, 'data-tally="empty"', 'data-tally="gone"');
+  const js = `${bound.js}\n// example: el("layout").dataset.tally = "gone";`;
+  const problems = checkAttributeValues(css, { app: js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /selects on \[data-tally="gone"\], but app only ever writes/);
+});
+
+test("a value mentioned in a block comment is not one it writes either", () => {
+  const css = mutate(bound.css, 'data-open="true"', 'data-open="ajar"');
+  const js = `/* it read dataset.open = "ajar" until the sheet arrived */\n${bound.js}`;
+  const problems = checkAttributeValues(css, { app: js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /selects on \[data-open="ajar"\], but app only ever writes/);
+});
+
+test("an apostrophe in a comment does not run on into the code below it", () => {
+  const js = `// the sheet's own word, and the stylesheet's\n${bound.js}`;
+  assert.deepEqual(checkAttributeValues(bound.css, { app: js }, bound.html), []);
+});
+
+test("the // in a URL is not a comment, and the code after it still counts", () => {
+  // app.js has one of these. Blanking from https:// onward would truncate the
+  // source being scanned, and the check would report a script that assigns
+  // nothing - a fault invented by the reading of it.
+  const js = 'const REPO = "https://example.com/x"; el("p").dataset.open = String(open);\n'
+    + 'el("layout").dataset.tally = isEmpty ? "empty" : "filled";';
+  assert.deepEqual(checkAttributeValues(bound.css, { app: js }, bound.html), []);
+});
+
+test("stripping a script's comments keeps the line numbering", () => {
+  const js = "const a = 1;\n// one\n/* two\n   lines */\nconst b = 2;";
+  const stripped = withoutScriptComments(js);
+  assert.equal(stripped.split("\n").length, js.split("\n").length);
+  assert.match(stripped, /^const a = 1;\n\s*\n\s*\n\s*\nconst b = 2;$/);
+});
+
+test("the shipped script keeps every line, and its comments none of their words", () => {
+  const stripped = withoutScriptComments(appjs);
+  assert.equal(stripped.split("\n").length, appjs.split("\n").length);
+  assert.ok(stripped.includes('dataset.open = String(open)'), "the code is still there");
+  assert.ok(stripped.includes("https://github.com/"), "and so is the URL");
+  assert.ok(!/:has\(\) selector/.test(stripped), "and the prose is not");
 });
 
 test("stripping comments keeps the line numbering", () => {

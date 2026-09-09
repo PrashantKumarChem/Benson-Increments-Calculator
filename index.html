@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09l">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09n">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -53,14 +53,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09l",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09l",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09l",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09l",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09l",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09l",
-    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09l",
-    "./assets/theme.js": "./assets/theme.js?v=2026-09-09l"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09n",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09n",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09n",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09n",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09n",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09n",
+    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09n",
+    "./assets/theme.js": "./assets/theme.js?v=2026-09-09n"
   }
 }
 </script>
@@ -121,6 +121,12 @@
     <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
   </header>
 
+  <!-- Nothing is chosen yet, so the page starts in the state assets/app.js
+       would put it in anyway. Written here as well because the first paint
+       happens before the module runs, and a layout that begins wide and
+       narrows a frame later is a jump nobody asked for. The word is
+       assets/styles.css's and assets/app.js's too; tools/validate_css.mjs
+       fails if the three stop agreeing. -->
   <div class="layout" id="layout" data-tally="empty">
     <main>
       <!-- The library used to carry aria-live itself. Its markup is replaced
@@ -177,6 +183,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09l"></script>
+<script type="module" src="assets/app.js?v=2026-09-09n"></script>
 </body>
 </html>

@@ -121,6 +121,72 @@ export function withoutComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "));
 }
 
+/**
+ * The same for a script, which also has comments this file cannot see through.
+ *
+ * The one above is CSS's, and CSS has no `//`. A line comment showing what an
+ * assignment looks like - `// el("layout").dataset.tally = "gone"` - was read
+ * by checkAttributeValues as an assignment, which took "gone" into the set of
+ * words the script writes and stopped it reporting a stylesheet that genuinely
+ * disagreed with the running code. The fault the check exists for, walking in
+ * through the check.
+ *
+ * Not a tokeniser, and not wanted as one. Strings are tracked because the `//`
+ * in a URL is not a comment and blanking from `https://` onward would quietly
+ * truncate the source being scanned; a backslash outside a string is stepped
+ * over so an escaped slash in a regular expression does not open one either;
+ * and an unterminated quote gives up at the newline, because a mis-read of one
+ * line should stay on that line. Nothing inside a comment is read for quotes,
+ * so an apostrophe in prose ends nothing. Newlines survive, as they do above.
+ */
+export function withoutScriptComments(source) {
+  let out = "";
+  let index = 0;
+
+  while (index < source.length) {
+    const char = source[index];
+    const pair = source.slice(index, index + 2);
+
+    if (pair === "//") {
+      while (index < source.length && source[index] !== "\n") { out += " "; index += 1; }
+      continue;
+    }
+    if (pair === "/*") {
+      while (index < source.length && source.slice(index, index + 2) !== "*/") {
+        out += source[index] === "\n" ? "\n" : " ";
+        index += 1;
+      }
+      if (index < source.length) { out += "  "; index += 2; }
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      const quote = char;
+      out += char;
+      index += 1;
+      while (index < source.length && source[index] !== quote) {
+        if (source[index] === "\n" && quote !== "`") break;
+        out += source[index];
+        if (source[index] === "\\" && index + 1 < source.length) {
+          out += source[index + 1];
+          index += 1;
+        }
+        index += 1;
+      }
+      if (index < source.length && source[index] === quote) { out += quote; index += 1; }
+      continue;
+    }
+    if (char === "\\" && index + 1 < source.length) {
+      out += source.slice(index, index + 2);
+      index += 2;
+      continue;
+    }
+
+    out += char;
+    index += 1;
+  }
+  return out;
+}
+
 const DECLARED_RE = /(--[A-Za-z0-9_-]+)\s*:/g;
 const USED_RE = /var\(\s*(--[A-Za-z0-9_-]+)/g;
 /** `element.style.setProperty("--name", ...)`, wherever a script does it. */
@@ -220,6 +286,109 @@ export function checkBreakpoint(css, scripts = {}) {
   return problems;
 }
 
+/** The attributes a script writes and the stylesheet then selects on. */
+export const STATE_ATTRIBUTES = ["data-open", "data-tally"];
+/** Where those attributes are written a third time, as the markup ships. */
+export const MARKUP = "index.html";
+
+/** `[data-open="true"]`, in either quote or none, all of which CSS allows. */
+const selectorValuesRe = (attribute) =>
+  new RegExp(`\\[${attribute}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\]]*))\\]`, "g");
+/** `panel.dataset.open = ...` and `panel.dataset.open !== ...`, to the statement's end. */
+const datasetRe = (property) =>
+  new RegExp(`dataset\\.${property}\\s*(=(?!=)|[!=]==?)([^;\\n]*)`, "g");
+const LITERAL_RE = /"([^"]*)"|'([^']*)'/g;
+/** `data-tally="empty"` as an attribute of an element, not as prose about one. */
+const markupValueRe = (attribute) => new RegExp(`\\s${attribute}\\s*=\\s*"([^"]*)"`, "g");
+
+/** `data-open` is `dataset.open`, which is the only name the script knows it by. */
+const datasetName = (attribute) =>
+  attribute.replace(/^data-/, "").replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+
+const literalsIn = (text) =>
+  [...text.matchAll(LITERAL_RE)].map(([, double, single]) => double ?? single);
+
+/**
+ * One state, spelled the same way by everything that reads or writes it.
+ *
+ * An attribute selector cannot read a custom property any more than a media
+ * query can, so `data-open="true"` and `data-tally="empty"` are written out in
+ * the stylesheet, in the script that sets them, and in the markup they start
+ * in. Change the spelling in one and nothing anywhere complains: the selector
+ * simply stops matching, and the phone sheet stays shut with its own close
+ * transition still running, or the grid keeps a column reserved for a panel
+ * that has nothing in it. There is no error, and the page still loads.
+ *
+ * The script is the one that says what a value is, so what it writes is taken
+ * as the vocabulary and the other two are checked against it. Not the reverse:
+ * it writes "false" and "filled" as well, and neither needs a rule of its own -
+ * "not open" and "not empty" are the plain state of the page, and demanding a
+ * selector per written value would mean writing rules that do nothing.
+ *
+ * The same bargain checkBreakpoint strikes with the sheet's width: where a
+ * value cannot live in one place, it is checked to be one value.
+ */
+export function checkAttributeValues(css, scripts = {}, markup = "") {
+  const problems = [];
+  const code = withoutComments(css);
+  const html = markup.replace(/<!--[\s\S]*?-->/g, "");
+
+  for (const attribute of STATE_ATTRIBUTES) {
+    const property = datasetName(attribute);
+    const selected = new Set([...code.matchAll(selectorValuesRe(attribute))]
+      .map(([, quoted, single, bare]) => (quoted ?? single ?? bare).trim()));
+    if (selected.size === 0) {
+      problems.push(`${STYLESHEET}: nothing selects on [${attribute}], so whatever a script `
+        + "writes there changes nothing about the page");
+      continue;
+    }
+
+    for (const [path, source] of Object.entries(scripts)) {
+      // Comments first: an assignment quoted in prose is not one the page ever
+      // runs, and reading it as one widens what the script is taken to write.
+      const script = withoutScriptComments(source);
+      const written = new Set();
+      const tested = new Set();
+      for (const [, operator, rhs] of script.matchAll(datasetRe(property))) {
+        for (const value of literalsIn(rhs)) (operator === "=" ? written : tested).add(value);
+        // String() of a boolean has exactly two spellings, and this is the one
+        // assignment that does not write its values out. Naming them here is
+        // what lets the check see a value the source never says. It is an
+        // assumption about a boolean, not about String() in general: String()
+        // of anything else - a count, a key - has no fixed vocabulary, and a
+        // value written that way would have to be spelled out to be checked.
+        if (operator === "=" && /\bString\(/.test(rhs)) {
+          written.add("true").add("false");
+        }
+      }
+
+      if (written.size === 0) {
+        problems.push(`${path}: never assigns dataset.${property}, so the [${attribute}] `
+          + "rules in the stylesheet are waiting for something that never arrives");
+        continue;
+      }
+      const vocabulary = [...written].map((value) => `"${value}"`).join(", ");
+
+      for (const value of selected) {
+        if (written.has(value)) continue;
+        problems.push(`${STYLESHEET}: selects on [${attribute}="${value}"], but ${path} only `
+          + `ever writes ${vocabulary} - the rule matches nothing`);
+      }
+      for (const value of tested) {
+        if (written.has(value)) continue;
+        problems.push(`${path}: compares dataset.${property} against "${value}", which it never `
+          + `writes - only ${vocabulary} - so the comparison has one answer for good`);
+      }
+      for (const [, value] of html.matchAll(markupValueRe(attribute))) {
+        if (written.has(value)) continue;
+        problems.push(`${MARKUP}: ships ${attribute}="${value}", which ${path} only ever `
+          + `replaces with ${vocabulary} - the page starts in a state nothing can return it to`);
+      }
+    }
+  }
+  return problems;
+}
+
 function read(path) {
   return readFileSync(new URL(path, ROOT), "utf8");
 }
@@ -227,11 +396,13 @@ function read(path) {
 export function main() {
   const css = read(STYLESHEET);
   const scripts = Object.fromEntries(SCRIPTS.map((path) => [path, read(path)]));
+  const markup = read(MARKUP);
 
   const problems = [
     ...checkStructure(css),
     ...checkTokens(css, scripts),
     ...checkBreakpoint(css, scripts),
+    ...checkAttributeValues(css, scripts, markup),
   ];
   if (problems.length) {
     console.error(`${problems.length} problem(s) found:\n`);
