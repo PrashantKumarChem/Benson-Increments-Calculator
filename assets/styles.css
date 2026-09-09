@@ -329,10 +329,14 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   color: var(--ink); text-align: left;
 }
 .table tbody th button:hover { color: var(--accent); text-decoration: underline; }
+/* The same job as the card's badge, and here it can be a real button, because
+   a table cell is not itself one. */
 .table .tally {
-  font-family: var(--font-mono); color: var(--accent); font-weight: 600;
-  margin-left: var(--space-3);
+  font: inherit; font-family: var(--font-mono); font-weight: 600; cursor: pointer;
+  background: transparent; color: var(--accent); border: 1px solid transparent;
+  margin-left: var(--space-3); padding: 0 var(--space-2); min-height: 1.5rem;
 }
+.table .tally:hover { background: var(--accent); color: var(--on-accent); }
 
 /* One scrolling library rather than five exclusive panels. The heading sticks
    so that "where am I" is answered without a sidebar spending 240px of the
@@ -406,11 +410,27 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
    value, so it steps back into the sans stack. */
 .grid .from { font-family: var(--font-sans); font-size: .6875rem; font-weight: 400; color: var(--ink-soft); }
 /* How many are chosen, as a filled badge: a count set inline in the accent was
-   read as part of the value. This cannot be missed and cannot be misread. */
+   read as part of the value. This cannot be missed and cannot be misread.
+
+   It is also how you take one back. Adding is a tap on the card, and until now
+   removing meant opening the panel and finding the row - three interactions to
+   undo one, and on a phone the panel is a sheet that has to be opened first.
+   The badge is already exactly where the thumb is.
+
+   The badge stays small because the card is 46px tall and a 40px block would
+   own it. The hit area does not: ::after reaches past the glyph on every side,
+   giving roughly 38x34px to press without moving anything in the layout. That
+   clears the 24px minimum comfortably and is a single tap - no gesture, no
+   path to trace, nothing a pointer cannot do. */
 .grid .tally {
-  margin-left: auto; font-size: .6875rem; font-weight: 600;
+  position: relative; margin-left: auto; cursor: pointer;
+  font-size: .6875rem; font-weight: 600;
   background: var(--accent); color: var(--on-accent); padding: 1px 5px;
 }
+.grid .tally::after { content: ""; position: absolute; inset: -9px -7px; }
+/* Inverted rather than merely lit, so it reads as a different control from the
+   card it sits on rather than as the card highlighting. */
+.grid .tally:hover { background: var(--ink); color: var(--layer); }
 /* The bounds an averaged value came from, beside the average itself. */
 .grid .range { color: var(--ink-soft); font-size: .6875rem; font-weight: 400; }
 .status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: var(--space-6) var(--space-1); }
@@ -551,6 +571,13 @@ ul.picks .sum {
     position: sticky; bottom: 0; z-index: 3;
     margin-top: var(--space-3); padding: var(--space-3) var(--space-4);
     max-height: 70vh; display: flex; flex-direction: column;
+  }
+  /* A sheet with a handle is a sheet you know you can drag. Without one the
+     swipe would be a secret, and a gesture nobody finds is not a feature. The
+     button beside the total does the same job for anyone who does not. */
+  .tally-panel::before {
+    content: ""; flex: none; width: 2rem; height: 3px;
+    background: var(--line-strong); margin: 0 auto var(--space-2);
   }
   /* The label, the total and the disclosure read as one row, so the button is
      beside the number it summarises rather than below the whole panel. */
