@@ -22,7 +22,7 @@ The table view shows every value beside its unit, quantity and source.
 
 ## Keyboard
 
-- `Ctrl`/`Cmd` + `K` jumps to the search box
+- `/` jumps to the search box
 - arrow keys move through the increments
 - `Enter` adds the one in focus
 - `+` and `-` adjust its count

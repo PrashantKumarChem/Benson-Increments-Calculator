@@ -67,7 +67,7 @@ so the reasoning stays visible and the arithmetic stays honest.
 
 | | |
 |---|---|
-| `Ctrl`/`Cmd` + `K` | jump to the search box |
+| `/` | jump to the search box |
 | arrow keys | move through the increments |
 | `Enter` | add the one in focus |
 | `+` / `-` | adjust its count |
