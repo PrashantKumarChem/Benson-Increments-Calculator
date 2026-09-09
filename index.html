@@ -5,7 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09g">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09i">
+<!-- A remembered theme has to be on the page before it is first painted, and
+     assets/app.js is a module, which means it is deferred until after that.
+     Setting it there would show the wrong colours for a frame and then flip
+     them. Four lines here, rather than a flash on every load.
+
+     No choice made means no attribute, which is how the stylesheet's
+     prefers-color-scheme branch stays in charge for anyone who has not asked
+     for one. localStorage can throw outright when a browser is set to block
+     site data, so the read is guarded. -->
+<script>
+  try {
+    const theme = localStorage.getItem("theme");
+    if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+  } catch { /* no stored preference is readable; the system's choice stands */ }
+</script>
 <!-- Every asset is requested with a version, and the version lives here and
      nowhere else.
 
@@ -32,12 +47,12 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09g",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09g",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09g",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09g",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09g",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09g"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09i",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09i",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09i",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09i",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09i",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09i"
   }
 }
 </script>
@@ -51,6 +66,22 @@
   <header class="bar">
     <h1>Benson Increments Calculator</h1>
     <button class="about-toggle" id="about-toggle" aria-expanded="false" aria-controls="about">About</button>
+    <!-- Both icons ship and the stylesheet shows whichever matches the theme
+         in force, using the same three branches as the colour tokens - so it
+         is right on a system-dark machine that has never touched the button.
+         The icon shown is the one you are switching to. -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Switch to dark theme">
+      <svg class="moon" width="16" height="16" viewBox="0 0 16 16" fill="none"
+           stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">
+        <path d="M13.6 9.7A5.9 5.9 0 0 1 6.3 2.4 5.9 5.9 0 1 0 13.6 9.7Z"/>
+      </svg>
+      <svg class="sun" width="16" height="16" viewBox="0 0 16 16" fill="none"
+           stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+        <circle cx="8" cy="8" r="3.1"/>
+        <path d="M8 1.1v1.5M8 13.4v1.5M14.9 8h-1.5M2.6 8H1.1M12.9 3.1l-1.1 1.1M4.2 11.8l-1.1 1.1M12.9 12.9l-1.1-1.1M4.2 4.2L3.1 3.1"/>
+      </svg>
+    </button>
+    <a class="about-toggle ref-link" href="reference.html">Reference</a>
     <div class="about" id="about" hidden>
       <p>Estimate the standard heat of formation of an organic molecule by choosing the group increments and corrections it needs.</p>
       <p class="how">Click a group to add it, and click its count to take one back. On a phone the
@@ -58,6 +89,7 @@
          to see the working out.</p>
       <p class="cite">Chemistry C450/C540, Indiana University Bloomington &middot; Prashant Kumar and Nicola L. B. Pohl &middot;
          values after Cohen &amp; Benson, <i>Chem. Rev.</i> <b>1993</b>, <i>93</i>, 2419.</p>
+      <p class="cite"><a href="reference.html">The method, the notation and the sources</a> &mdash; what a group name means, why a range is averaged, and where the values come from.</p>
     </div>
 
     <div class="search">
@@ -128,6 +160,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09g"></script>
+<script type="module" src="assets/app.js?v=2026-09-09i"></script>
 </body>
 </html>
