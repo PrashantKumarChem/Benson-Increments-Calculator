@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09f">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09g">
 <!-- Every asset is requested with a version, and the version lives here and
      nowhere else.
 
@@ -32,12 +32,12 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09f",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09f",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09f",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09f",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09f",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09f"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09g",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09g",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09g",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09g",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09g",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09g"
   }
 }
 </script>
@@ -92,6 +92,11 @@
          Under it, on a phone, the head stays on screen and the body folds
          away behind the button. -->
     <aside class="tally-panel" id="tally-panel" aria-label="Running total">
+      <!-- A real element, not a ::before: a pseudo-element is painted by its
+           parent and hit-tested as its parent, so it cannot carry the
+           touch-action that stops the browser scrolling the page out from
+           under the drag. -->
+      <div class="sheet-grip" aria-hidden="true"></div>
       <div class="tally-head">
         <p class="tally-label" id="tally-label">Total</p>
         <div class="kj" id="kj">0.00<span>kJ/mol</span></div>
@@ -123,6 +128,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09f"></script>
+<script type="module" src="assets/app.js?v=2026-09-09g"></script>
 </body>
 </html>

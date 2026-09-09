@@ -306,8 +306,15 @@ el("panel-toggle").addEventListener("click", () => {
  *
  * It listens on the panel but ignores anything starting inside the body, which
  * is a scrolling region: dragging a list of contributions should scroll the
- * list. Nothing is prevented, so a swipe that was meant as a scroll still
- * scrolls; the threshold is what tells the two apart.
+ * list. The threshold is what tells a swipe from a twitch.
+ *
+ * Nothing is prevented here, and it does not need to be: the handle and the
+ * head carry touch-action: none, so the browser never starts a pan from them
+ * in the first place. Doing it in the stylesheet rather than with
+ * preventDefault is what lets these stay passive listeners, and it is also
+ * what fixed the gesture on real hardware - the browser used to claim the same
+ * downward swipe, scrolling the page under the finger and, at the top of the
+ * document, reloading it as pull-to-refresh with every increment in it.
  */
 const SWIPE = 40;
 
