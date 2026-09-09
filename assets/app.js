@@ -249,7 +249,15 @@ function render() {
   renderChips();
   renderLibrary();
   renderTally();
+  // Last, because it measures what the three above just drew.
+  measureSheet();
 }
+
+// The sheet's travel is a pixel count, so anything that changes what a pixel
+// has to hold invalidates it: turning the phone over, crossing the breakpoint,
+// or the mono arriving and re-setting every figure in the panel.
+addEventListener("resize", measureSheet);
+document.fonts?.ready.then(measureSheet);
 
 function setQuery(query) {
   view.query = query.trim();
@@ -286,6 +294,37 @@ el("views").addEventListener("click", (event) => {
  * Beside the grid the panel is one block and the button is not rendered, so
  * this listener is harmless there: nothing can press what has no box.
  */
+/**
+ * How far the sheet slides, and how much of the page it leaves covered.
+ *
+ * The sheet is slid rather than resized, because animating a height reflows a
+ * document holding 236 cards on every frame. A transform needs a distance, and
+ * the distance is the height of the part that hides - which is not a constant:
+ * it is however tall the contributions happen to be, in whatever font size the
+ * reader has chosen, capped by the panel's own limit.
+ *
+ * Measured after each render for the same reason, since adding an increment
+ * makes the list taller. Transform does not affect offsetHeight, so this reads
+ * the same whether the sheet is open or shut.
+ */
+function measureSheet() {
+  const panel = el("tally-panel");
+  const body = el("tally-body");
+
+  // Beside the grid the panel is an ordinary block in the layout and neither
+  // number means anything, so they are removed rather than left stale.
+  if (!matchMedia("(max-width: 859px)").matches) {
+    panel.style.removeProperty("--sheet-hidden");
+    document.documentElement.style.removeProperty("--sheet-peek");
+    return;
+  }
+
+  const hidden = body.offsetHeight;
+  panel.style.setProperty("--sheet-hidden", `${hidden}px`);
+  document.documentElement.style.setProperty(
+    "--sheet-peek", `${Math.max(0, panel.offsetHeight - hidden)}px`);
+}
+
 function setPanelOpen(open) {
   el("tally-panel").dataset.open = String(open);
   el("panel-toggle").setAttribute("aria-expanded", String(open));
@@ -333,6 +372,42 @@ el("tally-panel").addEventListener("touchend", (event) => {
   if (Math.abs(travelled) < SWIPE) return;
   setPanelOpen(travelled < 0);
 }, { passive: true });
+
+/**
+ * Light and dark, and the third state that matters: not having said.
+ *
+ * No attribute means the stylesheet's prefers-color-scheme branch decides, so
+ * a reader who never touches this still follows their machine, including when
+ * their machine changes its mind at sunset. Pressing the button is what turns
+ * that into a choice, and the choice is remembered.
+ *
+ * The label is written from the theme actually in force rather than from the
+ * stored value, because until the button is pressed there is no stored value
+ * to read - only what the system is doing.
+ */
+const prefersDark = matchMedia("(prefers-color-scheme: dark)");
+
+const isDark = () => (document.documentElement.dataset.theme
+  ? document.documentElement.dataset.theme === "dark"
+  : prefersDark.matches);
+
+function labelTheme() {
+  el("theme-toggle").setAttribute(
+    "aria-label", isDark() ? "Switch to light theme" : "Switch to dark theme");
+}
+
+el("theme-toggle").addEventListener("click", () => {
+  const theme = isDark() ? "light" : "dark";
+  document.documentElement.dataset.theme = theme;
+  // Refusing to remember it is not a reason to refuse to change it.
+  try { localStorage.setItem("theme", theme); } catch { /* not stored */ }
+  labelTheme();
+});
+
+// Only reaches the label while no choice has been made; once it has, the
+// attribute is set and isDark() stops consulting the system at all.
+prefersDark.addEventListener("change", labelTheme);
+labelTheme();
 
 el("about-toggle").addEventListener("click", (event) => {
   const open = el("about").hidden;

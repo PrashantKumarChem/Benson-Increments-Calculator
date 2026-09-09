@@ -192,9 +192,41 @@ h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
   padding: var(--space-1) var(--space-3);
 }
 .about-toggle:hover { background: var(--layer-accent); color: var(--ink); }
+
+/* Which theme is on is something the page already shows by being that theme,
+   so this needs no label - only a target big enough to hit and a glyph saying
+   where it goes. Square, like everything else, and sized to sit level with
+   About beside it. */
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.75rem; height: 1.75rem; padding: 0; cursor: pointer;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid var(--line-strong);
+}
+.theme-toggle:hover { background: var(--layer-accent); color: var(--ink); }
+/* The same three branches the colour tokens use, so the icon is right on a
+   system-dark machine whose reader has never pressed this. Light shows the
+   moon, because the moon is where pressing it takes you. */
+.theme-toggle .sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .moon { display: none; }
+  :root:not([data-theme="light"]) .theme-toggle .sun { display: block; }
+}
+:root[data-theme="dark"] .theme-toggle .moon { display: none; }
+:root[data-theme="dark"] .theme-toggle .sun { display: block; }
+/* A thumb needs more than 28px, and the row it sits in has the width to give. */
+@media (max-width: 859px) { .theme-toggle { width: 2.25rem; height: 2.25rem; } }
+/* The Reference link is the same control as the About button and shares its
+   rule, so the two sit level in the strip. It is an <a> and not a <button>
+   because it goes to a page: a reader can open it in a new tab, and it still
+   works with scripting off. */
+.ref-link { text-decoration: none; display: inline-block; line-height: 1.55; }
 .about { flex-basis: 100%; }
 .about p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
 .about .cite { margin-top: var(--space-3); color: var(--ink-helper); font-size: .8rem; }
+/* The accent, not the browser's blue. Every other link on the site is already
+   a token; this one was the last one left to the user agent. */
+.about a { color: var(--accent); }
 
 .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); align-items: start; }
 /* A grid item's min-width is auto, which means "as wide as my content", and
@@ -568,11 +600,36 @@ ul.picks .sum {
    These come after the rules they override - at the same specificity, order is
    what decides. */
 @media (max-width: 859px) {
+  /* Pinned and slid, rather than grown and shrunk.
+
+     The sheet used to open by animating its height while sticky, which changes
+     the height of the document on every frame - and with 236 cards behind it,
+     that is a full page reflow sixty times a second. Height is a layout
+     property and layout cannot run on the compositor, so it was never going to
+     be smooth however the curve was tuned; it read as jitter because it was.
+
+     Fixed takes the panel out of the flow, so its size stops being the
+     document's problem, and transform is handed to the compositor. The page
+     gets padding under it worth exactly what the sheet leaves showing, so
+     nothing hides behind a panel that no longer occupies any space.
+
+     Both distances are measured rather than guessed - the head is as tall as
+     the total is, and the total is as tall as the reader's font makes it. */
   .tally-panel {
-    position: sticky; bottom: 0; z-index: 3;
-    margin-top: var(--space-3); padding: var(--space-3) var(--space-4);
-    max-height: 70vh; display: flex; flex-direction: column;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 3;
+    margin: 0; padding: var(--space-3) var(--space-4);
+    max-height: 80vh; display: flex; flex-direction: column;
+    transform: translateY(0);
+    /* Material's emphasized pair: it leaves quickly and arrives gently, which
+       is what "native" turns out to mean when you slow it down and look. */
+    transition: transform .34s cubic-bezier(.05, .7, .1, 1);
   }
+  .tally-panel:not([data-open="true"]) {
+    transform: translateY(var(--sheet-hidden, 0px));
+    transition-duration: .25s;
+    transition-timing-function: cubic-bezier(.3, 0, .8, .15);
+  }
+  body { padding-bottom: calc(var(--sheet-peek, 0px) + var(--space-5)); }
   /* A sheet with a handle is a sheet you know you can drag. Without one the
      swipe would be a secret, and a gesture nobody finds is not a feature. The
      button beside the total does the same job for anyone who does not.
@@ -621,14 +678,24 @@ ul.picks .sum {
      overscroll-behavior stops a flick that reaches the end of the list from
      continuing into the page behind it - the same chaining that turns into
      pull-to-refresh at the top. */
+  /* The body no longer animates anything. It keeps its full height at all
+     times - that height is exactly how far the panel slides - and simply ends
+     up below the bottom of the screen when the sheet is shut.
+
+     visibility still does the job display was doing before: once the sheet has
+     finished closing, nothing inside it can be tabbed to or announced, so the
+     keyboard order matches what is on the screen. The delay is what keeps the
+     contributions visible for as long as they are still sliding past.
+
+     overscroll-behavior stops a flick that reaches the end of the list from
+     continuing into the page behind it - the same chaining that turns into
+     pull-to-refresh at the top. */
   .tally-body {
-    min-height: 0; max-height: 70vh; overflow-y: auto; overscroll-behavior: contain;
-    opacity: 1; visibility: visible;
-    transition: max-height .22s ease, opacity .16s ease, visibility 0s;
+    min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    visibility: visible; transition: visibility 0s;
   }
   .tally-panel:not([data-open="true"]) .tally-body {
-    max-height: 0; opacity: 0; visibility: hidden; overflow: hidden;
-    transition: max-height .22s ease, opacity .16s ease, visibility 0s linear .22s;
+    visibility: hidden; transition: visibility 0s linear .25s;
   }
   /* The list no longer needs its own cap - the sheet caps the whole thing, and
      one scrolling region is easier to use than two nested ones. */
@@ -693,3 +760,101 @@ footer a { color: var(--ink-soft); }
     scroll-behavior: auto !important;
   }
 }
+
+/* ------------------------------------------------------------------ reference.html
+
+   The reference page. One stylesheet, not two: the page is the same design
+   language as the calculator and shares its tokens, and a second file would be
+   a second thing to version. Everything below is prefixed .ref- so it costs the
+   calculator nothing but the bytes.
+
+   Two rules from the calculator carry over unchanged and are the reason this
+   section is short. Nothing has a corner radius. And the mono face is for
+   notation and numerals only - which here means <code>, and nothing else, so a
+   table cell is set in mono because its content is a group name rather than
+   because of which column it happens to be in. That is why the notation is
+   written `Cd` in reference/03_Notation.csv: the content decides its own
+   typography, and the renderer never has to know which column is which.
+
+   There is no text-transform anywhere on this page. A heading here can contain
+   a chemistry symbol - ΔHf° is a row in the glossary - and uppercasing it
+   renders ΔHF°, which is a different thing and not a real one. */
+
+.ref-bar { justify-content: space-between; border-bottom: 1px solid var(--line); }
+.ref-back {
+  font-size: .78rem; color: var(--ink-soft); text-decoration: none;
+  border: 1px solid var(--line-strong); padding: var(--space-1) var(--space-3);
+}
+.ref-back:hover { background: var(--layer-accent); color: var(--ink); }
+
+/* Contents above the prose on a narrow screen, beside it on a wide one. The
+   grid is declared once at the wide breakpoint rather than being un-declared
+   here, so the small screen keeps the simpler box model. */
+.ref-toc { margin: var(--space-6) 0; }
+.ref-toc-head {
+  margin: 0 0 var(--space-3); font-size: .78rem; color: var(--ink-helper);
+  letter-spacing: .02em;
+}
+.ref-toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+.ref-toc a { color: var(--ink-soft); font-size: .87rem; text-decoration: none; border-bottom: 1px solid var(--line); }
+.ref-toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* A measure, not a column width. Prose past about 70 characters a line is
+   measurably harder to come back to after looking away, and this is a page
+   people read a paragraph of, look at the calculator, and return to. */
+.ref-main { max-width: 68ch; }
+.ref-section { margin: 0 0 var(--space-8); scroll-margin-top: var(--space-5); }
+.ref-section h2 {
+  margin: 0 0 var(--space-4); font-size: 1.05rem; font-weight: 620;
+  letter-spacing: -.01em; padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--accent);
+}
+.ref-section h3 { margin: var(--space-6) 0 var(--space-3); font-size: .95rem; font-weight: 620; }
+.ref-section p { margin: 0 0 var(--space-4); color: var(--ink); }
+.ref-section ul { margin: 0 0 var(--space-4); padding-left: var(--space-5); }
+.ref-section li { margin-bottom: var(--space-2); }
+.ref-section code { font: 600 .89em/1 var(--font-mono); color: var(--ink); }
+.ref-section a { color: var(--accent); }
+
+/* Wide enough for the contents to sit beside the prose without either being
+   squeezed. Below this the two stack, which is also what happens when a reader
+   has zoomed a narrow window - the breakpoint is about the space available,
+   not about what kind of machine is asking. */
+@media (min-width: 900px) {
+  /* Narrower than the calculator's 1180px, and deliberately. The calculator
+     wants width - it is a grid of 236 cards. This page is a column of prose
+     with a contents list beside it, and at 1180px the two sit at opposite
+     edges of the window with a hand's width of nothing between them. Sized to
+     the content it actually has, the list reads as attached to the prose. */
+  .ref-body .wrap { max-width: 940px; }
+  .ref-toc {
+    float: right; width: 13rem; margin: 0 0 var(--space-6) var(--space-7);
+    padding-left: var(--space-5); border-left: 1px solid var(--line);
+    position: sticky; top: var(--space-5);
+  }
+  .ref-toc ul { flex-direction: column; gap: var(--space-2); }
+}
+
+/* A table here is a reference table, so it reads like the increment grid:
+   hairlines, no fill, no radius, and it scrolls inside its own box rather than
+   pushing the page sideways. The wrap is what keeps a six-column table - the
+   categories, included whole from notation/categories.csv - from setting the
+   width of the whole document on a phone. */
+.ref-table-wrap { overflow-x: auto; margin: 0 0 var(--space-5); border: 1px solid var(--line); }
+.ref-table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+/* Wide tables take their natural width and scroll inside .ref-table-wrap. At
+   100% of a 68ch measure a six-column table gives each column about nine
+   characters, which turns "Cohen & Benson 1993" into four lines and the table
+   into a wall. */
+.ref-table-wide { width: max-content; min-width: 100%; }
+.ref-table-wide .ref-cell { white-space: nowrap; }
+/* The one column that is prose rather than a label still wraps, so a long note
+   does not set the width of the whole table. */
+.ref-table-wide .ref-cell:last-child { white-space: normal; min-width: 22rem; }
+.ref-table th {
+  text-align: left; font-weight: 620; color: var(--ink-soft);
+  background: var(--layer-accent); white-space: nowrap;
+}
+.ref-cell { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line); vertical-align: top; }
+.ref-table tbody tr:last-child .ref-cell { border-bottom: 0; }
+.ref-table tbody tr:hover { background: var(--layer); }
