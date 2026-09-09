@@ -229,11 +229,19 @@ h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
   .bar { padding: var(--space-4) 0; }
   .bar .search { flex: 1 1 60%; }
 }
+/* About and Reference share this rule with the theme toggle's height, so the
+   three controls in the strip sit on one line and read as one set. Left to
+   their text metrics they came out about 25px against the toggle's 28, which
+   is not enough to name but is enough to look unconsidered. Height rather than
+   padding, because the two labels differ in length and only a fixed height
+   makes them agree. */
 .about-toggle {
+  display: inline-flex; align-items: center;
+  height: 1.75rem;
   font: inherit; font-size: .78rem; cursor: pointer;
   background: transparent; color: var(--ink-soft);
   border: 1px solid var(--line-strong);
-  padding: var(--space-1) var(--space-3);
+  padding: 0 var(--space-3);
 }
 .about-toggle:hover { background: var(--layer-accent); color: var(--ink); }
 
@@ -259,7 +267,10 @@ h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
 :root[data-theme="dark"] .theme-toggle .moon { display: none; }
 :root[data-theme="dark"] .theme-toggle .sun { display: block; }
 /* A thumb needs more than 28px, and the row it sits in has the width to give. */
-@media (max-width: 859px) { .theme-toggle { width: 2.25rem; height: 2.25rem; } }
+@media (max-width: 859px) {
+  .theme-toggle { width: 2.25rem; height: 2.25rem; }
+  .about-toggle { height: 2.25rem; }
+}
 /* The Reference link is the same control as the About button and shares its
    rule, so the two sit level in the strip. It is an <a> and not a <button>
    because it goes to a page: a reader can open it in a new tab, and it still
