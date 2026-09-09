@@ -29,6 +29,13 @@ jobs:
           python tools/build_data.py
           git diff --exit-code CSV_data_files/manifest.json
 
+      # An asset the page requests without a version is one a returning visitor
+      # can be served from cache while the rest of the page is current. That has
+      # broken the site once already; a stale module can also change a value
+      # silently, which is worse.
+      - name: Confirm every asset is versioned
+        run: python tools/validate_assets.py
+
   calculator:
     name: Calculator behaviour
     runs-on: ubuntu-latest

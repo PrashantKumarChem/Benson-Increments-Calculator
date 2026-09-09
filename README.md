@@ -80,6 +80,24 @@ python -m http.server 8000
 # then open http://localhost:8000/
 ```
 
+### Changing anything in `assets/`
+
+Bump the version in `index.html`. It appears in one place — a stylesheet link, a
+module `src`, and an import map that carries the same version to every module
+the page loads.
+
+GitHub Pages caches every file for ten minutes, and each file's ten minutes
+start when that file was last fetched, so they expire at different times. A
+returning visitor can therefore get a fresh `index.html` and a cached
+`assets/app.js`, which is how the site once ended up stuck on "Loading
+increment data": the old script looked for an element the new page no longer
+had. Naming each asset with a version means a page can only ever load the files
+it shipped with.
+
+`python tools/validate_assets.py` checks that nothing is requested unversioned,
+that every module is in the import map, and that one version is used
+throughout. CI runs it.
+
 ### Tests
 
 ```bash

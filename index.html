@@ -5,7 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09">
+<!-- Every asset is requested with a version, and the version lives here and
+     nowhere else.
+
+     GitHub Pages serves every file with Cache-Control: max-age=600, and each
+     file's ten minutes start when that file was last fetched. They therefore
+     expire at different moments, so there is always a window in which a
+     returning visitor gets this document fresh and a stale assets/app.js from
+     cache. That combination broke the site once already: the old app.js asked
+     for a #tabs element this page no longer has, threw, and left the page
+     saying "Loading increment data" forever.
+
+     Versioning only the entry point would be worse than doing nothing. The
+     browser would fetch a new app.js and still import a cached notation.js,
+     and an older notation.js drops the source precision from each value - so
+     -20.9 renders as -21. A loud failure would become a wrong number, which on
+     a calculator is the one outcome worth avoiding.
+
+     The import map below is what prevents that. A module's own imports are
+     written relative - app.js asks for "./benson.js" - and the browser
+     resolves those to URLs before consulting this map, so remapping the
+     resolved URL reaches the whole graph from one place. Change anything in
+     assets/ and bump the version; tools/validate_data.py checks that every
+     module is listed here and that every version on this page agrees. -->
+<script type="importmap">
+{
+  "imports": {
+    "./assets/app.js": "./assets/app.js?v=2026-09-09",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09"
+  }
+}
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -62,6 +97,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js"></script>
+<script type="module" src="assets/app.js?v=2026-09-09"></script>
 </body>
 </html>
