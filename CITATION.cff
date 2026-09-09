@@ -1,25 +1,52 @@
+# GitHub reads this file and renders a "Cite this repository" box from it, so
+# everything below is public the moment it is pushed.
+#
+# !! BEFORE RELEASE OR SUBMISSION !!
+# The two orcid: lines are PLACEHOLDERS. 0000-0000-0000-0000 is not a real
+# identifier, and GitHub will render it as a working link. Replace both with
+# real ORCID iDs, or delete the orcid: lines - a missing field is honest, a
+# zeroed one is not. Check date-released against the actual release date too.
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
 title: "Benson Increments Calculator"
+version: 2.0.0
+date-released: 2026-09-09
+abstract: >-
+  A dependency-free web calculator that estimates the standard enthalpy of
+  formation of an organic molecule from Benson group increments. The user
+  chooses the groups and corrections a molecule needs; the tool does the
+  arithmetic and shows the working. Written for teaching, so it deliberately
+  does not parse structures or decide which groups apply.
+keywords:
+  - thermochemistry
+  - group additivity
+  - Benson increments
+  - enthalpy of formation
+  - chemistry education
 authors:
-- family-names: "Kumar"
-  given-names: "Prashant"
-  orcid: "https://orcid.org/0000-0000-0000-0000"  # Replace with actual ORCID if available
-- family-names: "Pohl"
-  given-names: "Nicola L. B."
-  orcid: "https://orcid.org/0000-0000-0000-0000"  # Replace with actual ORCID if available
-repository-code: "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
-url: "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
-license: GPL-3.0
-preferred-citation:
-  type: software
-  title: "Benson Increments Calculator"
-  authors:
   - family-names: "Kumar"
     given-names: "Prashant"
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # PLACEHOLDER - see note above
   - family-names: "Pohl"
     given-names: "Nicola L. B."
-  year: 2024
-  url: "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
-  license: GPL-3.0
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # PLACEHOLDER - see note above
+repository-code: "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
+url: "https://prashantkumarchem.github.io/Benson-Increments-Calculator/"
+license: GPL-3.0
+references:
+  - type: article
+    title: "Estimation of Heats of Formation of Organic Compounds by Additivity Methods"
+    authors:
+      - family-names: "Cohen"
+        given-names: "N."
+      - family-names: "Benson"
+        given-names: "S. W."
+    journal: "Chemical Reviews"
+    year: 1993
+    volume: 93
+    issue: 7
+    start: 2419
+    end: 2438
+    doi: "10.1021/cr00023a005"
+    notes: "The source of the increment values used by this software."

@@ -239,9 +239,15 @@ It must be started from the repository folder, since it looks for
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and
-[CONTRIBUTOR_GUIDELINES.md](CONTRIBUTOR_GUIDELINES.md). New increment values are
-especially welcome — please include a reference for anything you add.
+See [CONTRIBUTING.md](CONTRIBUTING.md), which covers running the project, the
+checks to run before opening a pull request, how to add a category of
+increments, and how to edit the reference page. Everyone taking part is asked
+to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+New increment values are especially welcome — please include a reference for
+anything you add.
+
+[AI_USE.md](AI_USE.md) records where generative AI was used in building this.
 
 ## License
 
@@ -258,12 +264,17 @@ nothing is fetched from a third party.
 
 ```bibtex
 @software{benson_increments_calculator,
-  author = {Kumar, Prashant and Pohl, Nicola L. B.},
-  title  = {Benson Increments Calculator},
-  year   = {2024},
-  url    = {https://github.com/PrashantKumarChem/Benson-Increments-Calculator},
-  version = {1.0}
+  author  = {Kumar, Prashant and Pohl, Nicola L. B.},
+  title   = {Benson Increments Calculator},
+  year    = {2026},
+  url     = {https://github.com/PrashantKumarChem/Benson-Increments-Calculator},
+  version = {2.0.0}
 }
 ```
 
-For the method itself: Cohen, N.; Benson, S. W. *Chem. Rev.* **1993**, *93*, 2419.
+`CITATION.cff` carries the same details in machine-readable form.
+
+For the method itself: Cohen, N.; Benson, S. W. Estimation of Heats of
+Formation of Organic Compounds by Additivity Methods. *Chem. Rev.* **1993**,
+*93* (7), 2419–2438. DOI:
+[10.1021/cr00023a005](https://doi.org/10.1021/cr00023a005).
