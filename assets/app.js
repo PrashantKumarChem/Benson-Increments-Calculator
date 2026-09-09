@@ -430,17 +430,18 @@ el("views").addEventListener("click", (event) => {
  * this listener is harmless there: nothing can press what has no box.
  */
 /**
- * How far the sheet slides, and how much of the page it leaves covered.
+ * How much of the sheet stays showing, and so how much of the page it covers.
  *
  * The sheet is slid rather than resized, because animating a height reflows a
- * document holding 236 cards on every frame. A transform needs a distance, and
- * the distance is the height of the part that hides - which is not a constant:
- * it is however tall the contributions happen to be, in whatever font size the
- * reader has chosen, capped by the panel's own limit.
+ * document holding 236 cards on every frame. How far it slides is the
+ * stylesheet's arithmetic now, not this file's; what it needs from here is the
+ * one number it cannot work out for itself, which is how tall the head is.
  *
- * Measured after each render for the same reason, since adding an increment
- * makes the list taller. Transform does not affect offsetHeight, so this reads
- * the same whether the sheet is open or shut.
+ * Measured after each render, because the label above the total is written
+ * from what has been chosen and a longer one can wrap. A translation changes
+ * neither an element's own height nor the height in its bounding rectangle, so
+ * this reads the same whether the sheet is open, shut, or halfway through a
+ * drag.
  */
 /**
  * Where the panel stops being a column and becomes a sheet.
@@ -480,15 +481,60 @@ function measureSheet() {
     return;
   }
 
-  // Transform does not affect offsetHeight, so these read the same whether the
-  // sheet is open or shut. What the two numbers mean is in sheet.js, where it
-  // can be tested without a browser.
+  // getBoundingClientRect rather than offsetHeight. offsetHeight rounds to
+  // whole pixels, so a panel of 328.6 over a body of 194.8 is measured as 329
+  // less 195 and the same layout a moment later as 329 less 194 - a peek that
+  // reads 134 and then 135 for no reason but where the rounding fell, and a
+  // pixel of padding that appears and disappears under the page. Subtracting
+  // two exact heights cannot do it.
+  //
+  // A translation affects neither reading, and translation is the only
+  // transform this panel is given, so both read the same whether the sheet is
+  // open, shut, or halfway through a drag. What the two numbers mean is in
+  // sheet.js, where it can be tested without a browser.
   const { hidden, peek } = sheetMetrics({
-    panelHeight: panel.offsetHeight,
-    bodyHeight: body.offsetHeight,
+    panelHeight: panel.getBoundingClientRect().height,
+    bodyHeight: body.getBoundingClientRect().height,
   });
-  panel.style.setProperty("--sheet-hidden", `${hidden}px`);
   document.documentElement.style.setProperty("--sheet-peek", `${peek}px`);
+  setSlide(panel, `${hidden}px`);
+}
+
+/**
+ * Tell the shut sheet how far down to sit, without animating its way there.
+ *
+ * The stylesheet transitions the panel's transform, which is what makes the
+ * sheet slide when somebody opens it. This distance feeds that same transform,
+ * but changing it is not somebody opening anything: it is the panel having
+ * just been re-measured because the list inside it grew.
+ *
+ * Those two are worth separating because the panel is anchored to the bottom
+ * of the screen and grows upwards. Adding a contribution makes it taller and
+ * pushes it further down by exactly the same amount, so the head should not
+ * move at all - and it did, because the height is layout and lands in the
+ * frame it is set, while the transform was transitioned and took a quarter of
+ * a second to follow. The head jumped up and slid back on every pick until the
+ * panel reached its 80vh cap and stopped growing, which is what "it bounces for
+ * the first few clicks and then it is stable" was.
+ *
+ * CSS cannot express "transition this, but not when it changes for that
+ * reason", so the transition is turned off for the one frame that applies the
+ * new number. Reading a layout property in between is what keeps it to one
+ * frame: without it the browser is free to coalesce all three lines into a
+ * single style change, in which the transition was never off and the sheet
+ * bounces exactly as before.
+ *
+ * Nothing is done at all when the distance has not moved, which is every
+ * render after the panel reaches its cap - and a forced layout skipped is the
+ * whole reason to check.
+ */
+function setSlide(panel, distance) {
+  if (panel.style.getPropertyValue("--sheet-hidden") === distance) return;
+
+  panel.style.transition = "none";
+  panel.style.setProperty("--sheet-hidden", distance);
+  void panel.offsetHeight;
+  panel.style.transition = "";
 }
 
 /**

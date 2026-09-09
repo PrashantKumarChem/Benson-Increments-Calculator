@@ -22,12 +22,26 @@
  * bottom padding, so nothing ends up behind a panel that, being fixed, no
  * longer occupies any space in the flow.
  *
- * Both are clamped at zero. A body taller than the panel that contains it is
- * not a state the layout can produce - the panel is capped at 80vh and the
- * body scrolls inside it - but a negative peek would pull padding off the
- * document rather than adding it, and a negative slide would throw the sheet
- * upwards off the top of the screen. Neither is worth trusting a measurement
- * not to produce, especially one taken mid-render.
+ * `hidden` grows as contributions are added, and that is worth knowing about,
+ * because the panel is anchored to the bottom of the screen and grows upwards
+ * at the same moment. The two cancel out and the head stays exactly where it
+ * is - but only if both arrive together. Left to a transition, the transform
+ * takes a quarter of a second to catch up with a height that changed at once,
+ * and the head visibly jumps up and settles back on every pick. app.js is
+ * where that is dealt with, because it is a question about when a value is
+ * applied rather than about what the value is.
+ *
+ * Both ends are clamped, and for two different reasons.
+ *
+ * A body taller than the panel that contains it is not a state the layout can
+ * produce - the panel is capped at 80vh and the body scrolls inside it - but a
+ * negative peek would pull padding off the document rather than adding it, and
+ * a negative slide would throw the sheet upwards off the top of the screen.
+ *
+ * A body of less than nothing is not a state anything can produce either, but
+ * a measurement taken mid-render is not a state: it is a reading. Clamping the
+ * reading before it is used says which of the two numbers was not to be
+ * trusted.
  */
 export function sheetMetrics({ panelHeight, bodyHeight }) {
   const hidden = Math.max(0, bodyHeight);

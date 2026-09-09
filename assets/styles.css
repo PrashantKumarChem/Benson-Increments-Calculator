@@ -700,6 +700,32 @@ ul.picks .sum {
      stop agreeing, which is the only thing that would: change the spelling on
      one side and the button still flips the attribute, the sheet still has
      every rule it needs, and none of them apply - it just never opens. */
+  /* Shut, the sheet is pushed down by exactly its own body, which leaves the
+     head showing.
+
+     That distance grows as contributions are added, and the panel grows by the
+     same amount at the same moment, because it is anchored to the bottom and
+     grows upwards. The two cancel and the head does not move - but only if
+     they arrive together. They did not: the height is layout and lands at
+     once, the transform is transitioned and takes var(--sheet-close) to
+     follow, so the head jumped up and slid back on every pick. It stopped
+     after a handful because once the body passes 80vh the panel is capped and
+     the distance stops changing - which is why it read as "bounces for the
+     first few clicks and then settles" rather than as a bug with a cause.
+
+     What fixes it is not written here, because it cannot be: CSS has no way to
+     say "transition this property when that other one changes, but not when
+     this one does". assets/app.js turns the transition off for the one frame
+     in which it applies a new measurement, which is the honest version of the
+     same sentence - a re-measurement is not a state change, and only a state
+     change should move the sheet.
+
+     Written as a plain length rather than as `100% - var(--sheet-peek)`, which
+     is the tidier way to say it and does not work: a percentage inside a
+     transform is resolved against the border box, and a Chrome that has handed
+     the transform to the compositor does not re-resolve it when the custom
+     property in the calc changes. The sheet stayed pushed down by a full 100%
+     and never came back onto the screen. */
   .tally-panel:not([data-open="true"]) {
     transform: translateY(var(--sheet-hidden, 0px));
     transition-duration: var(--sheet-close);
@@ -725,17 +751,32 @@ ul.picks .sum {
     content: ""; display: block; width: 2rem; height: 3px;
     background: var(--line-strong); margin: 0 auto;
   }
-  /* The label, the total and the disclosure read as one row, so the button is
-     beside the number it summarises rather than below the whole panel. */
+  /* One line: what the quantity is, what it comes to, and the way in.
+
+     Shut, this bar is the entire sheet, and it is on the screen for as long as
+     somebody is choosing increments - so every pixel of it is a pixel of the
+     grid they came to read. It used to take three lines and 134px of an 844px
+     phone. The kcal figure has moved into the body (index.html), which leaves
+     a label, a figure and a button, and those fit beside each other.
+
+     Baselines, not centres: a .6875rem label has nothing to line up on
+     against a 1.875rem figure except the line they are written on. The button
+     is the exception and centres itself, because it is a box rather than
+     text.
+
+     The figure takes its own leading here. 1.55 is set on the body for prose,
+     and prose leading around a number that is alone on its line is 10px of air
+     above and below it - which on this bar is 20px of the grid. */
   .tally-head {
     touch-action: none;
-    display: grid; grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center; column-gap: var(--space-4);
+    display: flex; align-items: baseline; column-gap: var(--space-3);
   }
-  .tally-head > :not(.panel-toggle) { grid-column: 1; }
+  /* Pushes the button to the far end, so the two readings stay together at
+     the near one rather than being spread across the bar. */
+  .tally-head .kj { margin-right: auto; line-height: 1.15; }
   .panel-toggle {
     display: flex; align-items: center; gap: var(--space-2);
-    grid-column: 2; grid-row: 1 / -1;
+    align-self: center; flex: none;
     font: inherit; font-size: .8125rem; cursor: pointer;
     background: transparent; color: var(--ink-soft);
     border: 1px solid var(--line-strong);
@@ -777,10 +818,38 @@ ul.picks .sum {
      one scrolling region is easier to use than two nested ones. */
   ul.picks { max-height: none; margin-top: var(--space-2); }
   .stepper button, .rm { width: 2.375rem; height: 2.375rem; }
-  /* Big enough for a thumb without spending four lines on six filters: the
-     old rule grew the padding, which pushed the last chips off the first
-     screen entirely. Height is what makes a target hittable, not width. */
-  .chip { min-height: 2.25rem; padding: var(--space-2) var(--space-4); }
+  /* One row that scrolls, rather than three that stack.
+
+     Six categories wrapped to three rows at 390px and took 116px - an eighth
+     of the screen - before a single increment was on it. Sideways they take
+     one row, and the row is the same height whatever the reader's font does
+     to the labels, which wrapping was not.
+
+     The row is pulled out to both edges of the screen and given the padding
+     back inside, so a chip that continues past the edge is cut off by the
+     screen rather than tucked behind the page margin. Being cut off is the
+     only thing telling a reader there is more, which is also why there is no
+     scrollbar: this is a thumb-scrolled row of six on a touch screen, and a
+     scrollbar would take height to say what the cut-off chip already says.
+
+     A chip must not be squeezed to make the row fit, which is what
+     flex-shrink would otherwise do to the longest label the moment the row
+     overflowed - so the labels stay whole and the row scrolls instead.
+
+     The chip itself is big enough for a thumb without spending lines on it:
+     the rule this replaced grew the padding, which pushed the last chips off
+     the first screen entirely. Height is what makes a target hittable, not
+     width. */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--space-5));
+    padding-inline: var(--space-5);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { min-height: 2.25rem; padding: var(--space-2) var(--space-4); flex: none; }
 }
 
 /* Narrower still, and a name like C-(Cd)(CB)(H)2 has no room left beside four

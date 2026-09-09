@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09n">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09o">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -53,14 +53,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09n",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09n",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09n",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09n",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09n",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09n",
-    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09n",
-    "./assets/theme.js": "./assets/theme.js?v=2026-09-09n"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09o",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09o",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09o",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09o",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09o",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09o",
+    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09o",
+    "./assets/theme.js": "./assets/theme.js?v=2026-09-09o"
   }
 }
 </script>
@@ -152,10 +152,12 @@
            touch-action that stops the browser scrolling the page out from
            under the drag. -->
       <div class="sheet-grip" aria-hidden="true"></div>
+      <!-- The head is what a phone sees while the sheet is shut, so only what
+           the bar is for lives here: what the quantity is, what it comes to,
+           and the way in. -->
       <div class="tally-head">
         <p class="tally-label" id="tally-label">Total</p>
         <div class="kj" id="kj">0.00<span>kJ/mol</span></div>
-        <div class="kcal" id="kcal">0.00 kcal/mol</div>
         <button class="panel-toggle" id="panel-toggle" aria-expanded="false" aria-controls="tally-body">
           <span id="panel-toggle-text">Details</span>
           <svg class="caret" width="10" height="10" viewBox="0 0 10 10" fill="none"
@@ -166,6 +168,16 @@
       </div>
 
       <div class="tally-body" id="tally-body">
+        <!-- The same total in the other unit, and the first thing in the body
+             rather than the last thing in the head.
+
+             Beside the grid this changes nothing: the body is always open
+             there, so the figure sits under the kJ total exactly where it
+             always has. On a phone it is the difference between a collapsed
+             sheet of three lines and one of one - the kJ figure is what the
+             bar is for, and a second unit of the same number is detail, which
+             is what the body holds. -->
+        <div class="kcal" id="kcal">0.00<span>kcal/mol</span></div>
         <p class="mixed" id="mixed" hidden></p>
         <p class="empty" id="empty">Nothing chosen yet. Click a group to add it.</p>
         <p class="picks-head" id="picks-head" hidden>Contributions</p>
@@ -183,6 +195,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09n"></script>
+<script type="module" src="assets/app.js?v=2026-09-09o"></script>
 </body>
 </html>
