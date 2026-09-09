@@ -94,6 +94,11 @@ increment data": the old script looked for an element the new page no longer
 had. Naming each asset with a version means a page can only ever load the files
 it shipped with.
 
+The two font files are the exception: they are named from `styles.css`, not
+from `index.html`, and they are immutable — replacing a face means a new
+filename, not a new version string. Do not add a `?v=` to them, or there
+would be a ninth place to keep in step that nothing checks.
+
 `python tools/validate_assets.py` checks that nothing is requested unversioned,
 that every module is in the import map, and that one version is used
 throughout. CI runs it.
@@ -121,6 +126,7 @@ assets/notation.js      reading Benson notation: what a group name is made of (n
 assets/selection.js     the chosen increments and the running total (no DOM)
 assets/app.js           rendering and events
 assets/styles.css       visual styles
+assets/fonts/           IBM Plex Mono, shipped with the site (see License)
 CSV_data_files/         the increment data, plus the generated manifest
 notation/               what the group names mean, the words students use, and
                         what each category of numbers is (categories.csv)
@@ -172,6 +178,13 @@ especially welcome — please include a reference for anything you add.
 ## License
 
 GNU General Public License v3.0 — see [LICENSE](LICENSE).
+
+The one thing here that is not ours is the typeface. IBM Plex Mono is
+Copyright © 2017 IBM Corp., used under the SIL Open Font License 1.1 — the
+full text ships beside it in [assets/fonts/OFL.txt](assets/fonts/OFL.txt). The
+OFL is a free/libre licence and the font files are served from this repository
+rather than a CDN, so everything this site sends a reader is open source and
+nothing is fetched from a third party.
 
 ## Citation
 

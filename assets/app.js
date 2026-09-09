@@ -158,7 +158,10 @@ function renderTally() {
   const totalKj = selection.totalKj;
   const entries = selection.entries;
   el("kj").innerHTML = `${escapeHtml(formatTotal(totalKj))}<span>kJ/mol</span>`;
-  el("kcal").textContent = `${formatKcal(totalKj * KJ_TO_KCAL)} kcal/mol`;
+  // The unit is written as its own element, as it is on the kJ line above:
+  // set as one string it inherited the figure's monospace and read as code.
+  el("kcal").innerHTML =
+    `${escapeHtml(formatKcal(totalKj * KJ_TO_KCAL))}<span>kcal/mol</span>`;
 
   // What the total is a total of. The categories do not all hold the same
   // quantity - a group increment is an enthalpy of formation, a cyclohexane
