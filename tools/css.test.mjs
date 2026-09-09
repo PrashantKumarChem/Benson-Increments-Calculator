@@ -25,6 +25,7 @@ import {
   checkBreakpoint,
   checkStructure,
   checkTokens,
+  checkTransforms,
   withoutComments,
   withoutScriptComments,
 } from "./validate_css.mjs";
@@ -387,4 +388,75 @@ test("stripping comments keeps the line numbering", () => {
   const css = ".a {}\n/* two\n   lines */\n.b {}";
   assert.equal(withoutComments(css).split("\n").length, css.split("\n").length);
   assert.match(withoutComments(css), /^\.a \{\}\n\s*\n\s*\n\.b \{\}$/);
+});
+
+
+/* -------------------------------------------------------------------------- */
+/* A percentage in a transform, beside a token a script rewrites               */
+/* -------------------------------------------------------------------------- */
+
+/** Enough of app.js for the check to know which tokens move at runtime. */
+const SETS_BOTH = 'panel.style.setProperty("--sheet-hidden", d);'
+  + ' document.documentElement.style.setProperty("--sheet-peek", p);';
+
+test("the fault that shipped is reported", () => {
+  // Written exactly as it was written the day it went out, which is the tidy
+  // way: let the stylesheet do the arithmetic instead of app.js handing over a
+  // pixel count. The sheet went off the bottom of the screen and stayed there.
+  const css = '.tally-panel { transform: translateY(calc(100% - var(--sheet-peek, 0px))); }';
+  const problems = checkTransforms(css, { app: SETS_BOTH });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /percentage with var\(--sheet-peek\)/);
+});
+
+test("the fix that replaced it is not reported", () => {
+  // The single most important false positive to avoid: this is the shipped
+  // code. A check that flags the correct version is a check that gets deleted
+  // the same afternoon it lands.
+  const css = '.tally-panel { transform: translateY(var(--sheet-hidden, 0px)); }';
+  assert.deepEqual(checkTransforms(css, { app: SETS_BOTH }), []);
+});
+
+test("a percentage beside a token nothing rewrites is left alone", () => {
+  // --space-5 is declared once and never touched again, so the percentage
+  // resolves once and nothing moves it afterwards. Legal, and useful.
+  const css = '.a { transform: translateY(calc(50% - var(--space-5))); }';
+  assert.deepEqual(checkTransforms(css, { app: SETS_BOTH }), []);
+});
+
+test("a percentage with no var at all is left alone", () => {
+  const css = '.a { transform: translateY(calc(100% - 12px)); }';
+  assert.deepEqual(checkTransforms(css, { app: SETS_BOTH }), []);
+});
+
+test("the var is found inside a nested function and behind a prefix", () => {
+  const nested = '.a { transform: translate(0, calc(100% - var(--sheet-peek))); }';
+  assert.equal(checkTransforms(nested, { app: SETS_BOTH }).length, 1,
+    "matching to the first ) would stop inside var() and miss the percentage");
+
+  const prefixed = '.a { -webkit-transform: translateY(calc(100% - var(--sheet-peek))); }';
+  assert.equal(checkTransforms(prefixed, { app: SETS_BOTH }).length, 1);
+});
+
+test("a transition naming transform is not a transform", () => {
+  // `transition: transform .25s` next to a width that legitimately mixes the
+  // two. Reading the word rather than the declaration would report this.
+  const css = '.a { transition: transform .25s; width: calc(100% - var(--sheet-peek)); }';
+  assert.deepEqual(checkTransforms(css, { app: SETS_BOTH }), []);
+});
+
+test("the fault written inside a comment is not the fault", () => {
+  const css = "/* transform: translateY(calc(100% - var(--sheet-peek))); */\n.a { color: red; }";
+  assert.deepEqual(checkTransforms(css, { app: SETS_BOTH }), []);
+});
+
+test("with no script to read, nothing is claimed", () => {
+  // Which tokens move is knowable only from the scripts. Given none, the check
+  // has no grounds to report anything and says nothing rather than guessing.
+  const css = '.tally-panel { transform: translateY(calc(100% - var(--sheet-peek, 0px))); }';
+  assert.deepEqual(checkTransforms(css), []);
+});
+
+test("the shipped stylesheet has no such transform", () => {
+  assert.deepEqual(checkTransforms(stylesheet, { "assets/app.js": appjs }), []);
 });

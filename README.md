@@ -82,9 +82,17 @@ python -m http.server 8000
 
 ### Changing anything in `assets/`
 
-Bump the version in `index.html`. It appears in one place — a stylesheet link, a
-module `src`, and an import map that carries the same version to every module
-the page loads.
+Run `python tools/build_version.py`. The version is a short hash of the
+stylesheet and the modules, and the script writes it into every slot in
+`index.html` — a stylesheet link, a module `src`, and an import map that
+carries the same version to every module the page loads.
+
+It used to be a date with a letter after it, picked by hand, under the rule
+that a value already in use is not a bump. That could only be checked by
+reading every version the page had ever carried, and the letters ran out faster
+than anyone expected; two branches once picked the same one. A hash cannot be
+forgotten or picked twice. CI regenerates it and fails if the committed copy
+differs, the same way it checks `manifest.json`.
 
 GitHub Pages caches every file for ten minutes, and each file's ten minutes
 start when that file was last fetched, so they expire at different times. A
@@ -96,8 +104,10 @@ it shipped with.
 
 The two font files are the exception: they are named from `styles.css`, not
 from `index.html`, and they are immutable — replacing a face means a new
-filename, not a new version string. Do not add a `?v=` to them, or there
-would be a ninth place to keep in step that nothing checks.
+filename, not a new version string. Do not add a `?v=` to them. They are left
+out of the hash for the same reason: including them would move the version
+without moving the URL that would have to change for a new face to reach
+anybody.
 
 `python tools/validate_assets.py` checks that nothing is requested unversioned,
 that every module is in the import map, and that one version is used
@@ -108,7 +118,31 @@ throughout. CI runs it.
 ```bash
 node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing, notation
 node tools/check_parity.mjs     # every increment, notebook vs. site
+node tools/validate_css.mjs     # the stylesheet parses, and every token it names exists
 ```
+
+Those need nothing installed. One more does:
+
+```bash
+npm install --no-save playwright && npx playwright install chromium
+node tools/check_render.mjs     # open the page and ask where its furniture ended up
+```
+
+Everything above `check_render.mjs` reads the source, which is why the faults
+that have actually reached this site are the ones none of them can see: valid
+CSS that parses, passes every check, and leaves the calculator somewhere nobody
+can reach it. It has happened twice — a comment closed early and the browser
+swallowed the media query that followed, so the running total stopped existing
+on desktop; and a transition was left to chase a height that had already
+changed, so the phone sheet jumped on every pick for months. A person looking
+at the page caught both.
+
+`check_render.mjs` loads the page at 320, 390 and 1180px, with and without
+increments chosen, and checks that the total is on screen, that it sits beside
+the increments on a wide screen, that adding one does not move the sheet, and
+that nothing spills sideways. Each of those has been run against a deliberately
+broken copy to confirm it fails. CI installs a browser for it; nothing else
+here needs one, which is why it is a separate script rather than a test.
 
 `check_parity.mjs` loads all 236 increments twice — once through the notebook's
 own code, once through the site's — and fails on any difference. Because a
@@ -136,8 +170,9 @@ tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```
 
-The seven files without any DOM access are the ones the test suite covers,
-which is why it needs no browser.
+The seven files without any DOM access are the ones the unit tests cover,
+which is why those need no browser. What is left is the page itself, and
+`tools/check_render.mjs` is what looks at that.
 
 They used to be five, and the README used to claim they held everything worth
 testing. That stopped being true as app.js grew: how far the sheet slides, what

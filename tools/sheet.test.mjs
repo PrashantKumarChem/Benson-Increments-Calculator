@@ -55,6 +55,16 @@ test("a panel not yet laid out measures as nothing rather than as something", ()
     { hidden: 0, peek: 0 });
 });
 
+test("a fractional measurement is kept whole rather than rounded", () => {
+  // Both heights come from getBoundingClientRect rather than offsetHeight,
+  // which rounds. Rounding them separately is what made the peek read 134 one
+  // moment and 135 the next, for no reason but where the rounding fell - a
+  // pixel of the page's bottom padding appearing and disappearing under a
+  // sheet that had not moved.
+  assert.deepEqual(sheetMetrics({ panelHeight: 328.6, bodyHeight: 194.8 }),
+    { hidden: 194.8, peek: 133.8 });
+});
+
 /* -------------------------------------------------------------------------- */
 /* What a drag meant                                                           */
 /* -------------------------------------------------------------------------- */

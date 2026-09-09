@@ -196,58 +196,86 @@ body {
    subscript no longer stretches the row it sits in. */
 sub { font-size: .82em; line-height: 0; }
 
-/* One strip: what the page is, how to search it, and how to show it, on a
-   single line, with the category filters on the next.
+/* ---------------- app bar ---------------- */
+
+/* The edge of the application, rather than the first paragraph of the page.
+
+   Three things say so, and they are the three every application chrome uses:
+   it runs the full width of the window, it sits on a surface of its own, and a
+   hairline closes it. The band is pulled out past the body's own padding and
+   given that padding back inside, so the surface reaches both edges of the
+   screen while its contents stay in column with everything below.
 
    The description and citation used to spend 208px before anything you could
    click. They are still here, and still in the markup for anyone reading the
    page with a screen reader or a search engine - just not in front of the
-   thing you came to use.
-
-   Moving the view toggle up here is what lets all six filters sit on one row.
-   Sharing a line with the toggle, they wrapped, and wrapped around it, which
-   left a hole under the toggle wherever the last chip fell short. */
-.bar {
-  padding: var(--space-5) 0;
+   thing you came to use. */
+.appbar {
+  margin-inline: calc(-1 * var(--space-5));
+  padding-inline: var(--space-5);
+  margin-bottom: var(--space-5);
+  background: var(--layer);
+  border-bottom: 1px solid var(--line);
+}
+/* 1180px is .wrap's width, written again rather than shared, because these are
+   two boxes that happen to line up rather than one box inside another - the
+   band has to be able to reach the edges while its contents do not. */
+.appbar-inner {
+  max-width: 1180px; margin: 0 auto;
+  min-height: 3.25rem;
   display: flex; flex-wrap: wrap; align-items: center;
-  gap: var(--space-3) var(--space-4);
+  gap: var(--space-2) var(--space-4);
 }
-/* A flex item asking for the whole line gets one, so the filters start a row
-   of their own without a spacer element to say so. */
-.bar .chips { flex: 1 1 100%; margin-bottom: 0; }
-.bar .search { flex: 1 1 22rem; min-width: 14rem; margin-bottom: 0; }
-.bar .about { order: 9; }
 /* The title is the one thing here nobody needs to read twice. */
-h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
-/* Too narrow for one strip. Asking the search for most of a line rather than
-   all of it is the whole change: the title and About then keep the first line
-   to themselves, the search takes the second and the view toggle rides along
-   beside it, and the filters still get their own row. Given a full line the
-   toggle was pushed onto a fourth row of its own, which on a phone is a row
-   of chrome for one control. */
-@media (max-width: 620px) {
-  .bar { padding: var(--space-4) 0; }
-  .bar .search { flex: 1 1 60%; }
+h1 { margin: 0; font-size: 1.0625rem; letter-spacing: -.01em; font-weight: 620; }
+/* Pushed to the far end, so the bar has two ends and not one queue. Wraps to a
+   line of its own below the title when the window is too narrow to hold both,
+   which on a phone is most of them - still right-aligned there, so it reads as
+   the same group that was beside the title a moment ago. */
+.appnav {
+  margin-left: auto;
+  display: flex; align-items: center; gap: var(--space-1);
 }
-.about-toggle {
-  font: inherit; font-size: .78rem; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong);
-  padding: var(--space-1) var(--space-3);
+
+/* A control drawn with spacing and a hover rather than with a border.
+
+   The border is what a container gets - the field you type into, the toggle
+   holding two states. Spending it on every control as well is what made the
+   old strip read as five rectangles of equal weight, none of them saying
+   which mattered. These recede until they are pointed at, which is what
+   secondary means.
+
+   It is a <button> for About, which discloses a panel, and an <a> for
+   Reference, which goes to a page: one rule for both, so they sit level, and
+   the link still opens in a new tab and still works with scripting off. */
+.ghost {
+  font: inherit; font-size: .8125rem; line-height: 1.6;
+  cursor: pointer; text-decoration: none;
+  background: transparent; color: var(--ink-soft); border: 0;
+  padding: var(--space-2) var(--space-3);
+  display: inline-flex; align-items: center; justify-content: center;
+  /* The same height as the square one beside them. Left to their text they
+     came to 29px against the theme button's 32px, so the three sat in a row
+     at two different heights - close enough to look like a mistake rather
+     than a difference. It is also the floor for a touch target on the widths
+     between a phone in landscape and a laptop, where these are still words
+     and a thumb is still what presses them. */
+  min-height: 2rem;
 }
-.about-toggle:hover { background: var(--layer-accent); color: var(--ink); }
+.ghost:hover { background: var(--layer-accent); color: var(--ink); }
+/* Words while there is room for words. The glyph ships on every screen and is
+   shown on the narrow ones by the rule further down; a word is unambiguous and
+   a glyph has to be learnt, so the glyph is what a shortage of width buys, not
+   a default. */
+.ghost-icon { display: none; }
 
 /* Which theme is on is something the page already shows by being that theme,
    so this needs no label - only a target big enough to hit and a glyph saying
-   where it goes. Square, like everything else, and sized to sit level with
-   About beside it. */
+   where it goes. Square, and sized to sit level with the words beside it. */
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 1.75rem; height: 1.75rem; padding: 0; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong);
+  width: 2rem; height: 2rem; padding: 0;
 }
-.theme-toggle:hover { background: var(--layer-accent); color: var(--ink); }
 /* The same three branches the colour tokens use, so the icon is right on a
    system-dark machine whose reader has never pressed this. Light shows the
    moon, because the moon is where pressing it takes you. */
@@ -258,14 +286,90 @@ h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
 }
 :root[data-theme="dark"] .theme-toggle .moon { display: none; }
 :root[data-theme="dark"] .theme-toggle .sun { display: block; }
-/* A thumb needs more than 28px, and the row it sits in has the width to give. */
+/* A thumb needs more than 32px, and the row it sits in has the width to give. */
 @media (max-width: 859px) { .theme-toggle { width: 2.25rem; height: 2.25rem; } }
-/* The Reference link is the same control as the About button and shares its
-   rule, so the two sit level in the strip. It is an <a> and not a <button>
-   because it goes to a page: a reader can open it in a new tab, and it still
-   works with scripting off. */
-.ref-link { text-decoration: none; display: inline-block; line-height: 1.55; }
-.about { flex-basis: 100%; }
+
+/* Below this the title and the three words stop sharing a line, so the two
+   that are words become the glyphs they already ship, and the row fits beside
+   the title again instead of dropping underneath it.
+
+   440px is measured rather than chosen. The title is 224px, the nav reading
+   About / Reference / theme is 160px, the gap between them is 12px and the
+   page keeps 16px each side: 428px, below which they cannot share a line. The
+   next ten pixels up are slack, because a reader who has raised their browser
+   font makes both of those numbers larger and there is no width at which that
+   is still exactly true.
+
+   As glyphs the same row is 112px, so the title has 348px of the 358px a
+   390px phone leaves - it fits, with the pixels to spare that the word version
+   did not have. Narrower than about 370px the title wraps to two lines rather
+   than the row breaking apart, which is why h1 is allowed to be narrower than
+   its text here: a wrapped title with the controls still beside it reads
+   better than a title alone above a row of three glyphs.
+
+   The word is hidden, never dropped. It is still the button's accessible name,
+   so a screen reader on a phone still meets "About" and "Reference" - and the
+   markup carries no aria-label repeating what the element already says. */
+@media (max-width: 440px) {
+  /* nowrap, and it is the whole of why the title wraps instead of the row
+     breaking apart. A wrapping flex container moves an item to the next line
+     before it will shrink one that is already on this line, so min-width alone
+     did nothing: the nav went underneath while the title sat on a line of its
+     own with room to spare beside it. Told it may not wrap, the container has
+     to shrink something instead, and min-width: 0 is what says the title is
+     the one that gives. The nav is held out of that: three 36px targets are
+     the floor here, not the slack. */
+  .appbar-inner { flex-wrap: nowrap; }
+  .appnav { flex: none; }
+  h1 { font-size: 1rem; min-width: 0; }
+  .ghost { width: 2.25rem; height: 2.25rem; padding: 0; }
+  .ghost-icon { display: block; }
+  .ghost-label {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden; clip-path: inset(50%);
+    white-space: nowrap; border: 0;
+  }
+}
+
+/* ---------------- toolbar ---------------- */
+
+/* What acts on the increments, on the near side of the bar's hairline: what to
+   look for, and how to look at it. The filters follow on their own row, which
+   they now get by being their own element rather than by asking a flex parent
+   for a whole line.
+
+   The search is allowed to grow but not to sprawl. Given the whole row it
+   became the largest thing on the page by area - a text field out-shouting 236
+   values - so it takes the room it needs to show a long placeholder and stops.
+   Cards/Table sits at the far end rather than trailing the field, so the row
+   has two ends the way the bar above it does. */
+.toolbar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.toolbar .search { flex: 1 1 20rem; min-width: 12rem; max-width: 34rem; margin-bottom: 0; }
+.toolbar .views { flex: none; margin-left: auto; }
+/* Too narrow for the field to ask for a comfortable width and still leave room
+   beside it. Asking for most of a line rather than all of one is the whole
+   change: Cards/Table then rides along on the same row instead of being
+   pushed onto a row of its own, which on a phone is 37px of chrome for one
+   control.
+
+   The floor comes down with it, and that is the half that actually mattered.
+   A flex basis only decides who wraps when there is room to negotiate; a
+   min-width decides it outright. At 320px the row has 288px, Cards/Table takes
+   120px and the gap 12px, so a field refusing to go below 12rem could not fit
+   whatever its basis said - and the toggle went back onto a row of its own on
+   the narrowest screens, which are the ones that could least afford it. 9rem
+   still shows enough of the placeholder to say what the field is for. */
+@media (max-width: 620px) {
+  .toolbar .search { flex: 1 1 45%; min-width: 9rem; }
+}
+
+.about { margin-bottom: var(--space-5); }
 .about p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
 .about .cite { margin-top: var(--space-3); color: var(--ink-helper); font-size: .8rem; }
 /* The accent, not the browser's blue. Every other link on the site is already
@@ -343,7 +447,15 @@ main, .library, .table-wrap { min-width: 0; }
   font: inherit; cursor: pointer; padding: var(--space-2) var(--space-3); line-height: 1;
 }
 .search .clear:hover { color: var(--ink); }
-input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Links are in this list too, and were not. Reference is an <a> because it goes
+   to a page, so it took the browser's default ring while the button beside it
+   took this one - two controls in the same row of three, focused the same way
+   by the same key, drawn differently. Nothing here can see that: it is a
+   selector that does not mention a tag, and the page looks right until
+   somebody navigates it by keyboard. */
+input:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px;
+}
 /* The panel is given focus when the control holding it disappears, so that it
    does not fall to the body. It is a container and not a control - it is not
    in the tab order and there is nothing on it to operate - so it is not drawn
@@ -700,6 +812,32 @@ ul.picks .sum {
      stop agreeing, which is the only thing that would: change the spelling on
      one side and the button still flips the attribute, the sheet still has
      every rule it needs, and none of them apply - it just never opens. */
+  /* Shut, the sheet is pushed down by exactly its own body, which leaves the
+     head showing.
+
+     That distance grows as contributions are added, and the panel grows by the
+     same amount at the same moment, because it is anchored to the bottom and
+     grows upwards. The two cancel and the head does not move - but only if
+     they arrive together. They did not: the height is layout and lands at
+     once, the transform is transitioned and takes var(--sheet-close) to
+     follow, so the head jumped up and slid back on every pick. It stopped
+     after a handful because once the body passes 80vh the panel is capped and
+     the distance stops changing - which is why it read as "bounces for the
+     first few clicks and then settles" rather than as a bug with a cause.
+
+     What fixes it is not written here, because it cannot be: CSS has no way to
+     say "transition this property when that other one changes, but not when
+     this one does". assets/app.js turns the transition off for the one frame
+     in which it applies a new measurement, which is the honest version of the
+     same sentence - a re-measurement is not a state change, and only a state
+     change should move the sheet.
+
+     Written as a plain length rather than as `100% - var(--sheet-peek)`, which
+     is the tidier way to say it and does not work: a percentage inside a
+     transform is resolved against the border box, and a Chrome that has handed
+     the transform to the compositor does not re-resolve it when the custom
+     property in the calc changes. The sheet stayed pushed down by a full 100%
+     and never came back onto the screen. */
   .tally-panel:not([data-open="true"]) {
     transform: translateY(var(--sheet-hidden, 0px));
     transition-duration: var(--sheet-close);
@@ -725,17 +863,32 @@ ul.picks .sum {
     content: ""; display: block; width: 2rem; height: 3px;
     background: var(--line-strong); margin: 0 auto;
   }
-  /* The label, the total and the disclosure read as one row, so the button is
-     beside the number it summarises rather than below the whole panel. */
+  /* One line: what the quantity is, what it comes to, and the way in.
+
+     Shut, this bar is the entire sheet, and it is on the screen for as long as
+     somebody is choosing increments - so every pixel of it is a pixel of the
+     grid they came to read. It used to take three lines and 134px of an 844px
+     phone. The kcal figure has moved into the body (index.html), which leaves
+     a label, a figure and a button, and those fit beside each other.
+
+     Baselines, not centres: a .6875rem label has nothing to line up on
+     against a 1.875rem figure except the line they are written on. The button
+     is the exception and centres itself, because it is a box rather than
+     text.
+
+     The figure takes its own leading here. 1.55 is set on the body for prose,
+     and prose leading around a number that is alone on its line is 10px of air
+     above and below it - which on this bar is 20px of the grid. */
   .tally-head {
     touch-action: none;
-    display: grid; grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center; column-gap: var(--space-4);
+    display: flex; align-items: baseline; column-gap: var(--space-3);
   }
-  .tally-head > :not(.panel-toggle) { grid-column: 1; }
+  /* Pushes the button to the far end, so the two readings stay together at
+     the near one rather than being spread across the bar. */
+  .tally-head .kj { margin-right: auto; line-height: 1.15; }
   .panel-toggle {
     display: flex; align-items: center; gap: var(--space-2);
-    grid-column: 2; grid-row: 1 / -1;
+    align-self: center; flex: none;
     font: inherit; font-size: .8125rem; cursor: pointer;
     background: transparent; color: var(--ink-soft);
     border: 1px solid var(--line-strong);
@@ -743,17 +896,6 @@ ul.picks .sum {
   }
   .panel-toggle .caret { transition: transform .12s ease; }
   .tally-panel[data-open="true"] .panel-toggle .caret { transform: rotate(180deg); }
-  /* It used to open and shut with display, which cannot be animated - the
-     sheet appeared and vanished in one frame, and a sheet that teleports does
-     not read as a sheet. Height and opacity can be animated, and visibility
-     still does the job display was there for: collapsed, nothing inside can be
-     tabbed to and nothing is announced, so the keyboard order matches what is
-     on the screen. Its own transition is a delay rather than a fade, so the
-     body stays visible for exactly as long as it takes to close.
-
-     overscroll-behavior stops a flick that reaches the end of the list from
-     continuing into the page behind it - the same chaining that turns into
-     pull-to-refresh at the top. */
   /* The body no longer animates anything. It keeps its full height at all
      times - that height is exactly how far the panel slides - and simply ends
      up below the bottom of the screen when the sheet is shut.
@@ -777,10 +919,38 @@ ul.picks .sum {
      one scrolling region is easier to use than two nested ones. */
   ul.picks { max-height: none; margin-top: var(--space-2); }
   .stepper button, .rm { width: 2.375rem; height: 2.375rem; }
-  /* Big enough for a thumb without spending four lines on six filters: the
-     old rule grew the padding, which pushed the last chips off the first
-     screen entirely. Height is what makes a target hittable, not width. */
-  .chip { min-height: 2.25rem; padding: var(--space-2) var(--space-4); }
+  /* One row that scrolls, rather than three that stack.
+
+     Six categories wrapped to three rows at 390px and took 116px - an eighth
+     of the screen - before a single increment was on it. Sideways they take
+     one row, and the row is the same height whatever the reader's font does
+     to the labels, which wrapping was not.
+
+     The row is pulled out to both edges of the screen and given the padding
+     back inside, so a chip that continues past the edge is cut off by the
+     screen rather than tucked behind the page margin. Being cut off is the
+     only thing telling a reader there is more, which is also why there is no
+     scrollbar: this is a thumb-scrolled row of six on a touch screen, and a
+     scrollbar would take height to say what the cut-off chip already says.
+
+     A chip must not be squeezed to make the row fit, which is what
+     flex-shrink would otherwise do to the longest label the moment the row
+     overflowed - so the labels stay whole and the row scrolls instead.
+
+     The chip itself is big enough for a thumb without spending lines on it:
+     the rule this replaced grew the padding, which pushed the last chips off
+     the first screen entirely. Height is what makes a target hittable, not
+     width. */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--space-5));
+    padding-inline: var(--space-5);
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { min-height: 2.25rem; padding: var(--space-2) var(--space-4); flex: none; }
 }
 
 /* Narrower still, and a name like C-(Cd)(CB)(H)2 has no room left beside four
@@ -800,13 +970,43 @@ ul.picks .sum {
    the document 1px wider than the window with it. They come back the moment
    they can do something. */
 .layout[data-tally="empty"] .actions { display: none; }
+/* The same bargain the header strikes, one panel over: a border means a
+   container, and these are controls. They were three identical outlined
+   rectangles of equal width - the same fault the top of the page had, where
+   nothing said which of them mattered or which of them you could not undo.
+
+   Quiet fills rather than ghosts, and the chips' fill exactly. Ghost controls
+   work in the bar because they are words at the edge of the page with a hover
+   to find them by; these sit under a list on a panel that on a phone has no
+   hover at all, and three bare words in a row there read as a caption rather
+   than as three things you can press. The chip is already this page's word for
+   "a control you can press that is not the important thing on the screen", so
+   these become chips rather than a fourth kind of button. */
+/* --ink, not --ink-soft, and all three the same. Marking Copy by giving it the
+   darker ink and leaving the other two soft did read as a hierarchy - it also
+   read as two disabled buttons beside an enabled one, because faded is already
+   this panel's word for "you cannot press this yet" and all three spend the
+   first part of every visit actually being that. One signal, one meaning. */
 .actions button {
-  flex: 1; font: inherit; font-size: .86rem; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong); padding: var(--space-3) var(--space-4);
+  font: inherit; font-size: .8125rem; cursor: pointer;
+  background: var(--layer-accent); color: var(--ink);
+  border: 0; padding: var(--space-2) var(--space-4); min-height: 2rem;
 }
-.actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
+.actions button:hover:not(:disabled) { background: var(--line); }
 .actions button:disabled { opacity: .4; cursor: default; }
+/* Weight, then - which is the one axis nothing else on this panel is using.
+   An accent fill would have said "primary" loudest and is the one thing it
+   must not do here: it would sit directly under the total and out-shout it,
+   and on this page a filled accent already means a state is on. Copy is not a
+   state. */
+.actions .primary { font-weight: 600; }
+/* Distance, not colour. Reset is the only one of the three that cannot be
+   taken back, and this palette has no danger red to say so - deliberately, and
+   adding one for a single button would be the wrong trade. Space says it
+   instead, and says it better: the two you can undo stay together at one end
+   and the one you cannot sits alone at the other, out of the path of a thumb
+   going for Copy. */
+.actions .destructive { margin-left: auto; }
 
 footer { color: var(--ink-helper); font-size: .8rem; margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--line); }
 footer a { color: var(--ink-soft); }
@@ -864,7 +1064,25 @@ footer a { color: var(--ink-soft); }
    a chemistry symbol - ΔHf° is a row in the glossary - and uppercasing it
    renders ΔHF°, which is a different thing and not a real one. */
 
-.ref-bar { justify-content: space-between; border-bottom: 1px solid var(--line); }
+/* The reference page's own strip, which stands on its own layout.
+
+   It used to say only `justify-content` and `border-bottom`, and take being a
+   flex row from `.bar` alongside it - the one strip this page had before the
+   calculator was split into an app bar and a toolbar. `.bar` is gone, so the
+   two lines it was leaning on are written here.
+
+   Said out loud because reference.html is not on main: it is built on the
+   docs/reference-page branch, whose markup still reads `class="bar ref-bar"`.
+   Nothing in this repository can fail on that, so this rule is what stops that
+   branch merging into an unstyled header. When it does land, the honest
+   follow-up is to give that page the same app bar as this one rather than to
+   keep a second kind of strip alive. */
+.ref-bar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-5) 0;
+  justify-content: space-between; border-bottom: 1px solid var(--line);
+}
 .ref-back {
   font-size: .78rem; color: var(--ink-soft); text-decoration: none;
   border: 1px solid var(--line-strong); padding: var(--space-1) var(--space-3);
