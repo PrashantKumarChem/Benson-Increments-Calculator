@@ -504,14 +504,20 @@ ul.picks .sum {
   font-size: .8125rem; font-variant-numeric: tabular-nums;
 }
 .rm { width: 1.875rem; font-size: 1.05rem; }
-/* Remove is the rarest thing you do to a row and the only destructive one, so
-   it waits until the row is under the pointer - but only where there is a
-   pointer. On a touch screen there is no hover to reveal it with, and a
-   control you cannot reach is worse than one that is always there. */
-@media (hover: hover) {
-  .rm { opacity: 0; transition: opacity .1s ease; }
-  ul.picks li:hover .rm, .rm:focus-visible { opacity: 1; }
-}
+/* Remove is the rarest thing you do to a row and the only destructive one.
+
+   It used to wait for hover, behind @media (hover: hover). That is a claim the
+   device makes about itself, and it is wrong often enough to matter: Chrome on
+   Android reports hover when it is asked for the desktop site, and so do
+   tablets with a stylus or a keyboard case. When the claim was wrong the
+   button was still there and still took a tap - opacity does not stop pointer
+   events - so the row carried an invisible destructive control right beside
+   the number. Reported from a phone, where it was simply not there.
+
+   Hiding it saved a little chrome and cost the one thing a remove button has
+   to be, which is findable. It is always drawn now: borderless, in --ink-soft,
+   and it only fills with the accent under an actual pointer. The space was
+   reserved for it either way, so nothing moves. */
 .empty { color: var(--ink-helper); font-size: .87rem; margin: var(--space-5) 0 var(--space-1); }
 
 /* How far the total would move if every averaged range were read at its
