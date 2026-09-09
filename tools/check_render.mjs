@@ -19,12 +19,25 @@
  * WHAT THIS CANNOT SEE, said out loud so nobody trusts it further than it
  * goes. The same afternoon produced a third failure - the sheet's slide
  * written as `translateY(calc(100% - var(--sheet-peek)))`, which pushed it a
- * full 100% down and off the screen - and this file does not catch it. It was
- * tried. Headless Chromium resolves that transform correctly; the bug needs a
- * compositor that does not re-resolve a percentage when the custom property
- * inside the calc changes, which is the browser on a desk and not the one
- * here. A headless render is a much better check than reading the source and
- * still not the same thing as looking.
+ * full 100% down and off the screen - and this file does not catch it.
+ *
+ * That is a measured result rather than an assumption. Three browsers were
+ * tried against a stylesheet with the fault put back in: the headless shell
+ * Playwright uses by default, the full Chromium binary in its new headless
+ * mode, and that same binary with --use-gl=angle --enable-gpu
+ * --ignore-gpu-blocklist. All three resolved the transform correctly and
+ * placed the sheet exactly where it belongs. The bug needs a compositor that
+ * will not re-resolve a percentage when the custom property inside the calc
+ * changes, and no headless configuration reproduces it.
+ *
+ * So it is checked where it can be: tools/validate_css.mjs refuses that shape
+ * of declaration outright - a percentage in a transform beside a token a
+ * script rewrites. A fault with no symptom in any instrument has to be caught
+ * by its cause.
+ *
+ * The lesson generalises, which is why it is written here rather than in a
+ * commit message. A headless render is a much better check than reading the
+ * source, and still not the same thing as looking at the page.
  *
  * So this is the smallest thing that would have caught them: load the page,
  * and ask it where its own furniture ended up. Every assertion below is a
