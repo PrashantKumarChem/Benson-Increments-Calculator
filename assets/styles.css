@@ -79,55 +79,57 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  padding: 0 18px 32px;
+  padding: 0 var(--space-5) var(--space-7);
   background: var(--bg);
   color: var(--ink);
-  font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* 1rem, not a pixel size: a reader who has set a larger default font in the
+     browser gets one. Every size below is relative to this. */
+  font: 1rem/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 .wrap { max-width: 1180px; margin: 0 auto; }
 sub { font-size: .72em; }
 
-header { padding: 30px 0 20px; }
-h1 { margin: 0 0 6px; font-size: 1.5rem; letter-spacing: -.015em; font-weight: 620; }
+header { padding: var(--space-7) 0 var(--space-6); }
+h1 { margin: 0 0 var(--space-3); font-size: 1.5rem; letter-spacing: -.015em; font-weight: 620; }
 header p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
-header .cite { margin-top: 10px; color: var(--ink-helper); font-size: .8rem; }
+header .cite { margin-top: var(--space-4); color: var(--ink-helper); font-size: .8rem; }
 
-.layout { display: grid; gap: 22px; align-items: start; }
+.layout { display: grid; gap: var(--space-6); align-items: start; }
 @media (min-width: 980px) { .layout { grid-template-columns: minmax(0,1fr) 366px; } }
 
 /* ---------------- picker ---------------- */
-.search { position: relative; margin-bottom: 14px; }
+.search { position: relative; margin-bottom: var(--space-5); }
 .search input {
   width: 100%; font: inherit; color: var(--ink); background: var(--layer);
   border: 1px solid var(--line-strong); border-radius: 10px;
-  padding: 11px 38px 11px 13px;
+  padding: var(--space-4) var(--space-8) var(--space-4) var(--space-4);
 }
 .search input::placeholder { color: var(--ink-helper); }
 .search .clear {
   position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
   border: 0; background: transparent; color: var(--ink-helper);
-  font: inherit; cursor: pointer; padding: 6px 8px; line-height: 1;
+  font: inherit; cursor: pointer; padding: var(--space-3); line-height: 1;
 }
 .search .clear:hover { color: var(--ink); }
 input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-nav.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
+nav.tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
 nav.tabs button {
   font: inherit; font-size: .87rem; cursor: pointer;
   background: transparent; color: var(--ink-soft);
-  border: 1px solid transparent; border-radius: 999px; padding: 6px 13px;
+  border: 1px solid transparent; border-radius: 999px; padding: var(--space-3) var(--space-4);
 }
 nav.tabs button:hover { background: var(--accent-soft); color: var(--ink); }
 nav.tabs button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
-nav.tabs .n { opacity: .6; font-size: .82em; margin-left: 6px; }
+nav.tabs .n { opacity: .6; font-size: .82em; margin-left: var(--space-3); }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 6px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: var(--space-3); }
 .grid button {
   font: inherit; font-size: .85rem; cursor: pointer; text-align: left;
   background: var(--layer); color: var(--ink);
   border: 1px solid var(--line-strong); border-radius: 9px;
-  padding: 9px 11px; min-height: 50px;
-  display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  padding: var(--space-3) var(--space-4); min-height: 3.125rem;
+  display: flex; flex-direction: column; justify-content: center; gap: var(--space-1);
   transition: border-color .12s ease, background .12s ease;
 }
 .grid button:hover { border-color: var(--accent); }
@@ -135,33 +137,33 @@ nav.tabs .n { opacity: .6; font-size: .82em; margin-left: 6px; }
 .grid button.picked { border-color: var(--accent); background: var(--accent-soft); }
 .grid .meta { color: var(--ink); font-size: .82em; font-weight: 600; font-variant-numeric: tabular-nums; }
 .grid .tally { color: var(--accent); font-weight: 600; }
-.status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: 22px 2px; }
+.status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: var(--space-6) var(--space-1); }
 
 /* ---------------- tally ---------------- */
 .tally-panel {
   background: var(--layer); border: 1px solid var(--line-strong);
-  border-radius: 12px; padding: 15px 16px;
+  border-radius: 12px; padding: var(--space-5);
 }
-@media (min-width: 980px) { .tally-panel { position: sticky; top: 18px; } }
+@media (min-width: 980px) { .tally-panel { position: sticky; top: var(--space-5); } }
 .kj { font-size: 1.7rem; font-weight: 640; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
-.kj span { font-size: .55em; font-weight: 500; color: var(--ink-soft); margin-left: 4px; letter-spacing: 0; }
+.kj span { font-size: .55em; font-weight: 500; color: var(--ink-soft); margin-left: var(--space-2); letter-spacing: 0; }
 .kcal { color: var(--ink-soft); font-size: .92rem; font-variant-numeric: tabular-nums; margin-top: 1px; }
 
-ul.picks { list-style: none; margin: 14px 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
-ul.picks li { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-top: 1px solid var(--line); }
+ul.picks { list-style: none; margin: var(--space-5) 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
+ul.picks li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-top: 1px solid var(--line); }
 ul.picks .name { flex: 1; min-width: 0; font-size: .87rem; overflow-wrap: anywhere; }
 ul.picks .each { display: block; color: var(--ink-helper); font-size: .76rem; font-variant-numeric: tabular-nums; }
-ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width: 74px; text-align: right; }
+ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width: 4.625rem; text-align: right; }
 .stepper { display: flex; align-items: center; gap: 1px; }
 .stepper button, .rm {
   font: inherit; cursor: pointer; background: transparent; color: var(--ink-soft);
   border: 1px solid var(--line-strong); border-radius: 7px;
-  width: 30px; height: 30px; line-height: 1; padding: 0;
+  width: 1.875rem; height: 1.875rem; line-height: 1; padding: 0;
 }
 .stepper button:hover, .rm:hover { border-color: var(--accent); color: var(--ink); }
-.stepper .n { min-width: 26px; text-align: center; font-size: .87rem; font-variant-numeric: tabular-nums; }
-.rm { width: 30px; font-size: 1.05rem; }
-.empty { color: var(--ink-helper); font-size: .87rem; margin: 14px 0 2px; }
+.stepper .n { min-width: 1.625rem; text-align: center; font-size: .87rem; font-variant-numeric: tabular-nums; }
+.rm { width: 1.875rem; font-size: 1.05rem; }
+.empty { color: var(--ink-helper); font-size: .87rem; margin: var(--space-5) 0 var(--space-1); }
 
 /* On a phone the panel sits at the foot of the page rather than beside the
    grid, so it has to earn its height: the list of picks is capped to leave the
@@ -169,13 +171,13 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
    actually hit. These come after the rules they override - as the same
    specificity, order is what decides. */
 @media (max-width: 979px) {
-  .tally-panel { position: sticky; bottom: 0; margin-top: 6px; }
+  .tally-panel { position: sticky; bottom: 0; margin-top: var(--space-3); }
   ul.picks { max-height: 32vh; }
-  ul.picks li { gap: 6px; }
-  ul.picks .sum { min-width: 62px; }
-  .stepper button, .rm { width: 38px; height: 38px; }
-  .rm { width: 38px; }
-  nav.tabs button { padding: 8px 14px; }
+  ul.picks li { gap: var(--space-3); }
+  ul.picks .sum { min-width: 3.875rem; }
+  .stepper button, .rm { width: 2.375rem; height: 2.375rem; }
+  .rm { width: 2.375rem; }
+  nav.tabs button { padding: var(--space-3) var(--space-5); }
 }
 
 /* Narrower still, and a name like C-(Cd)(CB)(H)2 has no room left beside four
@@ -187,16 +189,16 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
   ul.picks .sum { margin-left: auto; }
 }
 
-.actions { display: flex; gap: 7px; margin-top: 14px; }
+.actions { display: flex; gap: var(--space-3); margin-top: var(--space-5); }
 .actions button {
   flex: 1; font: inherit; font-size: .86rem; cursor: pointer;
   background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong); border-radius: 8px; padding: 8px 10px;
+  border: 1px solid var(--line-strong); border-radius: 8px; padding: var(--space-3) var(--space-4);
 }
 .actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
 .actions button:disabled { opacity: .4; cursor: default; }
 
-footer { color: var(--ink-helper); font-size: .8rem; margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); }
+footer { color: var(--ink-helper); font-size: .8rem; margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--line); }
 footer a { color: var(--ink-soft); }
 
 /* Visible to screen readers only - the search field's label. */
