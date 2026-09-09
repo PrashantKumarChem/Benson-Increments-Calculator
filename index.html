@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09c">
 <!-- Every asset is requested with a version, and the version lives here and
      nowhere else.
 
@@ -32,12 +32,12 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09c",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09c",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09c",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09c",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09c",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09c"
   }
 }
 </script>
@@ -45,7 +45,10 @@
 <body>
 <div class="wrap">
 
-  <header>
+  <!-- One strip. The About panel follows its own button in the source, so a
+       screen reader meets them together, and is ordered last visually so the
+       filters are not pushed down the page when it opens. -->
+  <header class="bar">
     <h1>Benson Increments Calculator</h1>
     <button class="about-toggle" id="about-toggle" aria-expanded="false" aria-controls="about">About</button>
     <div class="about" id="about" hidden>
@@ -53,43 +56,63 @@
       <p class="cite">Chemistry C450/C540, Indiana University Bloomington &middot; Prashant Kumar and Nicola L. B. Pohl &middot;
          values after Cohen &amp; Benson, <i>Chem. Rev.</i> <b>1993</b>, <i>93</i>, 2419.</p>
     </div>
+
+    <div class="search">
+      <label class="visually-hidden" for="filter">Search the increments</label>
+      <span class="icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="7" cy="7" r="4.5"></circle><path d="M10.4 10.4 14 14"></path>
+        </svg>
+      </span>
+      <input type="search" id="filter" autocomplete="off" spellcheck="false"
+             placeholder="Search every category — CH3, methyl, C-(C)(H)3, cyclohexane">
+      <kbd class="shortcut" id="shortcut" aria-hidden="true">Ctrl K</kbd>
+      <button class="clear" id="clear" hidden aria-label="Clear search">&times;</button>
+    </div>
+
+    <div class="views" id="views" role="group" aria-label="How to show the increments">
+      <button data-mode="cards" aria-pressed="true">Cards</button>
+      <button data-mode="table" aria-pressed="false">Table</button>
+    </div>
+
+    <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
   </header>
 
   <div class="layout" id="layout" data-tally="empty">
     <main>
-      <div class="search">
-        <label class="visually-hidden" for="filter">Search the increments</label>
-        <input type="search" id="filter" autocomplete="off" spellcheck="false"
-               placeholder="Search every category — CH3, methyl, C-(C)(H)3, cyclohexane">
-        <kbd class="shortcut" id="shortcut" aria-hidden="true">Ctrl K</kbd>
-        <button class="clear" id="clear" hidden aria-label="Clear search">&times;</button>
-      </div>
-
-      <div class="controls">
-        <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
-        <div class="views" id="views" role="group" aria-label="How to show the increments">
-          <button data-mode="cards" aria-pressed="true">Cards</button>
-          <button data-mode="table" aria-pressed="false">Table</button>
-        </div>
-      </div>
-
       <div class="library" id="library" aria-live="polite">
         <p class="status">Loading increment data&hellip;</p>
       </div>
     </main>
 
-    <aside class="tally-panel" aria-label="Running total">
-      <p class="tally-label" id="tally-label">Total</p>
-      <div class="kj" id="kj">0.00<span>kJ/mol</span></div>
-      <div class="kcal" id="kcal">0.00 kcal/mol</div>
-      <p class="mixed" id="mixed" hidden></p>
-      <p class="empty" id="empty">Nothing chosen yet. Click a group to add it.</p>
-      <ul class="picks" id="picks"></ul>
-      <p class="band" id="band" hidden></p>
-      <div class="actions">
-        <button id="undo" disabled>Undo</button>
-        <button id="copy" disabled>Copy</button>
-        <button id="reset" disabled>Reset</button>
+    <!-- Beside the grid this is one block and the disclosure is not rendered.
+         Under it, on a phone, the head stays on screen and the body folds
+         away behind the button. -->
+    <aside class="tally-panel" id="tally-panel" aria-label="Running total">
+      <div class="tally-head">
+        <p class="tally-label" id="tally-label">Total</p>
+        <div class="kj" id="kj">0.00<span>kJ/mol</span></div>
+        <div class="kcal" id="kcal">0.00 kcal/mol</div>
+        <button class="panel-toggle" id="panel-toggle" aria-expanded="false" aria-controls="tally-body">
+          <span id="panel-toggle-text">Details</span>
+          <svg class="caret" width="10" height="10" viewBox="0 0 10 10" fill="none"
+               stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M1.5 3.5 5 7l3.5-3.5"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="tally-body" id="tally-body">
+        <p class="mixed" id="mixed" hidden></p>
+        <p class="empty" id="empty">Nothing chosen yet. Click a group to add it.</p>
+        <p class="picks-head" id="picks-head" hidden>Contributions</p>
+        <ul class="picks" id="picks"></ul>
+        <p class="band" id="band" hidden></p>
+        <div class="actions">
+          <button id="undo" disabled>Undo</button>
+          <button id="copy" disabled>Copy</button>
+          <button id="reset" disabled>Reset</button>
+        </div>
       </div>
     </aside>
   </div>
@@ -97,6 +120,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09"></script>
+<script type="module" src="assets/app.js?v=2026-09-09c"></script>
 </body>
 </html>

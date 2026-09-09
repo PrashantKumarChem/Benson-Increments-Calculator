@@ -15,7 +15,19 @@
 
    Every pair below clears WCAG AA against the surface it is used on: body text
    at 4.5:1, and boundaries and focus rings at 3:1. --line is decorative only
-   (rules between rows); anything that marks out a control uses --line-strong. */
+   (rules between rows); anything that marks out a control uses --line-strong.
+
+   Type is split by role rather than by taste. Benson notation is code-shaped -
+   bracketed, subscripted, structural - so it is set in mono, and so is every
+   numeral, because that is what makes the ligand columns and the sign column
+   line up down a grid of 236 cards. Everything that is prose about the
+   chemistry rather than the chemistry itself - headings, chips, labels,
+   explanatory copy - stays in the sans stack.
+
+   Nothing here has a corner radius. A rounded card asks to be read as an
+   object on a surface; this page is a dense reference, and square edges plus a
+   1px hairline let the increments read as one continuous table. Radius is also
+   the cheapest way to look like a generic web app, which this is not. */
 
 :root {
   --bg: #e9ecee;
@@ -27,12 +39,24 @@
   --line: #c2c9cd;
   --line-strong: #7d878c;
   --accent: #0b5d63;
-  --accent-soft: #cbe8ec;
+  /* A tint, not a wash. Selection is carried by the 2px ring; when a dozen
+     increments are chosen the fill only has to say which cards they are, and
+     a saturated one turns the grid into blocks of colour that out-shout the
+     values. Lighter here also means more contrast under the ink, not less. */
+  --accent-soft: #e8f4f5;
   /* Text on a filled accent. Hardcoding #fff here is the bug that made the
      selected tab 2.42:1 in dark mode, so it is a token like everything else. */
   --on-accent: #ffffff;
   /* Distinct from --accent's other job by shape - an offset ring, never a fill. */
   --focus: #0b5d63;
+
+  /* Two stacks, two jobs. --font-mono is notation and numerals and nothing
+     else; --font-sans is everything the page says about them. Both are the
+     system's own faces rather than webfonts: this page has no external
+     dependencies and no build step, and keeping it that way is worth more here
+     than the particular shapes of any one typeface. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
   /* One spacing scale, so the density pass is not fifty separate judgements. */
   --space-1: 2px;
@@ -55,7 +79,7 @@
     --line: #2c353a;
     --line-strong: #626e74;
     --accent: #5cc9d3;
-    --accent-soft: #15464d;
+    --accent-soft: #16333a;
     --on-accent: #101417;
     --focus: #5cc9d3;
   }
@@ -70,7 +94,7 @@
   --line: #2c353a;
   --line-strong: #626e74;
   --accent: #5cc9d3;
-  --accent-soft: #15464d;
+  --accent-soft: #16333a;
   --on-accent: #101417;
   --focus: #5cc9d3;
 }
@@ -84,24 +108,51 @@ body {
   color: var(--ink);
   /* 1rem, not a pixel size: a reader who has set a larger default font in the
      browser gets one. Every size below is relative to this. */
-  font: 1rem/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font: 1rem/1.55 var(--font-sans);
 }
 .wrap { max-width: 1180px; margin: 0 auto; }
-sub { font-size: .72em; }
+/* A chemist looked straight at these and did not see them: at .72em of a small
+   card they were about 9px. Larger, with the line-height collapsed so a
+   subscript no longer stretches the row it sits in. */
+sub { font-size: .82em; line-height: 0; }
 
-/* The description and citation used to spend 208px before anything you could
+/* One strip: what the page is, how to search it, and how to show it, on a
+   single line, with the category filters on the next.
+
+   The description and citation used to spend 208px before anything you could
    click. They are still here, and still in the markup for anyone reading the
    page with a screen reader or a search engine - just not in front of the
-   thing you came to use. */
-header {
-  padding: var(--space-6) 0 var(--space-5);
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-4);
+   thing you came to use.
+
+   Moving the view toggle up here is what lets all six filters sit on one row.
+   Sharing a line with the toggle, they wrapped, and wrapped around it, which
+   left a hole under the toggle wherever the last chip fell short. */
+.bar {
+  padding: var(--space-5) 0;
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--space-3) var(--space-4);
 }
-h1 { margin: 0; font-size: 1.25rem; letter-spacing: -.015em; font-weight: 620; }
+/* A flex item asking for the whole line gets one, so the filters start a row
+   of their own without a spacer element to say so. */
+.bar .chips { flex: 1 1 100%; margin-bottom: 0; }
+.bar .search { flex: 1 1 22rem; min-width: 14rem; margin-bottom: 0; }
+.bar .about { order: 9; }
+/* The title is the one thing here nobody needs to read twice. */
+h1 { margin: 0; font-size: 1rem; letter-spacing: -.01em; font-weight: 620; }
+/* Too narrow for one strip. Asking the search for most of a line rather than
+   all of it is the whole change: the title and About then keep the first line
+   to themselves, the search takes the second and the view toggle rides along
+   beside it, and the filters still get their own row. Given a full line the
+   toggle was pushed onto a fourth row of its own, which on a phone is a row
+   of chrome for one control. */
+@media (max-width: 620px) {
+  .bar { padding: var(--space-4) 0; }
+  .bar .search { flex: 1 1 60%; }
+}
 .about-toggle {
   font: inherit; font-size: .78rem; cursor: pointer;
   background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong); border-radius: 6px;
+  border: 1px solid var(--line-strong);
   padding: var(--space-1) var(--space-3);
 }
 .about-toggle:hover { background: var(--layer-accent); color: var(--ink); }
@@ -109,39 +160,69 @@ h1 { margin: 0; font-size: 1.25rem; letter-spacing: -.015em; font-weight: 620; }
 .about p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
 .about .cite { margin-top: var(--space-3); color: var(--ink-helper); font-size: .8rem; }
 
-.layout { display: grid; gap: var(--space-6); align-items: start; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+/* A grid item's min-width is auto, which means "as wide as my content", and
+   the table's content is six nowrap columns. Without this the column grew to
+   fit the table and took the whole document sideways with it - the header and
+   the filters slid off the left of a phone screen, and .table-wrap's own
+   overflow never got the chance to scroll. Everything in this column has to
+   be allowed to be narrower than what is inside it. */
+main, .library, .table-wrap { min-width: 0; }
 /* The panel is 23rem once it has contributions to list, and a little over a
    third of that before it does - where its whole content is "0". It never
    disappears, because the README promises the running total is always on
    screen and that is worth keeping; it just stops reserving a column it is
    not using, which is four more columns of increments while you are choosing
-   the first one. */
-@media (min-width: 980px) {
+   the first one.
+
+   The rail arrives at 860px rather than 980px, so a tablet held either way
+   gets the total beside the increments instead of underneath them. At 860px
+   that still leaves three columns of cards, and four once the panel collapses. */
+@media (min-width: 860px) {
   .layout { grid-template-columns: minmax(0,1fr) 23rem; }
   .layout[data-tally="empty"] { grid-template-columns: minmax(0,1fr) 11rem; }
 }
 
 /* ---------------- picker ---------------- */
 .search { position: relative; margin-bottom: var(--space-5); }
+/* Search spans all 236 rows and is the most-used control here, so it carries a
+   heavier bottom rule than its other three sides and an icon that says what it
+   is before the placeholder has to.
+
+   It is sized to sit in the line of text beside it rather than to announce
+   itself: at full width and body size it read as a banner, and the longest
+   thing anyone types into it is "cyclohexane". */
 .search input {
-  width: 100%; font: inherit; color: var(--ink); background: var(--layer);
-  border: 1px solid var(--line-strong); border-radius: 10px;
-  padding: var(--space-4) var(--space-8) var(--space-4) var(--space-4);
+  width: 100%; font: inherit; font-size: .9375rem; line-height: 1.3;
+  color: var(--ink); background: var(--layer);
+  border: 1px solid var(--line-strong); border-bottom-width: 2px;
+  padding: 6px 60px 6px 30px;
 }
 .search input::placeholder { color: var(--ink-helper); }
-/* The shortcut is a hint, so it steps out of the way as soon as it is used. */
+/* Drawn rather than fetched, and in currentColor so it themes for free. */
+.search .icon {
+  position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+  display: flex; color: var(--ink-soft); pointer-events: none;
+}
+/* The shortcut is a hint, so it steps out of the way as soon as it is used -
+   which is also why it and the clear button can share one corner: the hint is
+   gone by the time there is anything to clear. */
 .shortcut {
-  position: absolute; right: var(--space-8); top: 50%; transform: translateY(-50%);
-  pointer-events: none; font: inherit; font-size: .7rem; color: var(--ink-helper);
-  border: 1px solid var(--line); border-radius: 4px; padding: 0 var(--space-2);
+  position: absolute; right: var(--space-3); top: 50%; transform: translateY(-50%);
+  pointer-events: none; font-family: var(--font-mono); font-size: .7rem;
+  color: var(--ink-helper);
+  border: 1px solid var(--line); padding: 0 var(--space-2);
   background: var(--layer-accent);
 }
 .search input:not(:placeholder-shown) ~ .shortcut { display: none; }
-@media (max-width: 520px) { .shortcut { display: none; } }
+@media (max-width: 520px) {
+  .shortcut { display: none; }
+  .search input { padding-right: var(--space-7); }
+}
 .search .clear {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: var(--space-1); top: 50%; transform: translateY(-50%);
   border: 0; background: transparent; color: var(--ink-helper);
-  font: inherit; cursor: pointer; padding: var(--space-3); line-height: 1;
+  font: inherit; cursor: pointer; padding: var(--space-2) var(--space-3); line-height: 1;
 }
 .search .clear:hover { color: var(--ink); }
 input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
@@ -150,18 +231,24 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
    means the whole set is showing rather than nothing - which is why "All"
    reads as chosen exactly when no category is. */
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
+/* Unselected chips carry a transparent border rather than none, so choosing one
+   changes its colour without moving the row a pixel. */
 .chip {
-  font: inherit; font-size: .84rem; cursor: pointer;
+  font: inherit; font-size: .8125rem; cursor: pointer;
   background: var(--layer-accent); color: var(--ink-soft);
-  border: 1px solid transparent; border-radius: 6px;
-  padding: var(--space-2) var(--space-4);
-  display: inline-flex; align-items: baseline; gap: var(--space-3);
+  border: 1px solid transparent;
+  padding: var(--space-2) 11px; min-height: 28px;
+  display: inline-flex; align-items: center; gap: 7px;
 }
 .chip:hover { background: var(--line); color: var(--ink); }
 .chip[aria-pressed="true"] {
   background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600;
 }
-.chip .n { font-size: .82em; opacity: .7; font-variant-numeric: tabular-nums; }
+/* The category is what you are choosing; how many it holds is a footnote to it. */
+.chip .n {
+  font-family: var(--font-mono); font-size: .78em; font-weight: 400;
+  opacity: .65; font-variant-numeric: tabular-nums;
+}
 
 /* Filters on the left, how-to-show on the right: they answer different
    questions, so they do not sit in one undifferentiated row of buttons. */
@@ -170,7 +257,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   gap: var(--space-4); margin-bottom: var(--space-5);
 }
 .controls .chips { margin-bottom: 0; flex: 1; }
-.views { display: flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
+.views { display: flex; border: 1px solid var(--line-strong); }
 .views button {
   font: inherit; font-size: .8rem; cursor: pointer; padding: var(--space-2) var(--space-4);
   background: var(--layer); color: var(--ink-soft); border: 0;
@@ -186,22 +273,30 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 .table-wrap { overflow-x: auto; margin: var(--space-3) 0 var(--space-6); }
 .table { border-collapse: collapse; width: 100%; font-size: .85rem; }
 .table th, .table td { padding: var(--space-2) var(--space-4); text-align: left; white-space: nowrap; }
+/* A column heading is a label for the chemistry, not chemistry, so it is sans -
+   the same rank and treatment as the headings over the card sections. */
 .table thead th {
   border-bottom: 1px solid var(--line-strong); color: var(--ink-soft);
-  font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  font-size: .6875rem; font-weight: 600; letter-spacing: .3px; text-transform: uppercase;
 }
 .table tbody th { font-weight: 400; }
 .table tbody tr { border-bottom: 1px solid var(--line); }
 .table tbody tr:hover { background: var(--layer-accent); }
 .table tbody tr.picked { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
-.table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.table .num {
+  text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+}
 .table .soft { color: var(--ink-soft); }
 .table tbody th button {
-  font: inherit; cursor: pointer; background: none; border: 0; padding: 0;
+  font: inherit; font-family: var(--font-mono); cursor: pointer;
+  background: none; border: 0; padding: 0;
   color: var(--ink); text-align: left;
 }
 .table tbody th button:hover { color: var(--accent); text-decoration: underline; }
-.table .tally { color: var(--accent); font-weight: 600; margin-left: var(--space-3); }
+.table .tally {
+  font-family: var(--font-mono); color: var(--accent); font-weight: 600;
+  margin-left: var(--space-3);
+}
 
 /* One scrolling library rather than five exclusive panels. The heading sticks
    so that "where am I" is answered without a sidebar spending 240px of the
@@ -212,13 +307,14 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   margin: 0; padding: var(--space-3) var(--space-1) var(--space-2);
   background: var(--bg);
   border-bottom: 1px solid var(--line);
-  font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  font-size: .75rem; font-weight: 600; letter-spacing: .3px; text-transform: uppercase;
   color: var(--ink-soft);
   display: flex; align-items: baseline; gap: var(--space-3);
 }
 .section-head .n {
-  margin-left: auto; font-weight: 400; letter-spacing: 0; text-transform: none;
-  color: var(--ink-helper); font-variant-numeric: tabular-nums;
+  margin-left: auto; font-family: var(--font-mono); font-size: .6875rem;
+  font-weight: 400; letter-spacing: 0; text-transform: none;
+  color: var(--ink-soft); font-variant-numeric: tabular-nums;
 }
 .section-head + .grid { margin: var(--space-3) 0 var(--space-6); }
 
@@ -230,38 +326,82 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
    in the card is for.
    The column count is left to auto-fill deliberately, so it follows the space
    available - and survives a reader who has set a larger default font. */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.25rem, 1fr)); gap: var(--space-3); }
+/* The increments meet along a 1px hairline rather than floating 8px apart: 236
+   of them are one continuous body of reference, and separated boxes ask to be
+   read one at a time. */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.25rem, 1fr)); gap: 1px; background: transparent; }
+/* Each card draws its own hairline as a ring, rather than the grid painting one
+   by showing a container background through the gap. The container trick is a
+   pixel cheaper and leaves a grey block wherever the last row is incomplete,
+   which is most of the time with sections of 44, 82, 57, 24 and 29. */
 .grid button {
-  font: inherit; font-size: .85rem; cursor: pointer; text-align: left;
+  font: inherit; font-size: .8125rem; cursor: pointer; text-align: left;
   background: var(--layer); color: var(--ink);
-  border: 1px solid var(--line-strong); border-radius: 9px;
-  padding: var(--space-3) var(--space-4); min-height: 3rem;
-  display: flex; flex-direction: column; justify-content: center; gap: var(--space-1);
-  transition: border-color .12s ease, background .12s ease;
+  border: 0; box-shadow: 0 0 0 1px var(--line-strong);
+  padding: 7px 10px; min-height: 46px;
+  display: flex; flex-direction: column; gap: var(--space-1);
+  transition: background .11s ease;
   overflow-wrap: anywhere;
 }
-.grid button:hover { border-color: var(--accent); }
-.grid button:active { transform: translateY(1px); }
-.grid button.picked { border-color: var(--accent); background: var(--accent-soft); }
-.grid .meta { color: var(--ink); font-size: .82em; font-weight: 600; font-variant-numeric: tabular-nums; }
-.grid .tally { color: var(--accent); font-weight: 600; }
+.grid button:hover { background: var(--layer-accent); }
+/* Chosen is a fill plus a 2px ring; focus is a ring of a different form. Both
+   have to sit above their neighbours or the flush grid clips them, and the
+   focus ring is drawn inside the card for the same reason. */
+.grid button.picked {
+  background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent);
+  position: relative; z-index: 1;
+}
+.grid button:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: -2px;
+  position: relative; z-index: 2;
+}
+/* The notation is the thing being scanned; mono is what lets the ligands line
+   up in a column so that looking for (H)2 is possible at all. */
+.grid .name { font-family: var(--font-mono); line-height: 1.35; }
+/* On a calculator the number is the content, so it is the boldest thing on the
+   card - and it shares the notation's mono, which is what puts the sign and
+   the decimal point in the same place on every card in the row. */
+.grid .meta {
+  font-family: var(--font-mono); color: var(--ink); font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+}
+/* Which category a search result came from - prose about the value, not the
+   value, so it steps back into the sans stack. */
+.grid .from { font-family: var(--font-sans); font-size: .6875rem; font-weight: 400; color: var(--ink-soft); }
+/* How many are chosen, as a filled badge: a count set inline in the accent was
+   read as part of the value. This cannot be missed and cannot be misread. */
+.grid .tally {
+  margin-left: auto; font-size: .6875rem; font-weight: 700;
+  background: var(--accent); color: var(--on-accent); padding: 1px 5px;
+}
 /* The bounds an averaged value came from, beside the average itself. */
-.grid .range { color: var(--ink-soft); font-weight: 400; }
+.grid .range { color: var(--ink-soft); font-size: .6875rem; font-weight: 400; }
 .status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: var(--space-6) var(--space-1); }
 
 /* ---------------- tally ---------------- */
 .tally-panel {
   background: var(--layer); border: 1px solid var(--line-strong);
-  border-radius: 12px; padding: var(--space-5);
+  padding: var(--space-5);
 }
-@media (min-width: 980px) { .tally-panel { position: sticky; top: var(--space-5); } }
+@media (min-width: 860px) { .tally-panel { position: sticky; top: var(--space-5); } }
+/* Beside the grid there is nothing to collapse, so the disclosure is not just
+   hidden - it is absent, and cannot be tabbed to. */
+.panel-toggle { display: none; }
 /* What the number underneath is a measure of. Written from the data rather
    than hardcoded, so a category that has declared nothing reads "Total".
    Deliberately not uppercased: the content is a quantity symbol, and the
    lowercase f in dHf is part of the notation, not a styling accident. */
 .tally-label {
   margin: 0 0 var(--space-1); color: var(--ink-soft);
-  font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+  font-size: .6875rem; font-weight: 600; letter-spacing: .4px;
+}
+/* Deliberately its own rule and not grouped with .tally-label above. The two
+   want the same type, but only this one may be uppercased: "Contributions" is
+   static English, and the label beside it is a quantity symbol. */
+.picks-head {
+  margin: var(--space-5) 0 0; color: var(--ink-soft);
+  font-size: .6875rem; font-weight: 600; letter-spacing: .4px; text-transform: uppercase;
 }
 /* Shown only when the sum holds more than one kind of quantity. */
 .mixed {
@@ -270,24 +410,62 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 }
 .mixed b { color: var(--ink); font-weight: 600; }
 
-.kj { font-size: 1.7rem; font-weight: 640; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
-.kj span { font-size: .55em; font-weight: 500; color: var(--ink-soft); margin-left: var(--space-2); letter-spacing: 0; }
-.kcal { color: var(--ink-soft); font-size: .92rem; font-variant-numeric: tabular-nums; margin-top: 1px; }
+/* The answer, and the largest thing on the page - the tight tracking is what
+   keeps a five-digit total from reading as loose at 30px. */
+.kj {
+  font-family: var(--font-mono); font-size: 1.875rem; font-weight: 700;
+  letter-spacing: -1px; font-variant-numeric: tabular-nums;
+}
+/* The unit is not a figure, so it is not mono and does not take the tracking. */
+.kj span {
+  font-family: var(--font-sans); font-size: .5em; font-weight: 400; color: var(--ink-soft);
+  margin-left: var(--space-2); letter-spacing: 0;
+}
+.kcal {
+  font-family: var(--font-mono); color: var(--ink-soft); font-size: .875rem;
+  font-variant-numeric: tabular-nums; margin-top: 1px;
+}
 
-ul.picks { list-style: none; margin: var(--space-5) 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
+ul.picks { list-style: none; margin: var(--space-3) 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
 ul.picks li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-top: 1px solid var(--line); }
-ul.picks .name { flex: 1; min-width: 0; font-size: .87rem; overflow-wrap: anywhere; }
-ul.picks .each { display: block; color: var(--ink-helper); font-size: .76rem; font-variant-numeric: tabular-nums; }
-ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width: 4.625rem; text-align: right; }
-.stepper { display: flex; align-items: center; gap: 1px; }
+/* A contribution row is a small equation: the notation, then what it is worth
+   each, then what it is worth here. Only the first and last are figures. */
+ul.picks .name {
+  flex: 1; min-width: 0; font-family: var(--font-mono); font-size: .8125rem;
+  overflow-wrap: anywhere;
+}
+ul.picks .each {
+  display: block; font-family: var(--font-sans); color: var(--ink-soft);
+  font-size: .6875rem; font-variant-numeric: tabular-nums;
+}
+/* Right-aligned in a fixed column so the signs line up down the list, which is
+   how you spot the one term that is pulling the total the wrong way. */
+ul.picks .sum {
+  font-family: var(--font-mono); font-size: .8125rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; min-width: 3.875rem; text-align: right;
+}
+/* One boundary around the pair, rather than one around each button: the group
+   is the control, and two boxes side by side read as two. */
+.stepper { display: flex; align-items: center; gap: 1px; border: 1px solid var(--line); }
 .stepper button, .rm {
   font: inherit; cursor: pointer; background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong); border-radius: 7px;
+  border: 1px solid transparent;
   width: 1.875rem; height: 1.875rem; line-height: 1; padding: 0;
 }
-.stepper button:hover, .rm:hover { border-color: var(--accent); color: var(--ink); }
-.stepper .n { min-width: 1.625rem; text-align: center; font-size: .87rem; font-variant-numeric: tabular-nums; }
+.stepper button:hover, .rm:hover { background: var(--accent); color: var(--on-accent); }
+.stepper .n {
+  min-width: 1.625rem; text-align: center; font-family: var(--font-mono);
+  font-size: .8125rem; font-variant-numeric: tabular-nums;
+}
 .rm { width: 1.875rem; font-size: 1.05rem; }
+/* Remove is the rarest thing you do to a row and the only destructive one, so
+   it waits until the row is under the pointer - but only where there is a
+   pointer. On a touch screen there is no hover to reveal it with, and a
+   control you cannot reach is worse than one that is always there. */
+@media (hover: hover) {
+  .rm { opacity: 0; transition: opacity .1s ease; }
+  ul.picks li:hover .rm, .rm:focus-visible { opacity: 1; }
+}
 .empty { color: var(--ink-helper); font-size: .87rem; margin: var(--space-5) 0 var(--space-1); }
 
 /* How far the total would move if every averaged range were read at its
@@ -297,21 +475,62 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
   margin: var(--space-4) 0 0; padding-top: var(--space-3);
   border-top: 1px solid var(--line);
 }
-.band b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.band b { font-family: var(--font-mono); color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* On a phone the panel sits at the foot of the page rather than beside the
-   grid, so it has to earn its height: the list of picks is capped to leave the
-   groups visible above it, and the counters grow to something a thumb can
-   actually hit. These come after the rules they override - as the same
-   specificity, order is what decides. */
-@media (max-width: 979px) {
-  .tally-panel { position: sticky; bottom: 0; margin-top: var(--space-3); }
-  ul.picks { max-height: 32vh; }
+   grid, and there it has to earn every pixel of its height.
+
+   It used to take whatever it needed and stick to the bottom, which meant that
+   with nothing chosen at all it still covered the lower half of the screen -
+   and once a few increments were in it, it covered the grid entirely and hid
+   three of the six category filters behind it. It also sat underneath the
+   sticky section headings, which have a z-index and it did not, so "CHO
+   GROUPS" painted a bar straight across the middle of it.
+
+   So on a small screen it becomes a sheet: the total is always on the screen,
+   as the README promises, and the working out is one tap away. Collapsed it
+   costs about 70px; opened it takes at most 70% of the viewport and scrolls
+   inside itself, so the grid is always reachable behind it.
+
+   These come after the rules they override - at the same specificity, order is
+   what decides. */
+@media (max-width: 859px) {
+  .tally-panel {
+    position: sticky; bottom: 0; z-index: 3;
+    margin-top: var(--space-3); padding: var(--space-3) var(--space-4);
+    max-height: 70vh; display: flex; flex-direction: column;
+  }
+  /* The label, the total and the disclosure read as one row, so the button is
+     beside the number it summarises rather than below the whole panel. */
+  .tally-head {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center; column-gap: var(--space-4);
+  }
+  .tally-head > :not(.panel-toggle) { grid-column: 1; }
+  .panel-toggle {
+    display: flex; align-items: center; gap: var(--space-2);
+    grid-column: 2; grid-row: 1 / -1;
+    font: inherit; font-size: .8125rem; cursor: pointer;
+    background: transparent; color: var(--ink-soft);
+    border: 1px solid var(--line-strong);
+    padding: var(--space-2) var(--space-3); min-height: 2.375rem;
+  }
+  .panel-toggle .caret { transition: transform .12s ease; }
+  .tally-panel[data-open="true"] .panel-toggle .caret { transform: rotate(180deg); }
+  /* Collapsed, the body is not merely invisible: nothing inside it can be
+     tabbed to, so the keyboard order matches what is on the screen. */
+  .tally-panel:not([data-open="true"]) .tally-body { display: none; }
+  .tally-body { min-height: 0; overflow-y: auto; }
+  /* The list no longer needs its own cap - the sheet caps the whole thing, and
+     one scrolling region is easier to use than two nested ones. */
+  ul.picks { max-height: none; margin-top: var(--space-2); }
   ul.picks li { gap: var(--space-3); }
-  ul.picks .sum { min-width: 3.875rem; }
   .stepper button, .rm { width: 2.375rem; height: 2.375rem; }
   .rm { width: 2.375rem; }
-  .chip { padding: var(--space-3) var(--space-5); }
+  /* Big enough for a thumb without spending four lines on six filters: the
+     old rule grew the padding, which pushed the last chips off the first
+     screen entirely. Height is what makes a target hittable, not width. */
+  .chip { min-height: 2.25rem; padding: var(--space-2) var(--space-4); }
 }
 
 /* Narrower still, and a name like C-(Cd)(CB)(H)2 has no room left beside four
@@ -324,10 +543,17 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
 }
 
 .actions { display: flex; gap: var(--space-3); margin-top: var(--space-5); }
+/* With nothing chosen there is nothing to undo, copy or reset, and three
+   greyed-out buttons said so three times. They also did not fit: the panel is
+   11rem while it is empty, and the row needs about 14rem before the labels
+   start being clipped, so Reset hung out past the panel's own border and took
+   the document 1px wider than the window with it. They come back the moment
+   they can do something. */
+.layout[data-tally="empty"] .actions { display: none; }
 .actions button {
   flex: 1; font: inherit; font-size: .86rem; cursor: pointer;
   background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong); border-radius: 8px; padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line-strong); padding: var(--space-3) var(--space-4);
 }
 .actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
 .actions button:disabled { opacity: .4; cursor: default; }

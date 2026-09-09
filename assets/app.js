@@ -58,14 +58,16 @@ function cardHtml(increment, counts) {
   // what they typed, so finding C-(C)(H)3 under "methyl" teaches the notation
   // rather than merely producing it.
   const context = view.query
-    ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
+    ? `<span class="from">&middot; ${escapeHtml(matchedSynonym ?? category.title)}</span>`
     : "";
-  const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
+  // How many are chosen, as a badge rather than as more text in the value line,
+  // where it was read as part of the number.
+  const tally = count ? `<span class="tally">&times;${count}</span>` : "";
   const hover = `${label} — ${increment.source} kJ/mol` +
     (increment.isRange ? " (published as a range; the average is used)" : "");
   return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
             class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
-            <span>${asFormula(label)}</span>
+            <span class="name">${asFormula(label)}</span>
             <span class="meta">${valueHtml(increment)}${context}${tally}</span>
           </button>`;
 }
@@ -198,6 +200,14 @@ function renderTally() {
   // to a :has() selector, so what drives the layout is visible in one place.
   el("layout").dataset.tally = isEmpty ? "empty" : "filled";
   el("empty").hidden = !isEmpty;
+  // The list is headed only once it has something in it: a heading over an
+  // empty list is a promise the panel is not yet keeping.
+  el("picks-head").hidden = isEmpty;
+  // On a phone the body is folded away, so the button has to say what is in
+  // it - "Details" tells you nothing you could not already see.
+  el("panel-toggle-text").textContent = isEmpty
+    ? "Details"
+    : `${entries.length} ${entries.length === 1 ? "term" : "terms"}`;
   el("undo").disabled = isEmpty;
   el("copy").disabled = isEmpty;
   el("reset").disabled = isEmpty;
@@ -256,6 +266,19 @@ el("views").addEventListener("click", (event) => {
     other.setAttribute("aria-pressed", String(other === button));
   }
   renderLibrary();
+});
+
+/**
+ * The panel's disclosure, which only exists on a small screen.
+ *
+ * Beside the grid the panel is one block and the button is not rendered, so
+ * this listener is harmless there: nothing can press what has no box.
+ */
+el("panel-toggle").addEventListener("click", (event) => {
+  const panel = el("tally-panel");
+  const open = panel.dataset.open !== "true";
+  panel.dataset.open = String(open);
+  event.currentTarget.setAttribute("aria-expanded", String(open));
 });
 
 el("about-toggle").addEventListener("click", (event) => {
