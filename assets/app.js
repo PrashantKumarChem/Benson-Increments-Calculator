@@ -61,10 +61,15 @@ function cardHtml(increment, counts) {
     ? `<span class="from">&middot; ${escapeHtml(matchedSynonym ?? category.title)}</span>`
     : "";
   // How many are chosen, as a badge rather than as more text in the value line,
-  // where it was read as part of the number.
-  const tally = count ? `<span class="tally">&times;${count}</span>` : "";
+  // where it was read as part of the number. The badge is also where you take
+  // one back: a card cannot hold a nested button, so it stays a span and the
+  // listener reads which part of the card was pressed.
+  const tally = count
+    ? `<span class="tally" data-step-down title="Remove one">&times;${count}</span>`
+    : "";
   const hover = `${label} — ${increment.source} kJ/mol` +
-    (increment.isRange ? " (published as a range; the average is used)" : "");
+    (increment.isRange ? " (published as a range; the average is used)" : "") +
+    (count ? " · press the count to remove one" : "");
   return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
             class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
             <span class="name">${asFormula(label)}</span>
@@ -85,7 +90,11 @@ function rowHtml(increment, counts) {
   const or = (text) => escapeHtml(text || "\u2014");
   return `<tr class="${count ? "picked" : ""}">
       <th scope="row"><button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
-        >${asFormula(label)}</button>${count ? `<span class="tally">&times; ${count}</span>` : ""}</th>
+        >${asFormula(label)}</button>${count
+          ? `<button class="tally" data-step-down
+               data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
+               aria-label="Remove one ${escapeHtml(label)}">&times;${count}</button>`
+          : ""}</th>
       <td class="num">${escapeHtml(formatIncrement(increment))}</td>
       <td class="num soft">${increment.isRange ? escapeHtml(formatRange(increment)) : "&mdash;"}</td>
       <td class="soft">${or(category.unit)}</td>
@@ -277,12 +286,46 @@ el("views").addEventListener("click", (event) => {
  * Beside the grid the panel is one block and the button is not rendered, so
  * this listener is harmless there: nothing can press what has no box.
  */
-el("panel-toggle").addEventListener("click", (event) => {
-  const panel = el("tally-panel");
-  const open = panel.dataset.open !== "true";
-  panel.dataset.open = String(open);
-  event.currentTarget.setAttribute("aria-expanded", String(open));
+function setPanelOpen(open) {
+  el("tally-panel").dataset.open = String(open);
+  el("panel-toggle").setAttribute("aria-expanded", String(open));
+}
+
+el("panel-toggle").addEventListener("click", () => {
+  setPanelOpen(el("tally-panel").dataset.open !== "true");
 });
+
+/**
+ * Swipe the sheet open and shut.
+ *
+ * The one gesture worth having here, because it is the one that cannot go
+ * wrong: it moves no number. A mis-swipe that adds or removes an increment
+ * changes someone's answer without saying so, which is the failure this whole
+ * project is arranged to avoid - so adding and removing stay on buttons you
+ * can see, and the gesture is limited to how much of the panel is showing.
+ *
+ * It listens on the panel but ignores anything starting inside the body, which
+ * is a scrolling region: dragging a list of contributions should scroll the
+ * list. Nothing is prevented, so a swipe that was meant as a scroll still
+ * scrolls; the threshold is what tells the two apart.
+ */
+const SWIPE = 40;
+
+el("tally-panel").addEventListener("touchstart", (event) => {
+  const panel = event.currentTarget;
+  panel.dataset.swipeFrom =
+    event.target.closest(".tally-body") ? "" : String(event.touches[0].clientY);
+}, { passive: true });
+
+el("tally-panel").addEventListener("touchend", (event) => {
+  const from = event.currentTarget.dataset.swipeFrom;
+  event.currentTarget.dataset.swipeFrom = "";
+  if (!from) return;
+
+  const travelled = event.changedTouches[0].clientY - Number(from);
+  if (Math.abs(travelled) < SWIPE) return;
+  setPanelOpen(travelled < 0);
+}, { passive: true });
 
 el("about-toggle").addEventListener("click", (event) => {
   const open = el("about").hidden;
@@ -299,6 +342,19 @@ function addIncrement(file, label) {
 }
 
 el("library").addEventListener("click", (event) => {
+  // Taking one back, before adding one: on a card the badge is a span inside
+  // the button, so both would match the add below. In the table it is a button
+  // of its own. Either way the file and label come from the nearest element
+  // carrying them, which is the badge itself in the table and the card around
+  // it in the grid.
+  const stepDown = event.target.closest("[data-step-down]");
+  if (stepDown) {
+    const owner = stepDown.closest("[data-file]");
+    selection.step(keyOf(owner.dataset.file, owner.dataset.label), -1);
+    render();
+    return;
+  }
+
   const button = event.target.closest("button[data-label]");
   if (!button) return;
   addIncrement(button.dataset.file, button.dataset.label);
