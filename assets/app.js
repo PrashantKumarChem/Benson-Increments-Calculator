@@ -203,6 +203,11 @@ function renderTally() {
   // The list is headed only once it has something in it: a heading over an
   // empty list is a promise the panel is not yet keeping.
   el("picks-head").hidden = isEmpty;
+  // On a phone the body is folded away, so the button has to say what is in
+  // it - "Details" tells you nothing you could not already see.
+  el("panel-toggle-text").textContent = isEmpty
+    ? "Details"
+    : `${entries.length} ${entries.length === 1 ? "term" : "terms"}`;
   el("undo").disabled = isEmpty;
   el("copy").disabled = isEmpty;
   el("reset").disabled = isEmpty;
@@ -261,6 +266,19 @@ el("views").addEventListener("click", (event) => {
     other.setAttribute("aria-pressed", String(other === button));
   }
   renderLibrary();
+});
+
+/**
+ * The panel's disclosure, which only exists on a small screen.
+ *
+ * Beside the grid the panel is one block and the button is not rendered, so
+ * this listener is harmless there: nothing can press what has no box.
+ */
+el("panel-toggle").addEventListener("click", (event) => {
+  const panel = el("tally-panel");
+  const open = panel.dataset.open !== "true";
+  panel.dataset.open = String(open);
+  event.currentTarget.setAttribute("aria-expanded", String(open));
 });
 
 el("about-toggle").addEventListener("click", (event) => {
