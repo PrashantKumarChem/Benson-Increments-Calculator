@@ -110,7 +110,16 @@ h1 { margin: 0; font-size: 1.25rem; letter-spacing: -.015em; font-weight: 620; }
 .about .cite { margin-top: var(--space-3); color: var(--ink-helper); font-size: .8rem; }
 
 .layout { display: grid; gap: var(--space-6); align-items: start; }
-@media (min-width: 980px) { .layout { grid-template-columns: minmax(0,1fr) 366px; } }
+/* The panel is 23rem once it has contributions to list, and a little over a
+   third of that before it does - where its whole content is "0". It never
+   disappears, because the README promises the running total is always on
+   screen and that is worth keeping; it just stops reserving a column it is
+   not using, which is four more columns of increments while you are choosing
+   the first one. */
+@media (min-width: 980px) {
+  .layout { grid-template-columns: minmax(0,1fr) 23rem; }
+  .layout[data-tally="empty"] { grid-template-columns: minmax(0,1fr) 11rem; }
+}
 
 /* ---------------- picker ---------------- */
 .search { position: relative; margin-bottom: var(--space-5); }
@@ -164,14 +173,23 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 }
 .section-head + .grid { margin: var(--space-3) 0 var(--space-6); }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: var(--space-3); }
+/* 7.25rem is measured rather than chosen: 116px is the 95th-percentile label
+   (92px at the card's own type size) plus the card's 24px of padding. Sizing
+   the track to the single longest label instead would cost every one of the
+   other 235 cards a column's worth of width to fit "cyclononene (trans)"; the
+   handful that are longer wrap to a second line, which is what the extra room
+   in the card is for.
+   The column count is left to auto-fill deliberately, so it follows the space
+   available - and survives a reader who has set a larger default font. */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(7.25rem, 1fr)); gap: var(--space-3); }
 .grid button {
   font: inherit; font-size: .85rem; cursor: pointer; text-align: left;
   background: var(--layer); color: var(--ink);
   border: 1px solid var(--line-strong); border-radius: 9px;
-  padding: var(--space-3) var(--space-4); min-height: 3.125rem;
+  padding: var(--space-3) var(--space-4); min-height: 3rem;
   display: flex; flex-direction: column; justify-content: center; gap: var(--space-1);
   transition: border-color .12s ease, background .12s ease;
+  overflow-wrap: anywhere;
 }
 .grid button:hover { border-color: var(--accent); }
 .grid button:active { transform: translateY(1px); }

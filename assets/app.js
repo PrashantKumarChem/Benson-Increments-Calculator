@@ -129,6 +129,10 @@ function renderTally() {
   }
 
   const isEmpty = selection.isEmpty;
+  // The panel keeps the total on screen either way, but stops reserving a
+  // column it has nothing to put in. Stated as an attribute rather than left
+  // to a :has() selector, so what drives the layout is visible in one place.
+  el("layout").dataset.tally = isEmpty ? "empty" : "filled";
   el("empty").hidden = !isEmpty;
   el("undo").disabled = isEmpty;
   el("reset").disabled = isEmpty;
