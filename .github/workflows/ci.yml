@@ -79,7 +79,44 @@ jobs:
             exit 1
           fi
 
-          echo "assets/ changed and the version moved: $there -> $here"
+          # Moving is not enough: it has to move somewhere new.
+          #
+          # Comparing against the base only proves this branch changed the
+          # value. Two branches can each do that correctly against their own
+          # base and still land on the same letter - which happened here, with
+          # two branches both choosing 2026-09-09l. Whichever merged second
+          # would have shipped changed assets under a string a returning
+          # visitor already had cached: the exact failure the versioning
+          # exists to prevent, reached by two individually correct bumps.
+          #
+          # So fail if this value has ever been on the base branch. That is the
+          # project's own rule - a value already in use is not a bump - which
+          # until now lived in a comment and in whoever remembered it.
+          #
+          # Scoped to the base branch's history rather than --all: --all
+          # reaches this branch too, so every pull request would find its own
+          # incoming version and fail itself. It also cannot see a branch
+          # nobody has pushed, so this catches the second of two colliding
+          # branches when its base moves rather than when the collision is
+          # created. Nothing here can do better, and the second is the one
+          # that ships the breakage.
+          used=$(git rev-list "$base" -- index.html | while read -r commit; do
+                   git show "$commit:index.html" 2>/dev/null
+                 done | grep -o '?v=[^"]*' | sort -u)
+
+          if echo "$used" | grep -qxF "$here"; then
+            echo "index.html asks for $here, which ${{ github.base_ref }} has already used."
+            echo
+            echo "Every version ${{ github.base_ref }} has used:"
+            echo "$used" | sed 's/^/  /'
+            echo
+            echo "A value already in use is not a bump - a returning visitor may"
+            echo "hold cached copies of the old files under this exact string."
+            echo "Pick the next free letter."
+            exit 1
+          fi
+
+          echo "assets/ changed and the version moved somewhere new: $there -> $here"
 
   calculator:
     name: Calculator behaviour
