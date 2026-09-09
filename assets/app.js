@@ -5,8 +5,9 @@
  * data into a page and keeps the selection in sync with what is displayed.
  */
 import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
+import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "./browse.js";
 import { formatIncrement, formatKcal, formatRange, formatTotal, rangeSpread } from "./format.js";
-import { buildIndex, emptyNotation, loadNotation, search } from "./notation.js";
+import { buildIndex, emptyNotation, loadNotation } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
 
 /** The increments chosen so far; see selection.js for the rules it enforces. */
@@ -31,62 +32,78 @@ function valueHtml(reading) {
 /* View                                                                        */
 /* -------------------------------------------------------------------------- */
 
-const view = { categories: [], notation: emptyNotation(), index: [], activeTab: 0, query: "" };
+/**
+ * What is on screen. `files` is the set of categories the chips have narrowed
+ * to; empty means all of them, since the chips narrow a complete list rather
+ * than building one up. See browse.js for the rules themselves.
+ */
+const view = { categories: [], notation: emptyNotation(), index: [], files: new Set(), query: "" };
+
+/** One increment, as a card. */
+function cardHtml(increment, counts) {
+  const { label, category, matchedSynonym } = increment;
+  const count = counts.get(keyOf(category.file, label)) ?? 0;
+  // While searching the section headings are gone, so a result has to say
+  // where it came from - and says it in the student's own words when that is
+  // what they typed, so finding C-(C)(H)3 under "methyl" teaches the notation
+  // rather than merely producing it.
+  const context = view.query
+    ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
+    : "";
+  const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
+  const hover = `${label} — ${increment.source} kJ/mol` +
+    (increment.isRange ? " (published as a range; the average is used)" : "");
+  return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
+            class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
+            <span>${asFormula(label)}</span>
+            <span class="meta">${valueHtml(increment)}${context}${tally}</span>
+          </button>`;
+}
 
 /**
- * Increments to show: the active tab, or the best matches from every category
- * while searching.
+ * The category filter.
  *
- * Searching goes through notation.js rather than matching the printed name,
- * because the printed name is not what a student types. `CH3` appears nowhere
- * in `C-(C)(H)3`, and looking for it literally used to return eleven
- * cyclohexane A-values and not one methyl group.
+ * "All" is not a sixth category but the absence of a filter, which is why it
+ * reads as chosen exactly when nothing else is. Counts follow the search, so a
+ * chip never claims 82 next to three matches.
  */
-function visibleIncrements() {
-  if (!view.query) {
-    const category = view.categories[view.activeTab];
-    return category ? category.rows.map((row) => ({ ...row, category })) : [];
-  }
+function renderChips() {
+  const visible = countsByCategory(visibleRows(view.index, { query: view.query }));
+  const total = [...visible.values()].reduce((sum, n) => sum + n, 0);
 
-  return search(view.query, view.index);
+  const chip = (file, title, count, pressed) =>
+    `<button class="chip" data-file="${escapeHtml(file)}" aria-pressed="${pressed}">` +
+    `${escapeHtml(title)}<span class="n">${count}</span></button>`;
+
+  el("chips").innerHTML = [
+    chip("", "All", total, view.files.size === 0),
+    ...view.categories.map((category) =>
+      chip(category.file, category.title, visible.get(category.file) ?? 0,
+        view.files.has(category.file))),
+  ].join("");
 }
 
-function renderTabs() {
-  el("tabs").innerHTML = view.categories
-    .map((category, index) =>
-      `<button role="tab" aria-selected="${!view.query && index === view.activeTab}" data-tab="${index}">` +
-      `${escapeHtml(category.title)}<span class="n">${category.rows.length}</span></button>`)
-    .join("");
-}
-
-function renderGrid() {
+function renderLibrary() {
   const counts = selection.countsByKey();
-  const increments = visibleIncrements();
+  const rows = visibleRows(view.index, { query: view.query, files: view.files });
+  const sections = sectionsFor(rows, { query: view.query });
 
-  if (!increments.length) {
-    el("grid").innerHTML =
+  if (!sections.length) {
+    el("library").innerHTML =
       `<p class="status">No group matches &ldquo;${escapeHtml(view.query)}&rdquo;.</p>`;
     return;
   }
 
-  el("grid").innerHTML = increments
-    .map((increment) => {
-      const { label, category, matchedSynonym } = increment;
-      const count = counts.get(keyOf(category.file, label)) ?? 0;
-      // While searching, name the group in the student's own words when that is
-      // what they typed, so finding C-(C)(H)3 under "methyl" teaches the
-      // notation rather than merely producing it.
-      const context = view.query
-        ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
-        : "";
-      const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
-      const hover = `${label} — ${increment.source} kJ/mol` +
-        (increment.isRange ? " (published as a range; the average is used)" : "");
-      return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
-                class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
-                <span>${asFormula(label)}</span>
-                <span class="meta">${valueHtml(increment)}${context}${tally}</span>
-              </button>`;
+  el("library").innerHTML = sections
+    .map((section) => {
+      // A search is ordered by relevance rather than by file, so it gets one
+      // heading describing the result instead of a heading per category.
+      const heading = section.category
+        ? `${escapeHtml(section.category.title)}<span class="n">${section.rows.length}</span>`
+        : `${section.rows.length} ${section.rows.length === 1 ? "match" : "matches"}` +
+          `<span class="n">best first</span>`;
+      return `<h2 class="section-head">${heading}</h2>` +
+        `<div class="grid">${section.rows.map((row) => cardHtml(row, counts)).join("")}</div>`;
     })
     .join("");
 }
@@ -138,14 +155,14 @@ function renderTally() {
 }
 
 function render() {
-  renderGrid();
+  renderChips();
+  renderLibrary();
   renderTally();
 }
 
 function setQuery(query) {
   view.query = query.trim();
   el("clear").hidden = !view.query;
-  renderTabs();
   render();
 }
 
@@ -153,15 +170,22 @@ function setQuery(query) {
 /* Events                                                                      */
 /* -------------------------------------------------------------------------- */
 
-el("tabs").addEventListener("click", (event) => {
-  const tab = event.target.closest("button[data-tab]");
-  if (!tab) return;
-  view.activeTab = Number(tab.dataset.tab);
-  el("filter").value = "";
-  setQuery("");
+el("chips").addEventListener("click", (event) => {
+  const chip = event.target.closest("button[data-file]");
+  if (!chip) return;
+  // The "All" chip carries no file: choosing it clears the filter rather than
+  // selecting a category, which is what "no filter" means here.
+  view.files = chip.dataset.file ? toggleFilter(view.files, chip.dataset.file) : new Set();
+  render();
 });
 
-el("grid").addEventListener("click", (event) => {
+el("about-toggle").addEventListener("click", (event) => {
+  const open = el("about").hidden;
+  el("about").hidden = !open;
+  event.currentTarget.setAttribute("aria-expanded", String(open));
+});
+
+el("library").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-label]");
   if (!button) return;
 
@@ -234,10 +258,9 @@ try {
       ? `<br><strong>${unreadable.length} row(s) could not be read:</strong> ${escapeHtml(unreadable.join(", "))}`
       : "");
 
-  renderTabs();
   render();
 } catch (error) {
-  el("grid").innerHTML =
+  el("library").innerHTML =
     `<p class="status">Could not load the increment data: ${escapeHtml(error.message)}.<br>
      If you opened this file straight from disk, serve the folder instead — for example
      <code>python -m http.server</code> — so the browser is allowed to read the CSV files.</p>`;

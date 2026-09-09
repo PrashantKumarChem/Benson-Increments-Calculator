@@ -89,10 +89,25 @@ body {
 .wrap { max-width: 1180px; margin: 0 auto; }
 sub { font-size: .72em; }
 
-header { padding: var(--space-7) 0 var(--space-6); }
-h1 { margin: 0 0 var(--space-3); font-size: 1.5rem; letter-spacing: -.015em; font-weight: 620; }
-header p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
-header .cite { margin-top: var(--space-4); color: var(--ink-helper); font-size: .8rem; }
+/* The description and citation used to spend 208px before anything you could
+   click. They are still here, and still in the markup for anyone reading the
+   page with a screen reader or a search engine - just not in front of the
+   thing you came to use. */
+header {
+  padding: var(--space-6) 0 var(--space-5);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-4);
+}
+h1 { margin: 0; font-size: 1.25rem; letter-spacing: -.015em; font-weight: 620; }
+.about-toggle {
+  font: inherit; font-size: .78rem; cursor: pointer;
+  background: transparent; color: var(--ink-soft);
+  border: 1px solid var(--line-strong); border-radius: 6px;
+  padding: var(--space-1) var(--space-3);
+}
+.about-toggle:hover { background: var(--layer-accent); color: var(--ink); }
+.about { flex-basis: 100%; }
+.about p { margin: 0; color: var(--ink-soft); font-size: .92rem; max-width: 62ch; }
+.about .cite { margin-top: var(--space-3); color: var(--ink-helper); font-size: .8rem; }
 
 .layout { display: grid; gap: var(--space-6); align-items: start; }
 @media (min-width: 980px) { .layout { grid-template-columns: minmax(0,1fr) 366px; } }
@@ -113,17 +128,43 @@ header .cite { margin-top: var(--space-4); color: var(--ink-helper); font-size: 
 .search .clear:hover { color: var(--ink); }
 input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-nav.tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
-nav.tabs button {
-  font: inherit; font-size: .87rem; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid transparent; border-radius: 999px; padding: var(--space-3) var(--space-4);
+/* Category filters, not tabs. Several can be on at once, and none being on
+   means the whole set is showing rather than nothing - which is why "All"
+   reads as chosen exactly when no category is. */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
+.chip {
+  font: inherit; font-size: .84rem; cursor: pointer;
+  background: var(--layer-accent); color: var(--ink-soft);
+  border: 1px solid transparent; border-radius: 6px;
+  padding: var(--space-2) var(--space-4);
+  display: inline-flex; align-items: baseline; gap: var(--space-3);
 }
-nav.tabs button:hover { background: var(--accent-soft); color: var(--ink); }
-nav.tabs button[aria-selected="true"] { background: var(--accent); color: var(--on-accent); }
-nav.tabs .n { opacity: .6; font-size: .82em; margin-left: var(--space-3); }
+.chip:hover { background: var(--line); color: var(--ink); }
+.chip[aria-pressed="true"] {
+  background: var(--accent); color: var(--on-accent); border-color: var(--accent); font-weight: 600;
+}
+.chip .n { font-size: .82em; opacity: .7; font-variant-numeric: tabular-nums; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: var(--space-3); }
+/* One scrolling library rather than five exclusive panels. The heading sticks
+   so that "where am I" is answered without a sidebar spending 240px of the
+   width the grid is already short of. */
+.library { display: flex; flex-direction: column; }
+.section-head {
+  position: sticky; top: 0; z-index: 2;
+  margin: 0; padding: var(--space-3) var(--space-1) var(--space-2);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex; align-items: baseline; gap: var(--space-3);
+}
+.section-head .n {
+  margin-left: auto; font-weight: 400; letter-spacing: 0; text-transform: none;
+  color: var(--ink-helper); font-variant-numeric: tabular-nums;
+}
+.section-head + .grid { margin: var(--space-3) 0 var(--space-6); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: var(--space-3); }
 .grid button {
   font: inherit; font-size: .85rem; cursor: pointer; text-align: left;
   background: var(--layer); color: var(--ink);
@@ -188,7 +229,7 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
   ul.picks .sum { min-width: 3.875rem; }
   .stepper button, .rm { width: 2.375rem; height: 2.375rem; }
   .rm { width: 2.375rem; }
-  nav.tabs button { padding: var(--space-3) var(--space-5); }
+  .chip { padding: var(--space-3) var(--space-5); }
 }
 
 /* Narrower still, and a name like C-(Cd)(CB)(H)2 has no room left beside four
