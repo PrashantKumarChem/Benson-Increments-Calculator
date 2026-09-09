@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09i">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09j">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -14,7 +14,13 @@
      No choice made means no attribute, which is how the stylesheet's
      prefers-color-scheme branch stays in charge for anyone who has not asked
      for one. localStorage can throw outright when a browser is set to block
-     site data, so the read is guarded. -->
+     site data, so the read is guarded.
+
+     THE KEY AND THE TWO VALUES BELOW ARE ALSO IN assets/theme.js. An inline
+     script cannot import, so this copy cannot be removed - but it can be kept
+     honest: tools/theme.test.mjs reads this file and fails if the two stop
+     agreeing. Change one, change the other, or the tests will say so. -->
+
 <script>
   try {
     const theme = localStorage.getItem("theme");
@@ -47,12 +53,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09i",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09i",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09i",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09i",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09i",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09i"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09j",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09j",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09j",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09j",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09j",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09j",
+    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09j",
+    "./assets/theme.js": "./assets/theme.js?v=2026-09-09j"
   }
 }
 </script>
@@ -160,6 +168,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09i"></script>
+<script type="module" src="assets/app.js?v=2026-09-09j"></script>
 </body>
 </html>

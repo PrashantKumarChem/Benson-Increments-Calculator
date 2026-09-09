@@ -94,7 +94,14 @@
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* One spacing scale, so the density pass is not fifty separate judgements. */
+  /* One spacing scale, so the density pass is not fifty separate judgements.
+
+     It has one deliberate exception, and it is written out where it happens
+     rather than left for a reader to notice: .grid button keeps the padding
+     the design spec drew, because 236 cards tile the page and a pixel each way
+     is a column. Everything else that looks off-scale is not spacing - a 3px
+     grip bar, a 1px hairline, a 2px ring - and those are in px on purpose,
+     because a hairline is a hairline whatever the type size. */
   --space-1: 2px;
   --space-2: 4px;
   --space-3: 8px;
@@ -103,6 +110,43 @@
   --space-6: 24px;
   --space-7: 32px;
   --space-8: 48px;
+
+  /* The width below which the tally panel stops being a column beside the
+     grid and becomes a sheet at the foot of the page.
+
+     assets/app.js has to agree with this number. It measures how far the
+     sheet slides, and that measurement means nothing on the other side of the
+     line - so a breakpoint that disagreed would either measure a desktop
+     panel that never moves, or leave a phone's sheet unmeasured and sitting
+     permanently across the bottom of the screen. The script reads this token
+     rather than carrying its own copy.
+
+     A media query cannot read a custom property, so the queries below still
+     write the number out: the rail is (min-width) at one pixel more than this.
+     What holds them together is tools/validate_css.mjs, which fails if this
+     token and the queries disagree - the same bargain index.html strikes with
+     the asset version, where one value in eight places is checked rather than
+     pretended away.
+
+     In px deliberately, as the three other breakpoints are (62369df): a
+     breakpoint describes the viewport, not the text in it. */
+  --sheet-max: 859px;
+
+  /* How long the sheet takes to arrive and how long it takes to leave.
+     Material's emphasized pair: it leaves quickly and arrives gently, which
+     is what "native" turns out to mean when you slow it down and look.
+
+     --sheet-close is a token because two rules have to agree on it. The panel
+     slides out over this long, and the contributions inside it are made
+     invisible after exactly this long - a delay rather than a fade, so they
+     stay readable for precisely as long as they are still sliding past.
+     visibility is what stops a shut sheet being tabbed into, so the two
+     numbers disagreeing is a keyboard bug either way round: shorter and the
+     panel goes untabbable while it is still on screen, longer and it stays
+     tabbable after it has gone. They were written out separately before and
+     nothing held them together. */
+  --sheet-open: .34s;
+  --sheet-close: .25s;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -410,7 +454,19 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   font: inherit; font-size: .8125rem; cursor: pointer; text-align: left;
   background: var(--layer); color: var(--ink);
   border: 0; box-shadow: 0 0 0 1px var(--line-strong);
-  padding: 7px 10px; min-height: 46px;
+  /* Off the spacing scale, and staying off it. These two came from the design
+     spec as drawn numbers rather than derived ones, and the card's density is
+     the one place in this stylesheet where that is the point: 236 of them tile
+     the page, so a pixel each way is a column gained or lost. Snapping them to
+     8px/12px would be tidier to read and a different grid to look at.
+
+     The height is a rem because it is a height. It was 46px, which is what
+     2.875rem comes to at the default font size - identical today, and no
+     longer identical for a reader who has raised their browser's font, who
+     used to get the larger text and the same 46px box to fit it in. That is
+     the whole point of un-pinning the body font in 62369df, and this rule was
+     quietly undoing it. */
+  padding: 7px 10px; min-height: 2.875rem;
   display: flex; flex-direction: column; gap: var(--space-1);
   transition: background .11s ease;
   overflow-wrap: anywhere;
@@ -449,8 +505,8 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
    undo one, and on a phone the panel is a sheet that has to be opened first.
    The badge is already exactly where the thumb is.
 
-   The badge stays small because the card is 46px tall and a 40px block would
-   own it. The hit area does not: ::after reaches past the glyph on every side,
+   The badge stays small because the card is only about 46px tall and a 40px
+   block would own it. The hit area does not: ::after reaches past the glyph on every side,
    giving roughly 38x34px to press without moving anything in the layout. That
    clears the 24px minimum comfortably and is a single tap - no gesture, no
    path to trace, nothing a pointer cannot do. */
@@ -471,8 +527,13 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 .tally-panel {
   background: var(--layer); border: 1px solid var(--line-strong);
   padding: var(--space-5);
+  /* Beside the grid it follows the page down. This needs no media query of
+     its own: the sheet rules further down take the panel out of the flow
+     entirely and win on source order, and they reset top so that a panel
+     pinned to the bottom is not also pinned to the top and stretched between
+     the two. One less place for the breakpoint to be written. */
+  position: sticky; top: var(--space-5);
 }
-@media (min-width: 860px) { .tally-panel { position: sticky; top: var(--space-5); } }
 /* Beside the grid there is nothing to collapse, so neither the disclosure nor
    the drag handle is merely hidden - both are absent, and cannot be tabbed to
    or dragged. */
@@ -616,17 +677,18 @@ ul.picks .sum {
      Both distances are measured rather than guessed - the head is as tall as
      the total is, and the total is as tall as the reader's font makes it. */
   .tally-panel {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 3;
+    /* top: auto undoes the sticky offset above. With both top and bottom set
+       a fixed box is stretched between them, which would make the sheet as
+       tall as the window instead of as tall as its contents. */
+    position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 3;
     margin: 0; padding: var(--space-3) var(--space-4);
     max-height: 80vh; display: flex; flex-direction: column;
     transform: translateY(0);
-    /* Material's emphasized pair: it leaves quickly and arrives gently, which
-       is what "native" turns out to mean when you slow it down and look. */
-    transition: transform .34s cubic-bezier(.05, .7, .1, 1);
+    transition: transform var(--sheet-open) cubic-bezier(.05, .7, .1, 1);
   }
   .tally-panel:not([data-open="true"]) {
     transform: translateY(var(--sheet-hidden, 0px));
-    transition-duration: .25s;
+    transition-duration: var(--sheet-close);
     transition-timing-function: cubic-bezier(.3, 0, .8, .15);
   }
   body { padding-bottom: calc(var(--sheet-peek, 0px) + var(--space-5)); }
@@ -695,7 +757,7 @@ ul.picks .sum {
     visibility: visible; transition: visibility 0s;
   }
   .tally-panel:not([data-open="true"]) .tally-body {
-    visibility: hidden; transition: visibility 0s linear .25s;
+    visibility: hidden; transition: visibility 0s linear var(--sheet-close);
   }
   /* The list no longer needs its own cap - the sheet caps the whole thing, and
      one scrolling region is easier to use than two nested ones. */
@@ -751,12 +813,22 @@ footer a { color: var(--ink-soft); }
 .search input::-webkit-search-cancel-button,
 .search input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
 
-/* Animation is a preference. Everything here is decorative, so it all goes. */
+/* Animation is a preference. Everything here is decorative, so it all goes.
+
+   The delay goes with the duration, and not only for tidiness. The sheet
+   holds its contributions visible for --sheet-close after it starts closing,
+   as a delay rather than a fade, so they are readable while they slide past.
+   Killing the duration alone left that delay standing: the panel vanished in
+   a frame and the contributions stayed visible - and so stayed tabbable -
+   for a quarter of a second after it had gone, which is the exact keyboard
+   fault the shared token above exists to prevent. With no motion to cover,
+   there is nothing to wait for. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }
