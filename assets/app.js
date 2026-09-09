@@ -691,7 +691,25 @@ function focusableIncrements() {
 }
 
 addEventListener("keydown", (event) => {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+  // Focus the search box.
+  //
+  // "/" and not Ctrl+K, because Ctrl+K is not the page's key to take. The
+  // browser claims it first - Firefox reserves it for its own search bar, and
+  // a key the page is never sent is one preventDefault cannot stop - so the
+  // hint was advertising something that opens the browser's search instead of
+  // this one. "/" is what GitHub, Wikipedia and YouTube use, no browser
+  // reserves it, and needing no modifier it reads the same on every platform.
+  //
+  // Not while typing: inside a field "/" is a character, and a group name is
+  // full of punctuation. Ctrl/Cmd+K still works where a browser allows it, for
+  // the muscle memory, but it is no longer what the page promises.
+  const inAField = document.activeElement?.matches?.("input, textarea, select") ||
+    document.activeElement?.isContentEditable;
+  const searchKey = (event.key === "/" && !inAField &&
+      !event.ctrlKey && !event.metaKey && !event.altKey) ||
+    ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k");
+
+  if (searchKey) {
     event.preventDefault();
     el("filter").focus();
     el("filter").select();
@@ -790,16 +808,6 @@ try {
       ? `<br><strong>Shorthand search is unavailable:</strong> the notation files could not be read ` +
         `(${escapeHtml(notationProblem)}). Groups can still be found by their printed names.`
       : "");
-
-  // Say Cmd where that is the key, so the hint is not wrong on half the class.
-  //
-  // navigator.platform is deprecated, and where a browser has removed it the
-  // hint silently stays "Ctrl K" on a Mac. userAgentData is asked first and
-  // answers "macOS"; the other two are the fallback for the browsers that do
-  // not implement it, which is every one of them outside Chromium.
-  const platform = navigator.userAgentData?.platform || navigator.platform ||
-    navigator.userAgent || "";
-  if (/Mac|iPhone|iPad/i.test(platform)) el("shortcut").textContent = "\u2318 K";
 
   render();
 } catch (error) {
