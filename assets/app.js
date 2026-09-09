@@ -133,6 +133,10 @@ function renderLibrary() {
   const rows = visibleRows(view.index, { query: view.query, files: view.files });
   const sections = sectionsFor(rows, { query: view.query });
 
+  // What the announcement below counts. Set before the empty branch returns,
+  // so "no group matches" is a count of zero rather than the previous count.
+  view.shown = rows.length;
+
   if (!sections.length) {
     el("library").innerHTML =
       `<p class="status">No group matches &ldquo;${escapeHtml(view.query)}&rdquo;.</p>`;
@@ -247,11 +251,136 @@ function renderTally() {
     .join("");
 }
 
+/**
+ * The one line a screen reader is asked to read.
+ *
+ * #library carried aria-live="polite" itself. Its markup is replaced wholesale
+ * on every keystroke and every add, so the reader was asked to announce up to
+ * 236 cards each time, which buries the thing that actually changed. This says
+ * what is on screen and what the total now is, in a sentence.
+ *
+ * It is written only when that sentence differs from the one already there.
+ * Assigning identical text still replaces the node, and a live region
+ * announces the replacement - so typing a letter that changes nothing would
+ * otherwise speak the whole line again.
+ *
+ * "per mole" rather than "/mol", which is read out as "slash".
+ */
+function announce() {
+  const shown = view.shown;
+  const found = view.query
+    ? `${shown} ${shown === 1 ? "match" : "matches"} for ${view.query}`
+    : `${shown} ${shown === 1 ? "group" : "groups"} shown`;
+  const message = `${found}. Total ${formatTotal(selection.totalKj)} kJ per mole.`;
+  const status = el("status-line");
+  if (status.textContent !== message) status.textContent = message;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Focus, across a re-render                                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * render() replaces the chips, the library and the contributions list
+ * wholesale, so whichever of their buttons held focus is gone by the time it
+ * returns and focus falls back to the body: the next Enter does nothing, and
+ * Tab restarts from the top of the page. That is what happened to every add
+ * made by keyboard, and to every filter chosen by keyboard.
+ *
+ * A button is found again by what it does rather than by where it sat, because
+ * a re-render can change the list under it: a search drops rows, adding the
+ * first of a group gives its card a badge, and removing a contribution takes
+ * its whole row out. An index only agrees with where the reader was by
+ * accident, which is how the + and - keys were restoring it.
+ */
+const FOCUS_REGIONS = "#chips, #library, #picks";
+
+/** Joins the parts below. A control character, because a label is free to
+    contain any punctuation a chemist writes - C-(Cd)(CB)(H)2 and the rest. */
+const SEPARATOR = "\u0000";
+
+/**
+ * What a button does, as a string. Unique within its region, and unlike the
+ * class list it survives the change that adding one makes to a card.
+ */
+function focusKey(button, kind = button.hasAttribute("data-step-down") ? "less" : "do") {
+  const { file = "", label = "", key = "", remove = "", step = "" } = button.dataset;
+  return [kind, file, label, key, remove, step].join(SEPARATOR);
+}
+
+function focusedButton() {
+  const active = document.activeElement;
+  if (active?.tagName !== "BUTTON") return null;
+
+  // Undo, Copy and Reset are not redrawn - they are disabled in place once the
+  // selection empties, and a browser blurs a control it has just disabled. The
+  // element is still there, so nothing below would notice; what has to be
+  // checked afterwards is whether it can still hold the focus it had.
+  if (active.closest(".actions")) return { action: active };
+
+  const region = active.closest(FOCUS_REGIONS);
+  if (!region) return null;
+
+  // One button reliably disappears under the finger that pressed it: the
+  // table's count badge, when the last one is taken back. The group's own
+  // button sits on the same row and outlives it, which is where a reader
+  // would expect to land - so it is named here as the second choice.
+  const keys = [focusKey(active)];
+  if (active.hasAttribute("data-step-down")) keys.push(focusKey(active, "do"));
+
+  // Removing a contribution takes its whole row out, so neither key can match
+  // and there is no button that means the same thing any more. The position is
+  // kept as a last resort, which lands on the row that moved up into it.
+  const buttons = [...region.querySelectorAll("button")];
+  return { region: region.id, keys, index: buttons.indexOf(active) };
+}
+
+/**
+ * Where focus goes when the panel has nothing left to put it on: the panel
+ * itself, which is labelled and is where the reader already was.
+ *
+ * Not the search box, which is the other always-present control: focusing an
+ * input opens the on-screen keyboard, and taking the last term back on a phone
+ * should not do that.
+ */
+function focusPanel() {
+  el("tally-panel").focus({ preventScroll: true });
+}
+
+function restoreFocus(memory) {
+  if (!memory) return;
+
+  if (memory.action) {
+    // Still enabled means focus was never taken from it.
+    if (memory.action.disabled) focusPanel();
+    return;
+  }
+
+  const buttons = [...el(memory.region).querySelectorAll("button")];
+  for (const key of memory.keys) {
+    const again = buttons.find((button) => focusKey(button) === key);
+    // preventScroll, because this is a restoration and not a move: the reader
+    // has not asked to go anywhere, and the button is where it already was.
+    if (again) return again.focus({ preventScroll: true });
+  }
+  // Nothing does that job any more, so take the place rather than the button.
+  const inItsPlace = buttons[Math.min(memory.index, buttons.length - 1)];
+  if (inItsPlace) return inItsPlace.focus({ preventScroll: true });
+
+  // The region has emptied out. Only the contributions list can do that while
+  // holding focus - the chips are fixed, and an empty library is only reached
+  // by typing, which means focus is in the search box and not here.
+  if (memory.region === "picks") focusPanel();
+}
+
 function render() {
+  const focused = focusedButton();
   renderChips();
   renderLibrary();
   renderTally();
-  // Last, because it measures what the three above just drew.
+  announce();
+  restoreFocus(focused);
+  // Last, because it measures what the four above just drew.
   measureSheet();
 }
 
@@ -455,7 +584,14 @@ el("about-toggle").addEventListener("click", (event) => {
 function addIncrement(file, label) {
   const category = view.byFile.get(file);
   const row = category?.rows.find((candidate) => candidate.label === label);
-  if (!row) return;
+  // A button carrying a file and a label the data does not have is a dead
+  // click, and silence makes it look like the page simply ignored the press.
+  // Nothing on screen can be said about it, because the fault is the markup
+  // and the data disagreeing, but the console should not stay quiet.
+  if (!row) {
+    console.warn(`no increment "${label}" in ${file}; the markup and the data disagree`);
+    return;
+  }
   selection.add({ ...row, categoryFile: category.file, categoryTitle: category.title });
 }
 
@@ -467,7 +603,14 @@ el("library").addEventListener("click", (event) => {
   // it in the grid.
   const stepDown = event.target.closest("[data-step-down]");
   if (stepDown) {
+    // Reachable markup always puts the file and the label on the badge or on
+    // the card around it, but nothing enforces that, and reading .dataset off
+    // null throws in the middle of a click handler.
     const owner = stepDown.closest("[data-file]");
+    if (!owner) {
+      console.warn("a count badge with no increment around it; the markup has changed");
+      return;
+    }
     selection.step(keyOf(owner.dataset.file, owner.dataset.label), -1);
     render();
     return;
@@ -536,15 +679,37 @@ el("copy").addEventListener("click", async (event) => {
  * Enter adds the focused one, which buttons already do; and + and - adjust it
  * without leaving the keyboard.
  *
- * Re-rendering replaces the button that had focus, so the position is restored
- * afterwards rather than the focus being allowed to fall back to the body.
+ * Re-rendering replaces the button that had focus. Restoring it is render()'s
+ * job now, for every button it redraws rather than only for these two keys.
  */
 function focusableIncrements() {
-  return [...el("library").querySelectorAll("button[data-label]")];
+  // Not the count badges. In the table a badge is a real button and carries
+  // the same file and label as the group it belongs to, so it matched here -
+  // and pressing + on one called addIncrement with the dataset of the control
+  // that takes one away, adding an increment from the remove button.
+  return [...el("library").querySelectorAll("button[data-label]:not([data-step-down])")];
 }
 
 addEventListener("keydown", (event) => {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+  // Focus the search box.
+  //
+  // "/" and not Ctrl+K, because Ctrl+K is not the page's key to take. The
+  // browser claims it first - Firefox reserves it for its own search bar, and
+  // a key the page is never sent is one preventDefault cannot stop - so the
+  // hint was advertising something that opens the browser's search instead of
+  // this one. "/" is what GitHub, Wikipedia and YouTube use, no browser
+  // reserves it, and needing no modifier it reads the same on every platform.
+  //
+  // Not while typing: inside a field "/" is a character, and a group name is
+  // full of punctuation. Ctrl/Cmd+K still works where a browser allows it, for
+  // the muscle memory, but it is no longer what the page promises.
+  const inAField = document.activeElement?.matches?.("input, textarea, select") ||
+    document.activeElement?.isContentEditable;
+  const searchKey = (event.key === "/" && !inAField &&
+      !event.ctrlKey && !event.metaKey && !event.altKey) ||
+    ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k");
+
+  if (searchKey) {
     event.preventDefault();
     el("filter").focus();
     el("filter").select();
@@ -552,7 +717,9 @@ addEventListener("keydown", (event) => {
   }
 
   const current = document.activeElement;
-  if (!current?.matches?.("#library button[data-label]")) return;
+  // Tab reaches a badge even though the arrow keys no longer walk onto one,
+  // so the same exclusion has to be written here.
+  if (!current?.matches?.("#library button[data-label]:not([data-step-down])")) return;
 
   const buttons = focusableIncrements();
   const here = buttons.indexOf(current);
@@ -577,7 +744,6 @@ addEventListener("keydown", (event) => {
     if (delta > 0) addIncrement(current.dataset.file, current.dataset.label);
     else selection.step(key, -1);
     render();
-    focusableIncrements()[here]?.focus();
   };
 
   switch (event.key) {
@@ -614,10 +780,12 @@ try {
   // found by the shorthand a student writes. If they cannot be read the sums
   // must still work, so this is reported and stepped over rather than thrown -
   // searching then falls back to the names as printed, by the same code path.
+  let notationProblem = "";
   try {
     view.notation = await loadNotation({ readText: fetchText });
   } catch (error) {
     view.notation = emptyNotation();
+    notationProblem = error.message;
     console.warn(`notation/ could not be read, so a group is only findable by its printed name: ${error.message}`);
   }
   view.index = buildIndex(view.categories, view.notation);
@@ -632,13 +800,22 @@ try {
     `project&rsquo;s CSV files. <a href="${REPO_URL}">Source and data on GitHub</a> &middot; GPL-3.0.` +
     (unreadable.length
       ? `<br><strong>${unreadable.length} row(s) could not be read:</strong> ${escapeHtml(unreadable.join(", "))}`
+      : "") +
+    // Stepping over an unreadable notation/ is deliberate - the sums do not
+    // need it - but the reader was never told, and a search for CH3 that
+    // quietly stops finding anything reads as the data being wrong.
+    (notationProblem
+      ? `<br><strong>Shorthand search is unavailable:</strong> the notation files could not be read ` +
+        `(${escapeHtml(notationProblem)}). Groups can still be found by their printed names.`
       : "");
-
-  // Say Cmd where that is the key, so the hint is not wrong on half the class.
-  if (/Mac|iPhone|iPad/i.test(navigator.platform ?? "")) el("shortcut").textContent = "\u2318 K";
 
   render();
 } catch (error) {
+  // render() never runs on this path, so the sentence below is the only thing
+  // a screen reader is given. While the library carried aria-live itself this
+  // message was announced by being written into it; now it has to be said.
+  el("status-line").textContent =
+    `Could not load the increment data: ${error.message}.`;
   el("library").innerHTML =
     `<p class="status">Could not load the increment data: ${escapeHtml(error.message)}.<br>
      If you opened this file straight from disk, serve the folder instead — for example
