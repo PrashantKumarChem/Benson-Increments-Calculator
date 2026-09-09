@@ -256,10 +256,12 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 }
 @media (min-width: 980px) { .tally-panel { position: sticky; top: var(--space-5); } }
 /* What the number underneath is a measure of. Written from the data rather
-   than hardcoded, so a category that has declared nothing reads "Total". */
+   than hardcoded, so a category that has declared nothing reads "Total".
+   Deliberately not uppercased: the content is a quantity symbol, and the
+   lowercase f in dHf is part of the notation, not a styling accident. */
 .tally-label {
   margin: 0 0 var(--space-1); color: var(--ink-soft);
-  font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  font-size: .75rem; font-weight: 600; letter-spacing: .04em;
 }
 /* Shown only when the sum holds more than one kind of quantity. */
 .mixed {
