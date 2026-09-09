@@ -970,13 +970,43 @@ ul.picks .sum {
    the document 1px wider than the window with it. They come back the moment
    they can do something. */
 .layout[data-tally="empty"] .actions { display: none; }
+/* The same bargain the header strikes, one panel over: a border means a
+   container, and these are controls. They were three identical outlined
+   rectangles of equal width - the same fault the top of the page had, where
+   nothing said which of them mattered or which of them you could not undo.
+
+   Quiet fills rather than ghosts, and the chips' fill exactly. Ghost controls
+   work in the bar because they are words at the edge of the page with a hover
+   to find them by; these sit under a list on a panel that on a phone has no
+   hover at all, and three bare words in a row there read as a caption rather
+   than as three things you can press. The chip is already this page's word for
+   "a control you can press that is not the important thing on the screen", so
+   these become chips rather than a fourth kind of button. */
+/* --ink, not --ink-soft, and all three the same. Marking Copy by giving it the
+   darker ink and leaving the other two soft did read as a hierarchy - it also
+   read as two disabled buttons beside an enabled one, because faded is already
+   this panel's word for "you cannot press this yet" and all three spend the
+   first part of every visit actually being that. One signal, one meaning. */
 .actions button {
-  flex: 1; font: inherit; font-size: .86rem; cursor: pointer;
-  background: transparent; color: var(--ink-soft);
-  border: 1px solid var(--line-strong); padding: var(--space-3) var(--space-4);
+  font: inherit; font-size: .8125rem; cursor: pointer;
+  background: var(--layer-accent); color: var(--ink);
+  border: 0; padding: var(--space-2) var(--space-4); min-height: 2rem;
 }
-.actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
+.actions button:hover:not(:disabled) { background: var(--line); }
 .actions button:disabled { opacity: .4; cursor: default; }
+/* Weight, then - which is the one axis nothing else on this panel is using.
+   An accent fill would have said "primary" loudest and is the one thing it
+   must not do here: it would sit directly under the total and out-shout it,
+   and on this page a filled accent already means a state is on. Copy is not a
+   state. */
+.actions .primary { font-weight: 600; }
+/* Distance, not colour. Reset is the only one of the three that cannot be
+   taken back, and this palette has no danger red to say so - deliberately, and
+   adding one for a single button would be the wrong trade. Space says it
+   instead, and says it better: the two you can undo stay together at one end
+   and the one you cannot sits alone at the other, out of the path of a thumb
+   going for Copy. */
+.actions .destructive { margin-left: auto; }
 
 footer { color: var(--ink-helper); font-size: .8rem; margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--line); }
 footer a { color: var(--ink-soft); }

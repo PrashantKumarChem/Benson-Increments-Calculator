@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09t">
+<link rel="stylesheet" href="assets/styles.css?v=2026-09-09w">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -53,14 +53,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09t",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09t",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09t",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09t",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09t",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09t",
-    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09t",
-    "./assets/theme.js": "./assets/theme.js?v=2026-09-09t"
+    "./assets/app.js": "./assets/app.js?v=2026-09-09w",
+    "./assets/benson.js": "./assets/benson.js?v=2026-09-09w",
+    "./assets/browse.js": "./assets/browse.js?v=2026-09-09w",
+    "./assets/format.js": "./assets/format.js?v=2026-09-09w",
+    "./assets/notation.js": "./assets/notation.js?v=2026-09-09w",
+    "./assets/selection.js": "./assets/selection.js?v=2026-09-09w",
+    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09w",
+    "./assets/theme.js": "./assets/theme.js?v=2026-09-09w"
   }
 }
 </script>
@@ -165,8 +165,27 @@
           <circle cx="7" cy="7" r="4.5"></circle><path d="M10.4 10.4 14 14"></path>
         </svg>
       </span>
+      <!-- Short enough to survive a phone. It used to run "Search every
+           category — CH3, methyl, C-(C)(H)3, cyclohexane", which fits the
+           544px field a desktop gives it and not the 233px field a 390px
+           phone does: it was cut to "Search every category —", a sentence
+           ending in a dash, which reads as something broken rather than as a
+           hint.
+
+           One example survives, because the thing worth advertising is that a
+           common name finds a group at all. The rest of that teaching happens
+           where it is more use anyway - a result found by synonym says which
+           word matched, so searching "methyl" shows C-(C)(H)3 labelled as
+           methyl, and the notation is learnt from the answer rather than from
+           the prompt.
+
+           No dash, and that is the point rather than a preference. Below about
+           340px nothing useful fits and this will be cut too - but it is cut
+           mid-word, which reads as a phrase continuing off the edge. What made
+           the old one look broken was not being cut, it was being cut directly
+           after punctuation that promises something after it. -->
       <input type="search" id="filter" autocomplete="off" spellcheck="false"
-             placeholder="Search every category — CH3, methyl, C-(C)(H)3, cyclohexane">
+             placeholder="Search increments, e.g. methyl">
       <kbd class="shortcut" aria-hidden="true">/</kbd>
       <button class="clear" id="clear" hidden aria-label="Clear search">&times;</button>
     </div>
@@ -242,9 +261,13 @@
         <ul class="picks" id="picks"></ul>
         <p class="band" id="band" hidden></p>
         <div class="actions">
+          <!-- The classes name what each one is, and the stylesheet decides
+               what that looks like. Copy is the action that finishes the job -
+               it is how the working out leaves the page for a lab book - and
+               Reset is the only one of the three you cannot take back. -->
           <button id="undo" disabled>Undo</button>
-          <button id="copy" disabled>Copy</button>
-          <button id="reset" disabled>Reset</button>
+          <button id="copy" class="primary" disabled>Copy</button>
+          <button id="reset" class="destructive" disabled>Reset</button>
         </div>
       </div>
     </aside>
@@ -253,6 +276,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09t"></script>
+<script type="module" src="assets/app.js?v=2026-09-09w"></script>
 </body>
 </html>
