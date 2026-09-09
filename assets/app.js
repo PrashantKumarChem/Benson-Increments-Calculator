@@ -12,6 +12,8 @@ import {
 } from "./format.js";
 import { buildIndex, emptyNotation, loadNotation } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
+import { sheetMetrics, swipeIntent } from "./sheet.js";
+import { THEME_KEY, isDark, nextTheme, themeLabel } from "./theme.js";
 
 /** The increments chosen so far; see selection.js for the rules it enforces. */
 const selection = createSelection();
@@ -345,10 +347,15 @@ function measureSheet() {
     return;
   }
 
-  const hidden = body.offsetHeight;
+  // Transform does not affect offsetHeight, so these read the same whether the
+  // sheet is open or shut. What the two numbers mean is in sheet.js, where it
+  // can be tested without a browser.
+  const { hidden, peek } = sheetMetrics({
+    panelHeight: panel.offsetHeight,
+    bodyHeight: body.offsetHeight,
+  });
   panel.style.setProperty("--sheet-hidden", `${hidden}px`);
-  document.documentElement.style.setProperty(
-    "--sheet-peek", `${Math.max(0, panel.offsetHeight - hidden)}px`);
+  document.documentElement.style.setProperty("--sheet-peek", `${peek}px`);
 }
 
 function setPanelOpen(open) {
@@ -380,9 +387,10 @@ el("panel-toggle").addEventListener("click", () => {
  * what fixed the gesture on real hardware - the browser used to claim the same
  * downward swipe, scrolling the page under the finger and, at the top of the
  * document, reloading it as pull-to-refresh with every increment in it.
+ *
+ * The threshold and what a finished drag meant are in sheet.js; what follows
+ * is only which element was touched and when.
  */
-const SWIPE = 40;
-
 el("tally-panel").addEventListener("touchstart", (event) => {
   const panel = event.currentTarget;
   panel.dataset.swipeFrom =
@@ -394,9 +402,9 @@ el("tally-panel").addEventListener("touchend", (event) => {
   event.currentTarget.dataset.swipeFrom = "";
   if (!from) return;
 
-  const travelled = event.changedTouches[0].clientY - Number(from);
-  if (Math.abs(travelled) < SWIPE) return;
-  setPanelOpen(travelled < 0);
+  const open = swipeIntent(Number(from), event.changedTouches[0].clientY);
+  if (open === null) return;
+  setPanelOpen(open);
 }, { passive: true });
 
 /**
@@ -410,28 +418,30 @@ el("tally-panel").addEventListener("touchend", (event) => {
  * The label is written from the theme actually in force rather than from the
  * stored value, because until the button is pressed there is no stored value
  * to read - only what the system is doing.
+ *
+ * The rules, the storage key and the two values it may hold are in theme.js,
+ * which index.html's inline script has to agree with and cannot import. What
+ * is left here is the wiring: what to ask, and what to set.
  */
 const prefersDark = matchMedia("(prefers-color-scheme: dark)");
 
-const isDark = () => (document.documentElement.dataset.theme
-  ? document.documentElement.dataset.theme === "dark"
-  : prefersDark.matches);
+/** Which theme is in force at this moment. */
+const dark = () => isDark(document.documentElement.dataset.theme, prefersDark.matches);
 
 function labelTheme() {
-  el("theme-toggle").setAttribute(
-    "aria-label", isDark() ? "Switch to light theme" : "Switch to dark theme");
+  el("theme-toggle").setAttribute("aria-label", themeLabel(dark()));
 }
 
 el("theme-toggle").addEventListener("click", () => {
-  const theme = isDark() ? "light" : "dark";
+  const theme = nextTheme(dark());
   document.documentElement.dataset.theme = theme;
   // Refusing to remember it is not a reason to refuse to change it.
-  try { localStorage.setItem("theme", theme); } catch { /* not stored */ }
+  try { localStorage.setItem(THEME_KEY, theme); } catch { /* not stored */ }
   labelTheme();
 });
 
 // Only reaches the label while no choice has been made; once it has, the
-// attribute is set and isDark() stops consulting the system at all.
+// attribute is set and the system stops being consulted at all.
 prefersDark.addEventListener("change", labelTheme);
 labelTheme();
 

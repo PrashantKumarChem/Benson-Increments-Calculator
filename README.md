@@ -124,6 +124,8 @@ assets/browse.js        which increments are shown, and how they group (no DOM)
 assets/format.js        how a value is written on the page (no DOM)
 assets/notation.js      reading Benson notation: what a group name is made of (no DOM)
 assets/selection.js     the chosen increments and the running total (no DOM)
+assets/sheet.js         how far the phone sheet slides, and what a swipe meant (no DOM)
+assets/theme.js         light, dark, and having chosen neither (no DOM)
 assets/app.js           rendering and events
 assets/styles.css       visual styles
 assets/fonts/           IBM Plex Mono, shipped with the site (see License)
@@ -134,8 +136,25 @@ tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```
 
-The five files without any DOM access hold everything worth testing, which is
-why the test suite needs no browser.
+The seven files without any DOM access are the ones the test suite covers,
+which is why it needs no browser.
+
+They used to be five, and the README used to claim they held everything worth
+testing. That stopped being true as app.js grew: how far the sheet slides, what
+a swipe meant, and which theme is in force are all decisions rather than
+wiring, and all three were reachable only by opening the page. They are in
+sheet.js and theme.js now, and tested. What is left in app.js is genuinely
+wiring - building HTML, attaching listeners, reading elements - with one
+exception still to move: the keyboard grid navigation works out how many cards
+share a row, which is arithmetic wearing a DOM coat.
+
+Two things the tests cover that are not modules at all. tools/validate_css.mjs
+checks that the stylesheet parses and that every token it names exists, because
+CSS fails quietly and a stray comment-close once removed a whole media query
+without anything going red. tools/theme.test.mjs checks that the inline script
+in index.html still agrees with theme.js about the storage key and its two
+values - that script runs before the first paint, so it cannot import, and the
+duplication is forced.
 
 ## Searching by shorthand
 
