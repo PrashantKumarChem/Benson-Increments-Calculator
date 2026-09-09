@@ -94,7 +94,14 @@
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* One spacing scale, so the density pass is not fifty separate judgements. */
+  /* One spacing scale, so the density pass is not fifty separate judgements.
+
+     It has one deliberate exception, and it is written out where it happens
+     rather than left for a reader to notice: .grid button keeps the padding
+     the design spec drew, because 236 cards tile the page and a pixel each way
+     is a column. Everything else that looks off-scale is not spacing - a 3px
+     grip bar, a 1px hairline, a 2px ring - and those are in px on purpose,
+     because a hairline is a hairline whatever the type size. */
   --space-1: 2px;
   --space-2: 4px;
   --space-3: 8px;
@@ -447,7 +454,19 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   font: inherit; font-size: .8125rem; cursor: pointer; text-align: left;
   background: var(--layer); color: var(--ink);
   border: 0; box-shadow: 0 0 0 1px var(--line-strong);
-  padding: 7px 10px; min-height: 46px;
+  /* Off the spacing scale, and staying off it. These two came from the design
+     spec as drawn numbers rather than derived ones, and the card's density is
+     the one place in this stylesheet where that is the point: 236 of them tile
+     the page, so a pixel each way is a column gained or lost. Snapping them to
+     8px/12px would be tidier to read and a different grid to look at.
+
+     The height is a rem because it is a height. It was 46px, which is what
+     2.875rem comes to at the default font size - identical today, and no
+     longer identical for a reader who has raised their browser's font, who
+     used to get the larger text and the same 46px box to fit it in. That is
+     the whole point of un-pinning the body font in 62369df, and this rule was
+     quietly undoing it. */
+  padding: 7px 10px; min-height: 2.875rem;
   display: flex; flex-direction: column; gap: var(--space-1);
   transition: background .11s ease;
   overflow-wrap: anywhere;
@@ -486,8 +505,8 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
    undo one, and on a phone the panel is a sheet that has to be opened first.
    The badge is already exactly where the thumb is.
 
-   The badge stays small because the card is 46px tall and a 40px block would
-   own it. The hit area does not: ::after reaches past the glyph on every side,
+   The badge stays small because the card is only about 46px tall and a 40px
+   block would own it. The hit area does not: ::after reaches past the glyph on every side,
    giving roughly 38x34px to press without moving anything in the layout. That
    clears the 24px minimum comfortably and is a single tap - no gesture, no
    path to trace, nothing a pointer cannot do. */
