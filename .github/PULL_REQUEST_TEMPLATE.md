@@ -1,24 +1,44 @@
-## Description
-Brief description of the changes made.
+## What this changes
 
-## Type of Change
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Other (please specify):
+Briefly, and why.
 
-## How Has This Been Tested?
-Describe the tests you ran to verify your changes.
+## Type of change
 
-## Checklist:
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
+- [ ] Increment data (new or corrected values)
+- [ ] Calculator behaviour
+- [ ] Reference page or other documentation
+- [ ] Tooling, tests or CI
+- [ ] Other:
 
-## Additional Notes
-Any additional information or context about the pull request.
+## Checks
+
+Run these locally. CI runs them too, so anything missed will go red rather
+than be merged by accident.
+
+- [ ] `python tools/validate_data.py`
+- [ ] `python tools/validate_assets.py`
+- [ ] `node --test tools/*.test.mjs`
+- [ ] `node tools/validate_css.mjs`
+- [ ] `node tools/check_parity.mjs`
+- [ ] `node tools/build_reference.mjs --check`
+
+## If you changed anything in `assets/`
+
+- [ ] I bumped the version in `index.html`, in every place it appears
+
+This is the one step CI cannot verify. `validate_assets.py` checks that the
+version references agree with each other, not that you moved them, so a missed
+bump passes every check and can serve a returning visitor a stale file. Count
+the places rather than assuming a number — it grows when a module is added. A
+value already in use is not a bump; a second release on the same day takes a
+letter suffix.
+
+## If you changed data or the reference page
+
+- [ ] New or changed values include a source
+- [ ] `CSV_data_files/manifest.json` regenerated and committed, if a file was added
+- [ ] `reference.html` rebuilt, if anything in `reference/` or an included CSV changed
+
+## Anything else
+
+Screenshots for a visual change, and anything a reviewer should know.

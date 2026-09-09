@@ -1,33 +1,44 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report something that behaves incorrectly
 title: ''
 labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Where did it happen?**
+- [ ] The web calculator (https://prashantkumarchem.github.io/Benson-Increments-Calculator/ or a local copy)
+- [ ] The Jupyter notebook
+- [ ] The tooling in `tools/`
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**What happened**
+A clear description of what went wrong.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**What you expected instead**
+
+**Steps to reproduce**
+1.
+2.
+3.
+
+**If a value looks wrong**
+This is the most useful kind of report, and it needs three things:
+- The group or correction, exactly as the calculator names it (e.g. `C-(C)2(H)2`)
+- The value shown, and the value you expected
+- The source you expected it from
+
+Note that a published range is averaged, and the range is shown beside the
+average — `2.51-4.35` displaying as `3.43` is intended behaviour.
+
+**Environment**
+- Browser and version: [e.g. Firefox 128, Safari 17]
+- Operating system: [e.g. Windows 11, macOS 14, Ubuntu 24.04]
+- Phone or desktop:
+- For a notebook issue, Python and Jupyter versions instead:
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If the problem is visual, a screenshot usually settles it faster than a
+description.
 
-**Environment (please complete the following information):**
-- OS: [e.g. Windows 10]
-- Python version: [e.g. 3.8]
-- Jupyter version: [e.g. 1.0.0]
-- Browser (if applicable): [e.g. Chrome 89]
-
-**Additional context**
-Add any other context about the problem here.
+**Anything else**
