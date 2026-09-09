@@ -282,20 +282,31 @@ export function buildPage(root = ROOT) {
   const names = readSections(dir);
   if (!names.length) throw new Error(`${CONTENT_DIR}/ has no numbered .md or .csv sections`);
 
-  const sections = names.map((name) => {
+  // Numbered by position, not by the digits in the filename. Those digits
+  // exist to order the files and are allowed to have gaps - inserting a
+  // section between 05 and 06 means renumbering the rest or picking 05a -
+  // whereas what a reader sees should always run 1, 2, 3. Numbering the page
+  // also lets one section cite another in a way that survives the reordering
+  // this layout invites.
+  const sections = names.map((name, index) => {
     const title = sectionTitle(name);
     const body = name.endsWith(".csv")
       ? renderTable(parseDelimited(readFileSync(path.join(dir, name), "utf8")))
       : renderMarkdown(readFileSync(path.join(dir, name), "utf8"), { includeCsv });
-    return { name, title, id: slug(title), body };
+    return { name, title, id: slug(title), body, number: index + 1 };
   });
 
   const version = versionFrom(read("index.html"));
-  const contents = sections
-    .map((s) => `      <li><a href="#${s.id}">${escapeHtml(s.title)}</a></li>`).join("\n");
+  const contents = sections.map((s) =>
+    `      <li><a href="#${s.id}"><span class="ref-num">${s.number}</span>` +
+    `${escapeHtml(s.title)}</a></li>`).join("\n");
   const body = sections.map((s) => [
     `    <section class="ref-section" id="${s.id}">`,
-    `      <h2>${escapeHtml(s.title)}</h2>`,
+    // The anchor is a real link, not a generated ::after, so it can be focused,
+    // copied and announced. Being pointed at is most of what a reference page
+    // is for.
+    `      <h2><span class="ref-num">${s.number}</span>${escapeHtml(s.title)}` +
+    `<a class="ref-anchor" href="#${s.id}" aria-label="Link to ${escapeHtml(s.title)}">#</a></h2>`,
     s.body.split("\n").map((line) => (line ? `      ${line}` : line)).join("\n"),
     "    </section>",
   ].join("\n")).join("\n\n");
@@ -324,7 +335,10 @@ export function buildPage(root = ROOT) {
 <div class="wrap">
 
   <header class="bar ref-bar">
-    <h1>Reference</h1>
+    <div class="ref-masthead">
+      <p class="ref-kicker">Benson Increments Calculator</p>
+      <h1>Reference</h1>
+    </div>
     <a class="ref-back" href="index.html">&larr; Calculator</a>
   </header>
 

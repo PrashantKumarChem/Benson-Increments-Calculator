@@ -14,6 +14,7 @@
  */
 import test from "node:test";
 import assert from "node:assert/strict";
+import path from "node:path";
 
 import {
   renderMarkdown,
@@ -21,6 +22,7 @@ import {
   parseDelimited,
   sectionTitle,
   versionFrom,
+  buildPage,
   orderOf,
 } from "./build_reference.mjs";
 
@@ -172,4 +174,26 @@ test("an include that cannot be read names the file it failed on", () => {
     }),
     /\{\{csv: nope\/missing\.csv\}\} could not be read/,
   );
+});
+
+test("sections are numbered by position, and every one can be linked to", () => {
+  const page = buildPage(path.resolve(import.meta.dirname, ".."));
+
+  // The numbers a reader sees run 1..n with no gaps, whatever the filenames
+  // happen to be numbered. Inserting a section is allowed to renumber files;
+  // it is not allowed to make the page count 1, 2, 4.
+  const numbers = [...page.matchAll(/<h2><span class="ref-num">(\d+)<\/span>/g)]
+    .map((m) => Number(m[1]));
+  assert.ok(numbers.length >= 2, "expected several sections");
+  assert.deepEqual(numbers, numbers.map((_, i) => i + 1));
+
+  // Every section heading carries an anchor pointing at its own id, so a
+  // definition can be linked to directly.
+  const sections = [...page.matchAll(/<section class="ref-section" id="([^"]+)"/g)]
+    .map((m) => m[1]);
+  assert.equal(sections.length, numbers.length);
+  for (const id of sections) {
+    assert.ok(page.includes(`<a class="ref-anchor" href="#${id}"`), `no anchor for #${id}`);
+    assert.ok(page.includes(`<li><a href="#${id}">`), `no contents entry for #${id}`);
+  }
 });

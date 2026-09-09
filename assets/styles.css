@@ -864,72 +864,82 @@ footer a { color: var(--ink-soft); }
    a chemistry symbol - ΔHf° is a row in the glossary - and uppercasing it
    renders ΔHF°, which is a different thing and not a real one. */
 
-.ref-bar { justify-content: space-between; border-bottom: 1px solid var(--line); }
+/* The masthead. A document says what it is before it says anything, and the
+   calculator's own h1 is deliberately tiny because there it is a label on a
+   tool. Here it is a title, so it is sized like one, with the product name
+   above it as a kicker rather than competing with it. */
+.ref-bar { align-items: flex-end; justify-content: space-between; padding-bottom: var(--space-5); border-bottom: 1px solid var(--line); }
+.ref-masthead { display: flex; flex-direction: column; gap: var(--space-1); }
+.ref-kicker { margin: 0; font-size: .75rem; color: var(--ink-helper); letter-spacing: .04em; }
+.ref-body h1 { font-size: 1.6rem; font-weight: 620; letter-spacing: -.02em; line-height: 1.15; }
 .ref-back {
+  display: inline-flex; align-items: center; height: 1.75rem;
   font-size: .78rem; color: var(--ink-soft); text-decoration: none;
-  border: 1px solid var(--line-strong); padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--line-strong); padding: 0 var(--space-3);
 }
 .ref-back:hover { background: var(--layer-accent); color: var(--ink); }
 
-/* Contents above the prose on a narrow screen, beside it on a wide one. The
-   grid is declared once at the wide breakpoint rather than being un-declared
-   here, so the small screen keeps the simpler box model. */
+/* Contents above the prose on a narrow screen, beside it on a wide one. */
 .ref-toc { margin: var(--space-6) 0; }
 .ref-toc-head {
-  margin: 0 0 var(--space-3); font-size: .78rem; color: var(--ink-helper);
-  letter-spacing: .02em;
+  margin: 0 0 var(--space-3); font-size: .75rem; color: var(--ink-helper);
+  letter-spacing: .04em;
 }
 .ref-toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
 .ref-toc a { color: var(--ink-soft); font-size: .87rem; text-decoration: none; border-bottom: 1px solid var(--line); }
 .ref-toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* A measure, not a column width. Prose past about 70 characters a line is
-   measurably harder to come back to after looking away, and this is a page
-   people read a paragraph of, look at the calculator, and return to. */
-.ref-main { max-width: 68ch; }
-.ref-section { margin: 0 0 var(--space-8); scroll-margin-top: var(--space-5); }
-.ref-section h2 {
-  margin: 0 0 var(--space-4); font-size: 1.05rem; font-weight: 620;
-  letter-spacing: -.01em; padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--accent);
+/* The number is the one place a numeral appears in this prose, so it is the
+   one place the mono face belongs - and being tabular it makes the contents
+   list align down its left edge without a second column. */
+.ref-num {
+  font: 400 .82em/1 var(--font-mono); color: var(--ink-helper);
+  display: inline-block; min-width: 1.6em;
 }
-.ref-section h3 { margin: var(--space-6) 0 var(--space-3); font-size: .95rem; font-weight: 620; }
+
+/* A measure, not a column width. Prose past about 70 characters a line is
+   harder to come back to after looking away, and this is a page people read a
+   paragraph of, look at the calculator, and return to. */
+.ref-main { max-width: 66ch; }
+
+/* Rhythm. Sections used to be separated by one space value and headed by
+   something a fifth of a step larger than the body, which made eleven of them
+   read as one undifferentiated column. The gap below is nearly three times the
+   space inside a section, so the eye finds a boundary without needing a rule
+   to be drawn. */
+.ref-section { margin: 0 0 var(--space-8); scroll-margin-top: var(--space-5); }
+.ref-section + .ref-section { margin-top: var(--space-8); }
+.ref-section h2 {
+  display: flex; align-items: baseline; gap: var(--space-1);
+  margin: 0 0 var(--space-5); font-size: 1.3rem; font-weight: 620;
+  letter-spacing: -.015em; line-height: 1.25;
+  padding-bottom: var(--space-3); border-bottom: 2px solid var(--accent);
+}
+.ref-section h3 { margin: var(--space-7) 0 var(--space-3); font-size: 1rem; font-weight: 620; }
 .ref-section p { margin: 0 0 var(--space-4); color: var(--ink); }
 .ref-section ul { margin: 0 0 var(--space-4); padding-left: var(--space-5); }
 .ref-section li { margin-bottom: var(--space-2); }
 .ref-section code { font: 600 .89em/1 var(--font-mono); color: var(--ink); }
 .ref-section a { color: var(--accent); }
 
-/* Wide enough for the contents to sit beside the prose without either being
-   squeezed. Below this the two stack, which is also what happens when a reader
-   has zoomed a narrow window - the breakpoint is about the space available,
-   not about what kind of machine is asking. */
-@media (min-width: 900px) {
-  /* Narrower than the calculator's 1180px, and deliberately. The calculator
-     wants width - it is a grid of 236 cards. This page is a column of prose
-     with a contents list beside it, and at 1180px the two sit at opposite
-     edges of the window with a hand's width of nothing between them. Sized to
-     the content it actually has, the list reads as attached to the prose. */
-  .ref-body .wrap { max-width: 940px; }
-  .ref-toc {
-    float: right; width: 13rem; margin: 0 0 var(--space-6) var(--space-7);
-    padding-left: var(--space-5); border-left: 1px solid var(--line);
-    position: sticky; top: var(--space-5);
-  }
-  .ref-toc ul { flex-direction: column; gap: var(--space-2); }
+/* Present only to a pointer or a keyboard that has arrived on it. It is a
+   permanent fixture of the markup either way, so a reader who wants the link
+   can still reach it with the keyboard alone. */
+.ref-anchor {
+  margin-left: auto; padding-left: var(--space-4);
+  font: 400 .8rem/1 var(--font-mono); text-decoration: none;
+  color: var(--ink-helper); opacity: 0;
 }
+.ref-section h2:hover .ref-anchor, .ref-anchor:focus-visible { opacity: 1; }
 
 /* A table here is a reference table, so it reads like the increment grid:
    hairlines, no fill, no radius, and it scrolls inside its own box rather than
-   pushing the page sideways. The wrap is what keeps a six-column table - the
-   categories, included whole from notation/categories.csv - from setting the
-   width of the whole document on a phone. */
+   pushing the page sideways. */
 .ref-table-wrap { overflow-x: auto; margin: 0 0 var(--space-5); border: 1px solid var(--line); }
 .ref-table { border-collapse: collapse; width: 100%; font-size: .87rem; }
-/* Wide tables take their natural width and scroll inside .ref-table-wrap. At
-   100% of a 68ch measure a six-column table gives each column about nine
-   characters, which turns "Cohen & Benson 1993" into four lines and the table
-   into a wall. */
+/* Wide tables take their natural width and scroll. At 100% of the measure a
+   six-column table gives each column about nine characters, which turns
+   "Cohen & Benson 1993" into four lines and the table into a wall. */
 .ref-table-wide { width: max-content; min-width: 100%; }
 .ref-table-wide .ref-cell { white-space: nowrap; }
 /* The one column that is prose rather than a label still wraps, so a long note
@@ -940,5 +950,68 @@ footer a { color: var(--ink-soft); }
   background: var(--layer-accent); white-space: nowrap;
 }
 .ref-cell { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line); vertical-align: top; }
+/* Banding, not borders. A definition runs to three lines in one row and one in
+   the next, and a ruled grid at that rhythm reads as noise; a faint band per
+   row keeps a long definition tied to the term it belongs to. */
+.ref-table tbody tr:nth-child(odd) { background: var(--layer); }
 .ref-table tbody tr:last-child .ref-cell { border-bottom: 0; }
-.ref-table tbody tr:hover { background: var(--layer); }
+
+@media (min-width: 900px) {
+  /* Narrower than the calculator's 1180px, and deliberately. The calculator
+     wants width - it is a grid of 236 cards. This page is a column of prose
+     with a contents list beside it, and at 1180px the two sit at opposite
+     edges of the window with a hand's width of nothing between them. */
+  .ref-body .wrap { max-width: 960px; }
+  .ref-body { padding-left: var(--space-6); padding-right: var(--space-6); }
+  .ref-toc {
+    float: right; width: 13rem; margin: 0 0 var(--space-6) var(--space-7);
+    padding-left: var(--space-5); border-left: 1px solid var(--line);
+    position: sticky; top: var(--space-5);
+  }
+  .ref-toc ul { flex-direction: column; gap: var(--space-3); }
+}
+
+/* Printed, this is a handout. The contents list is dead weight on paper, the
+   link back to the calculator cannot be followed, and a URL that only exists
+   as an underline is lost - so the ones that matter are written out. Colours
+   go to ink on white whatever theme the screen was in. */
+@media print {
+  /* Ink on paper, whatever the screen was showing.
+
+     A browser does not print background colours by default, but it does print
+     text colour - so printing this page from dark mode put near-white type on
+     white paper and produced a blank sheet. The tokens are therefore forced
+     back to the light set here, and all three selectors are needed because
+     that is how many ways the dark palette can be in force: an explicit
+     choice, and a system-dark machine that has never touched the button. Each
+     matches the specificity of the rule it is overriding and comes later. */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"] {
+    --bg: #ffffff;
+    --layer: #ffffff;
+    --layer-accent: #ffffff;
+    --ink: #000000;
+    --ink-soft: #333333;
+    --ink-helper: #555555;
+    --line: #b0b0b0;
+    --line-strong: #6a6a6a;
+    --accent: #000000;
+    --accent-soft: #ffffff;
+    --on-accent: #000000;
+  }
+  .ref-toc, .ref-back { display: none; }
+  /* The banding and the header fill are backgrounds, so neither survives the
+     trip to paper. Rules do the same job in ink. */
+  .ref-table th { border-bottom: 2px solid var(--line-strong); }
+  .ref-cell { border-bottom: 1px solid var(--line); }
+  .ref-table tbody tr:last-child .ref-cell { border-bottom: 0; }
+  .ref-body { padding: 0; }
+  .ref-body .wrap { max-width: none; }
+  .ref-main { max-width: none; }
+  .ref-section { page-break-inside: avoid; }
+  .ref-section h2 { page-break-after: avoid; }
+  .ref-table-wrap { overflow-x: visible; }
+  .ref-section a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; word-break: break-all; }
+  .ref-anchor { display: none; }
+}
