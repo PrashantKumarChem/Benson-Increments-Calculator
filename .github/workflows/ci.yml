@@ -86,6 +86,27 @@ jobs:
       - name: Validate the stylesheet
         run: node tools/validate_css.mjs
 
+      # The one step here that needs a browser, and the only one anywhere in
+      # this repository that does.
+      #
+      # Every other check reads the source, which is why the faults that have
+      # actually reached this site are the ones none of them can see: valid CSS
+      # that parses, passes, and puts the calculator somewhere nobody can reach
+      # it. That has happened twice, and a person looking at the page caught it
+      # both times.
+      #
+      # It installs rather than the project declaring a dependency, because
+      # `git clone && node --test tools/*.test.mjs` working on a clean machine
+      # with nothing installed is a property worth keeping. The browser lives
+      # here, in the runner, where it costs a contributor nothing.
+      - name: Install a browser to render with
+        run: |
+          npm install --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      - name: Check the page actually renders
+        run: node tools/check_render.mjs
+
   parity:
     name: Parity with the notebook
     runs-on: ubuntu-latest
