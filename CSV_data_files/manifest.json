@@ -8,7 +8,12 @@
         "CH Benson Group Increment",
         "Delta_Hf kJ/mol"
       ],
-      "count": 44
+      "count": 44,
+      "quantity": "standard enthalpy of formation",
+      "symbol": "\u0394Hf\u00b0",
+      "unit": "kJ/mol",
+      "source": "Cohen & Benson 1993",
+      "note": ""
     },
     {
       "file": "02_CHO_Groups.csv",
@@ -17,7 +22,12 @@
         "CHO Benson Group Increment",
         "CHO Values"
       ],
-      "count": 82
+      "count": 82,
+      "quantity": "standard enthalpy of formation",
+      "symbol": "\u0394Hf\u00b0",
+      "unit": "kJ/mol",
+      "source": "Cohen & Benson 1993",
+      "note": ""
     },
     {
       "file": "03_CHNO_Groups.csv",
@@ -26,7 +36,12 @@
         "CHNO benson increments",
         "CHNO benson value in kJ/mol"
       ],
-      "count": 57
+      "count": 57,
+      "quantity": "standard enthalpy of formation",
+      "symbol": "\u0394Hf\u00b0",
+      "unit": "kJ/mol",
+      "source": "Cohen & Benson 1993",
+      "note": ""
     },
     {
       "file": "04_Corrections.csv",
@@ -35,7 +50,12 @@
         "Correction",
         "Correction Values"
       ],
-      "count": 24
+      "count": 24,
+      "quantity": "ring and steric correction",
+      "symbol": "\u0394Hf\u00b0",
+      "unit": "kJ/mol",
+      "source": "Cohen & Benson 1993",
+      "note": "Added once per ring or interaction rather than per atom"
     },
     {
       "file": "05_Cyclohexane_A_Values.csv",
@@ -44,7 +64,12 @@
         "Group on cyclohexane",
         "A-values in kJ/mol"
       ],
-      "count": 29
+      "count": 29,
+      "quantity": "conformational free-energy preference",
+      "symbol": "\u0394G\u00b0",
+      "unit": "kJ/mol",
+      "source": "",
+      "note": "Axial substituent penalty. Not an enthalpy of formation. 15 of the 29 values are published as ranges"
     }
   ]
 }

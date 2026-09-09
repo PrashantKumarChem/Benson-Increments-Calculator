@@ -6,7 +6,9 @@
  */
 import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
 import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "./browse.js";
-import { formatIncrement, formatKcal, formatRange, formatTotal, rangeSpread } from "./format.js";
+import {
+  describeTotal, formatIncrement, formatKcal, formatRange, formatTotal, rangeSpread,
+} from "./format.js";
 import { buildIndex, emptyNotation, loadNotation } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
 
@@ -37,7 +39,12 @@ function valueHtml(reading) {
  * to; empty means all of them, since the chips narrow a complete list rather
  * than building one up. See browse.js for the rules themselves.
  */
-const view = { categories: [], notation: emptyNotation(), index: [], files: new Set(), query: "" };
+const view = {
+  categories: [], notation: emptyNotation(), index: [],
+  /** Categories by filename, for looking up what a chosen increment is a measure of. */
+  byFile: new Map(),
+  files: new Set(), query: "",
+};
 
 /** One increment, as a card. */
 function cardHtml(increment, counts) {
@@ -113,6 +120,26 @@ function renderTally() {
   const entries = selection.entries;
   el("kj").innerHTML = `${escapeHtml(formatTotal(totalKj))}<span>kJ/mol</span>`;
   el("kcal").textContent = `${formatKcal(totalKj * KJ_TO_KCAL)} kcal/mol`;
+
+  // What the total is a total of. The categories do not all hold the same
+  // quantity - a group increment is an enthalpy of formation, a cyclohexane
+  // A-value is a conformational preference - so a heading reading dHf over a
+  // sum containing an A-value would state something untrue. Both are summed,
+  // which is settled; only the heading follows what was actually chosen.
+  const described = describeTotal(entries, view.byFile);
+  el("tally-label").textContent = described.label;
+
+  // A mixed total names what is in it rather than claiming to be any one of
+  // them. The wording comes from the data: each category says what it holds.
+  const mixed = el("mixed");
+  mixed.hidden = !described.mixed;
+  if (described.mixed) {
+    const parts = described.quantities
+      .map((quantity) => `${quantity.count} &times; <b>${escapeHtml(quantity.quantity)}</b>`)
+      .join(", ");
+    mixed.innerHTML = `This total mixes ${parts}. They are summed as published, ` +
+      "but they are not the same quantity.";
+  }
 
   // An averaged range is a soft number, and how soft is worth saying: this is
   // how far the total would move if every one of them were read at its bounds.
@@ -250,6 +277,7 @@ try {
     console.warn(`notation/ could not be read, so a group is only findable by its printed name: ${error.message}`);
   }
   view.index = buildIndex(view.categories, view.notation);
+  view.byFile = new Map(view.categories.map((category) => [category.file, category]));
 
   const total = view.categories.reduce((sum, category) => sum + category.rows.length, 0);
   const unreadable = view.categories.flatMap((category) =>

@@ -206,6 +206,19 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   border-radius: 12px; padding: var(--space-5);
 }
 @media (min-width: 980px) { .tally-panel { position: sticky; top: var(--space-5); } }
+/* What the number underneath is a measure of. Written from the data rather
+   than hardcoded, so a category that has declared nothing reads "Total". */
+.tally-label {
+  margin: 0 0 var(--space-1); color: var(--ink-soft);
+  font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+}
+/* Shown only when the sum holds more than one kind of quantity. */
+.mixed {
+  margin: var(--space-3) 0 0; color: var(--ink-soft);
+  font-size: .78rem; line-height: 1.45;
+}
+.mixed b { color: var(--ink); font-weight: 600; }
+
 .kj { font-size: 1.7rem; font-weight: 640; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
 .kj span { font-size: .55em; font-weight: 500; color: var(--ink-soft); margin-left: var(--space-2); letter-spacing: 0; }
 .kcal { color: var(--ink-soft); font-size: .92rem; font-variant-numeric: tabular-nums; margin-top: 1px; }

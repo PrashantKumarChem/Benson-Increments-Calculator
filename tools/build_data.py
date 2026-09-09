@@ -12,7 +12,11 @@ import json
 import os
 import sys
 
-from benson_data import CSV_DIR, MANIFEST_NAME, find_categories, manifest_for
+# A quantity symbol may be non-ASCII, and the default Windows console encoding
+# cannot print one. Reporting is not worth crashing a build over.
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+from benson_data import CSV_DIR, MANIFEST_NAME, find_categories, manifest_for, read_metadata
 
 
 def main() -> int:
@@ -21,14 +25,15 @@ def main() -> int:
         print(f"No CSV files found in {CSV_DIR}/", file=sys.stderr)
         return 1
 
-    manifest = manifest_for(categories)
+    manifest = manifest_for(categories, read_metadata())
     path = os.path.join(CSV_DIR, MANIFEST_NAME)
     with open(path, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(manifest, handle, indent=2)
         handle.write("\n")
 
     for entry in manifest["categories"]:
-        print(f"  {entry['file']:<32} {entry['count']:>3} rows  -> {entry['title']}")
+        described = entry["symbol"] or "-"
+        print(f"  {entry['file']:<32} {entry['count']:>3} rows  {described:<6} -> {entry['title']}")
     print(f"Wrote {path}")
     return 0
 

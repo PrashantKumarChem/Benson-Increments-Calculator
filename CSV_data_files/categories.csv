@@ -1,0 +1,6 @@
+File,Quantity,Symbol,Unit,Source,Note
+01_CH_Groups.csv,standard enthalpy of formation,ΔHf°,kJ/mol,Cohen & Benson 1993,
+02_CHO_Groups.csv,standard enthalpy of formation,ΔHf°,kJ/mol,Cohen & Benson 1993,
+03_CHNO_Groups.csv,standard enthalpy of formation,ΔHf°,kJ/mol,Cohen & Benson 1993,
+04_Corrections.csv,ring and steric correction,ΔHf°,kJ/mol,Cohen & Benson 1993,Added once per ring or interaction rather than per atom
+05_Cyclohexane_A_Values.csv,conformational free-energy preference,ΔG°,kJ/mol,,Axial substituent penalty. Not an enthalpy of formation. 15 of the 29 values are published as ranges
