@@ -362,13 +362,6 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   opacity: .65; font-variant-numeric: tabular-nums;
 }
 
-/* Filters on the left, how-to-show on the right: they answer different
-   questions, so they do not sit in one undifferentiated row of buttons. */
-.controls {
-  display: flex; flex-wrap: wrap; align-items: flex-start;
-  gap: var(--space-4); margin-bottom: var(--space-5);
-}
-.controls .chips { margin-bottom: 0; flex: 1; }
 .views { display: flex; border: 1px solid var(--line-strong); }
 .views button {
   font: inherit; font-size: .8rem; cursor: pointer; padding: var(--space-2) var(--space-4);
@@ -399,10 +392,15 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums;
 }
 .table .soft { color: var(--ink-soft); }
+/* The group name is how you add an increment in this view, so it is a target
+   before it is a label: at .85rem with no padding it came to about 21px, under
+   the 24px a pointer target needs. The height is given rather than the padding
+   so the column does not widen and the row does not grow. */
 .table tbody th button {
   font: inherit; font-family: var(--font-mono); cursor: pointer;
   background: none; border: 0; padding: 0;
   color: var(--ink); text-align: left;
+  display: inline-flex; align-items: center; min-height: 1.5rem;
 }
 .table tbody th button:hover { color: var(--accent); text-decoration: underline; }
 /* The same job as the card's badge, and here it can be a real button, because
@@ -521,7 +519,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 .grid .tally:hover { background: var(--ink); color: var(--layer); }
 /* The bounds an averaged value came from, beside the average itself. */
 .grid .range { color: var(--ink-soft); font-size: .6875rem; font-weight: 400; }
-.status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: var(--space-6) var(--space-1); }
+.status { color: var(--ink-helper); font-size: .9rem; padding: var(--space-6) var(--space-1); }
 
 /* ---------------- tally ---------------- */
 .tally-panel {
@@ -617,7 +615,7 @@ ul.picks .sum {
   min-width: 1.625rem; text-align: center; font-family: var(--font-mono);
   font-size: .8125rem; font-variant-numeric: tabular-nums;
 }
-.rm { width: 1.875rem; font-size: 1.05rem; }
+.rm { font-size: 1.05rem; }
 /* Remove is the rarest thing you do to a row and the only destructive one.
 
    It used to wait for hover, behind @media (hover: hover). That is a claim the
@@ -711,10 +709,10 @@ ul.picks .sum {
     content: ""; display: block; width: 2rem; height: 3px;
     background: var(--line-strong); margin: 0 auto;
   }
-  .tally-head { touch-action: none; }
   /* The label, the total and the disclosure read as one row, so the button is
      beside the number it summarises rather than below the whole panel. */
   .tally-head {
+    touch-action: none;
     display: grid; grid-template-columns: minmax(0, 1fr) auto;
     align-items: center; column-gap: var(--space-4);
   }
@@ -762,9 +760,7 @@ ul.picks .sum {
   /* The list no longer needs its own cap - the sheet caps the whole thing, and
      one scrolling region is easier to use than two nested ones. */
   ul.picks { max-height: none; margin-top: var(--space-2); }
-  ul.picks li { gap: var(--space-3); }
   .stepper button, .rm { width: 2.375rem; height: 2.375rem; }
-  .rm { width: 2.375rem; }
   /* Big enough for a thumb without spending four lines on six filters: the
      old rule grew the padding, which pushed the last chips off the first
      screen entirely. Height is what makes a target hittable, not width. */
