@@ -4,7 +4,7 @@
   the group increments and corrections, and the paper to cite for the method.
   This is the citation the calculator itself carries.
 
-The cyclohexane A-values have no source recorded. See the note above.
+The cyclohexane A-values have no source recorded. See The Five Categories.
 
 ## Background reading
 

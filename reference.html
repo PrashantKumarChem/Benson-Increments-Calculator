@@ -97,15 +97,15 @@
       <table class="ref-table">
       <thead><tr><th class="ref-cell">Notation</th><th class="ref-cell">What it is</th><th class="ref-cell">Verified</th></tr></thead>
       <tbody>
-      <tr><td class="ref-cell"><code>C</code></td><td class="ref-cell">A saturated carbon: four single bonds.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>Cd</code></td><td class="ref-cell">A carbon of a C=C double bond (&quot;d&quot; for double), as in an alkene.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>Ct</code></td><td class="ref-cell">A carbon of a C≡C triple bond (&quot;t&quot; for triple), as in an alkyne.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>CB</code></td><td class="ref-cell">An aromatic carbon in a benzene ring (&quot;B&quot; for benzene).</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>CO</code></td><td class="ref-cell">A carbonyl carbon taken together with its oxygen, C=O.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>O</code></td><td class="ref-cell">A divalent oxygen: the oxygen of an ether, an alcohol or an ester.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>N</code></td><td class="ref-cell">A trivalent amine nitrogen: three single bonds.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>CN</code></td><td class="ref-cell">The carbon of a nitrile, C≡N, taken together with its nitrogen.</td><td class="ref-cell">yes</td></tr>
-      <tr><td class="ref-cell"><code>NO2</code></td><td class="ref-cell">The nitrogen of a nitro group, taken with its two oxygens.</td><td class="ref-cell">yes</td></tr>
+      <tr><td class="ref-cell"><code>C</code></td><td class="ref-cell">A saturated carbon: four single bonds.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>Cd</code></td><td class="ref-cell">A carbon of a C=C double bond (&quot;d&quot; for double), as in an alkene.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>Ct</code></td><td class="ref-cell">A carbon of a C≡C triple bond (&quot;t&quot; for triple), as in an alkyne.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>CB</code></td><td class="ref-cell">An aromatic carbon in a benzene ring (&quot;B&quot; for benzene).</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>CO</code></td><td class="ref-cell">A carbonyl carbon taken together with its oxygen, C=O.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>O</code></td><td class="ref-cell">A divalent oxygen: the oxygen of an ether, an alcohol or an ester.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>N</code></td><td class="ref-cell">A trivalent amine nitrogen: three single bonds.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>CN</code></td><td class="ref-cell">The carbon of a nitrile, C≡N, taken together with its nitrogen.</td><td class="ref-cell">not yet</td></tr>
+      <tr><td class="ref-cell"><code>NO2</code></td><td class="ref-cell">The nitrogen of a nitro group, taken with its two oxygens.</td><td class="ref-cell">not yet</td></tr>
       <tr><td class="ref-cell"><code>NI</code></td><td class="ref-cell">A doubly-bonded nitrogen, as in an imine or an oxime. Contributes its nitrogen only; the carbon is counted by its own group.</td><td class="ref-cell">not yet</td></tr>
       <tr><td class="ref-cell"><code>CdN</code></td><td class="ref-cell">The carbon of a C=N double bond. In this data set it is taken to contribute its nitrogen as well as its carbon.</td><td class="ref-cell">not yet</td></tr>
       <tr><td class="ref-cell"><code>NC</code></td><td class="ref-cell">An isocyanide, R–N≡C. The single value here is <code>NC-(C)</code>, at +210 kJ/mol.</td><td class="ref-cell">not yet</td></tr>
@@ -118,21 +118,26 @@
 
     <section class="ref-section" id="what-is-not-yet-confirmed">
       <h2>What Is Not Yet Confirmed</h2>
-      <p>Four rows in the table above are marked <em>not yet</em>. That means the value in
-      the calculator is the published one and is used exactly as it stands — what
-      has not been checked is the description of the bonding written beside it on
-      this page.</p>
+      <p>The <code>Verified</code> column in the Notation table records whether a chemist has
+      checked that description against Cohen &amp; Benson (1993). **No row has had that
+      check yet*<em>, so every row reads </em>not yet*.</p>
+      <p>The column is about the prose, not the arithmetic. Every value in the
+      calculator is the published one and is used exactly as it stands; what is
+      unconfirmed is the sentence describing the bonding beside it. Four entries are
+      worth more attention than the rest — <code>NI</code>, <code>CdN</code>, <code>NC</code> and <code>ONO</code> — because
+      they are the ones where the notation admits more than one reading.</p>
       <p>They are marked rather than quietly asserted because this is a teaching tool,
-      and a confident wrong gloss is worse than an admitted gap. Confirming one is
-      a matter of editing a single line of <code>reference/03_Notation.csv</code> against
-      Cohen &amp; Benson (1993) and changing <em>not yet</em> to <em>yes</em>. No code changes.</p>
-      <p>There is one open question in the data itself, not just in the description:
-      <code>notation/central_atoms.csv</code> records <code>CdN</code> as contributing both a carbon and
-      a nitrogen while <code>NI</code> contributes a nitrogen. A molecule written with both
-      would have its nitrogen counted twice. Nothing in the calculator is affected
-      today — the atom-counting feeds a molecular-formula check that is deliberately
-      switched off, and every enthalpy value is read straight from the CSV files.
-      It is recorded here so that whoever switches that check on meets it first.</p>
+      and a confident wrong gloss is worse than an admitted gap. Confirming one is a
+      matter of editing a single line of <code>reference/03_Notation.csv</code> and changing
+      <em>not yet</em> to <em>yes</em>. There is no code to change.</p>
+      <h3 id="an-open-question-in-the-data-itself">An open question in the data itself</h3>
+      <p><code>notation/central_atoms.csv</code> records <code>CdN</code> as contributing both a carbon and a
+      nitrogen, while <code>NI</code> contributes a nitrogen. A molecule written with both would
+      have its nitrogen counted twice.</p>
+      <p>Nothing in the calculator is affected today: the atom counting feeds a
+      molecular-formula check that is deliberately switched off, and every enthalpy
+      value is read straight from the CSV files. It is recorded here so that whoever
+      switches that check on meets it first.</p>
     </section>
 
     <section class="ref-section" id="glossary">
@@ -252,7 +257,7 @@
       </ul>
       <p>the group increments and corrections, and the paper to cite for the method.
       This is the citation the calculator itself carries.</p>
-      <p>The cyclohexane A-values have no source recorded. See the note above.</p>
+      <p>The cyclohexane A-values have no source recorded. See The Five Categories.</p>
       <h3 id="background-reading">Background reading</h3>
       <ul>
       <li>Benson, S. W. <em>Thermochemical Kinetics</em>, 2nd ed.; Wiley: New York, 1976. —</li>

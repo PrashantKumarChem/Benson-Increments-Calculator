@@ -213,9 +213,18 @@ export function renderMarkdown(text, { includeCsv } = {}) {
     const directive = CSV_DIRECTIVE.exec(line.trim());
     if (directive) {
       flush();
-      // Unresolvable includes stay visible as text rather than vanishing: a
-      // silently missing table is the failure that is hard to notice.
-      out.push(includeCsv ? includeCsv(directive[1]) : escapeHtml(line.trim()));
+      // With no resolver - renderMarkdown called on its own, as the tests call
+      // it - the directive stays visible as the text it is. With one, a path
+      // that cannot be read stops the build. That is deliberate: the quiet
+      // failure here would be a page missing a whole table, and nobody reads
+      // every section after every edit. The message names the file, because
+      // ENOENT on its own does not say which directive was wrong.
+      if (!includeCsv) { out.push(escapeHtml(line.trim())); continue; }
+      try {
+        out.push(includeCsv(directive[1]));
+      } catch (error) {
+        throw new Error(`{{csv: ${directive[1]}}} could not be read: ${error.message}`);
+      }
       continue;
     }
     if (!line.trim()) { flush(); continue; }

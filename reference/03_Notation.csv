@@ -1,13 +1,13 @@
 Notation,What it is,Verified
-`C`,"A saturated carbon: four single bonds.",yes
-`Cd`,"A carbon of a C=C double bond (""d"" for double), as in an alkene.",yes
-`Ct`,"A carbon of a C≡C triple bond (""t"" for triple), as in an alkyne.",yes
-`CB`,"An aromatic carbon in a benzene ring (""B"" for benzene).",yes
-`CO`,"A carbonyl carbon taken together with its oxygen, C=O.",yes
-`O`,"A divalent oxygen: the oxygen of an ether, an alcohol or an ester.",yes
-`N`,"A trivalent amine nitrogen: three single bonds.",yes
-`CN`,"The carbon of a nitrile, C≡N, taken together with its nitrogen.",yes
-`NO2`,"The nitrogen of a nitro group, taken with its two oxygens.",yes
+`C`,"A saturated carbon: four single bonds.",not yet
+`Cd`,"A carbon of a C=C double bond (""d"" for double), as in an alkene.",not yet
+`Ct`,"A carbon of a C≡C triple bond (""t"" for triple), as in an alkyne.",not yet
+`CB`,"An aromatic carbon in a benzene ring (""B"" for benzene).",not yet
+`CO`,"A carbonyl carbon taken together with its oxygen, C=O.",not yet
+`O`,"A divalent oxygen: the oxygen of an ether, an alcohol or an ester.",not yet
+`N`,"A trivalent amine nitrogen: three single bonds.",not yet
+`CN`,"The carbon of a nitrile, C≡N, taken together with its nitrogen.",not yet
+`NO2`,"The nitrogen of a nitro group, taken with its two oxygens.",not yet
 `NI`,"A doubly-bonded nitrogen, as in an imine or an oxime. Contributes its nitrogen only; the carbon is counted by its own group.",not yet
 `CdN`,"The carbon of a C=N double bond. In this data set it is taken to contribute its nitrogen as well as its carbon.",not yet
 `NC`,"An isocyanide, R–N≡C. The single value here is `NC-(C)`, at +210 kJ/mol.",not yet

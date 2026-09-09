@@ -20,6 +20,7 @@ import {
   renderTable,
   parseDelimited,
   sectionTitle,
+  versionFrom,
   orderOf,
 } from "./build_reference.mjs";
 
@@ -141,4 +142,34 @@ test("the filename gives the order and the heading", () => {
   assert.equal(sectionTitle("01_The_Method.md"), "The Method");
   assert.equal(sectionTitle("08_The_Five_Categories.md"), "The Five Categories");
   assert.equal(sectionTitle("03_Notation.csv"), "Notation");
+});
+
+test("the version is read from index.html, never written here", () => {
+  const page = '<link href="assets/styles.css?v=2026-09-09i">'
+    + '<script type="module" src="assets/app.js?v=2026-09-09i"></script>';
+  assert.equal(versionFrom(page), "2026-09-09i");
+});
+
+test("a half-bumped index.html is refused rather than guessed at", () => {
+  // Picking either version would stamp reference.html with a version that is
+  // wrong for half of index.html, and quietly.
+  assert.throws(
+    () => versionFrom('"assets/a.js?v=2026-09-09a" "assets/b.js?v=2026-09-09b"'),
+    /exactly one asset version, found 2/,
+  );
+  assert.throws(() => versionFrom("<p>no assets here</p>"), /found 0/);
+});
+
+test("an include with no resolver stays visible instead of vanishing", () => {
+  assert.equal(renderMarkdown("{{csv: notation/categories.csv}}"),
+    "{{csv: notation/categories.csv}}");
+});
+
+test("an include that cannot be read names the file it failed on", () => {
+  assert.throws(
+    () => renderMarkdown("{{csv: nope/missing.csv}}", {
+      includeCsv: () => { throw new Error("ENOENT"); },
+    }),
+    /\{\{csv: nope\/missing\.csv\}\} could not be read/,
+  );
 });
