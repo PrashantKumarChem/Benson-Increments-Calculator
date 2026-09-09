@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=2026-09-09w">
+<link rel="stylesheet" href="assets/styles.css?v=01e217b639">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -47,20 +47,37 @@
      The import map below is what prevents that. A module's own imports are
      written relative - app.js asks for "./benson.js" - and the browser
      resolves those to URLs before consulting this map, so remapping the
-     resolved URL reaches the whole graph from one place. Change anything in
-     assets/ and bump the version; tools/validate_data.py checks that every
-     module is listed here and that every version on this page agrees. -->
+     resolved URL reaches the whole graph from one place.
+
+     THE VERSION IS GENERATED. It is a short hash of the stylesheet and the
+     modules, written by tools/build_version.py, and CI regenerates it and
+     fails on any difference - the same bargain CSV_data_files/manifest.json
+     already strikes. Change anything under assets/ and run:
+
+         python tools/build_version.py
+
+     It was a date with a letter after it, chosen by hand, and the rule was
+     that a value already in use is not a bump. That rule could only be checked
+     by reading every version this page had ever carried, and it had a ceiling
+     nobody planned - a session that touches assets/ a few times spends five or
+     six letters, and they do not come back. Two branches once picked the same
+     one. A hash cannot be forgotten, mis-typed, or picked twice: different
+     bytes give a different string, so the bump is no longer a thing anybody
+     has to remember to do.
+
+     tools/validate_assets.py still checks the other half - that every module
+     is listed here, and that all ten slots agree with each other. -->
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=2026-09-09w",
-    "./assets/benson.js": "./assets/benson.js?v=2026-09-09w",
-    "./assets/browse.js": "./assets/browse.js?v=2026-09-09w",
-    "./assets/format.js": "./assets/format.js?v=2026-09-09w",
-    "./assets/notation.js": "./assets/notation.js?v=2026-09-09w",
-    "./assets/selection.js": "./assets/selection.js?v=2026-09-09w",
-    "./assets/sheet.js": "./assets/sheet.js?v=2026-09-09w",
-    "./assets/theme.js": "./assets/theme.js?v=2026-09-09w"
+    "./assets/app.js": "./assets/app.js?v=01e217b639",
+    "./assets/benson.js": "./assets/benson.js?v=01e217b639",
+    "./assets/browse.js": "./assets/browse.js?v=01e217b639",
+    "./assets/format.js": "./assets/format.js?v=01e217b639",
+    "./assets/notation.js": "./assets/notation.js?v=01e217b639",
+    "./assets/selection.js": "./assets/selection.js?v=01e217b639",
+    "./assets/sheet.js": "./assets/sheet.js?v=01e217b639",
+    "./assets/theme.js": "./assets/theme.js?v=01e217b639"
   }
 }
 </script>
@@ -276,6 +293,6 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=2026-09-09w"></script>
+<script type="module" src="assets/app.js?v=01e217b639"></script>
 </body>
 </html>

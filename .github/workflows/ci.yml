@@ -11,11 +11,10 @@ jobs:
     name: Increment data
     runs-on: ubuntu-latest
     steps:
-      # Full history: the version check below compares this branch against the
-      # base of the pull request, and a shallow clone has no base to compare to.
+      # A shallow clone is enough. The version check below regenerates the
+      # version from the working tree rather than comparing against the base of
+      # the pull request, so there is no history for it to need.
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -40,83 +39,28 @@ jobs:
       - name: Confirm every asset is versioned
         run: python tools/validate_assets.py
 
-      # The step above checks that the version slots in index.html agree with
-      # each other. It cannot check the thing that actually takes the site
-      # down: that you moved them. Change a file under assets/, leave the
-      # version alone, and every check in this file passes - while a returning
-      # visitor keeps a cached copy of the old file under a string saying it is
-      # current. That is the silent half of the failure the versioning exists
-      # to prevent, and nothing here was looking for it.
+      # The step above checks that the ten version slots agree with each other.
+      # It cannot check the thing that actually takes the site down: that the
+      # version moved at all. Change a file under assets/, leave the version
+      # alone, and a returning visitor keeps a cached copy of the old file under
+      # a string saying it is current.
       #
-      # Only a pull request has a base to compare against, so this is skipped
-      # on a push to main, where the comparison would be against the commit
-      # that was just merged and would fail every time.
-      - name: Confirm a change under assets/ comes with a version bump
-        if: github.event_name == 'pull_request'
+      # The version is generated from the assets now, so that is one diff rather
+      # than an argument about letters. This is the same bargain the manifest
+      # above strikes: regenerate the file, and fail if the committed copy is
+      # not what the sources produce.
+      #
+      # It replaces a step that walked the whole history of index.html to prove
+      # a hand-picked letter had never been used before - which was needed
+      # because two branches had each bumped correctly against their own base
+      # and landed on the same letter. A hash cannot do that: two branches that
+      # change different bytes get different strings without having to know
+      # about each other, and this runs on a push as well, because it no longer
+      # needs a base to compare against.
+      - name: Confirm the asset version matches the assets
         run: |
-          base="origin/${{ github.base_ref }}"
-
-          if git diff --quiet "$base" HEAD -- assets/; then
-            echo "Nothing under assets/ changed; no bump needed."
-            exit 0
-          fi
-
-          here=$(git show HEAD:index.html | grep -o '?v=[^"]*' | sort -u)
-          there=$(git show "$base":index.html | grep -o '?v=[^"]*' | sort -u)
-
-          if [ "$here" = "$there" ]; then
-            echo "These files under assets/ changed:"
-            git diff --name-only "$base" HEAD -- assets/ | sed 's/^/  /'
-            echo
-            echo "But index.html still asks for $here, the same as ${{ github.base_ref }}."
-            echo
-            echo "Bump the version in index.html - every slot, they must agree."
-            echo "It is a date; for a second release on the same day add a"
-            echo "letter (2026-09-09b), since a value already in use is not a bump."
-            echo "If reference.html exists on this branch, rerun"
-            echo "  node tools/build_reference.mjs"
-            echo "afterwards so the generated page follows."
-            exit 1
-          fi
-
-          # Moving is not enough: it has to move somewhere new.
-          #
-          # Comparing against the base only proves this branch changed the
-          # value. Two branches can each do that correctly against their own
-          # base and still land on the same letter - which happened here, with
-          # two branches both choosing 2026-09-09l. Whichever merged second
-          # would have shipped changed assets under a string a returning
-          # visitor already had cached: the exact failure the versioning
-          # exists to prevent, reached by two individually correct bumps.
-          #
-          # So fail if this value has ever been on the base branch. That is the
-          # project's own rule - a value already in use is not a bump - which
-          # until now lived in a comment and in whoever remembered it.
-          #
-          # Scoped to the base branch's history rather than --all: --all
-          # reaches this branch too, so every pull request would find its own
-          # incoming version and fail itself. It also cannot see a branch
-          # nobody has pushed, so this catches the second of two colliding
-          # branches when its base moves rather than when the collision is
-          # created. Nothing here can do better, and the second is the one
-          # that ships the breakage.
-          used=$(git rev-list "$base" -- index.html | while read -r commit; do
-                   git show "$commit:index.html" 2>/dev/null
-                 done | grep -o '?v=[^"]*' | sort -u)
-
-          if echo "$used" | grep -qxF "$here"; then
-            echo "index.html asks for $here, which ${{ github.base_ref }} has already used."
-            echo
-            echo "Every version ${{ github.base_ref }} has used:"
-            echo "$used" | sed 's/^/  /'
-            echo
-            echo "A value already in use is not a bump - a returning visitor may"
-            echo "hold cached copies of the old files under this exact string."
-            echo "Pick the next free letter."
-            exit 1
-          fi
-
-          echo "assets/ changed and the version moved somewhere new: $there -> $here"
+          python tools/build_version.py
+          git diff --exit-code index.html
 
   calculator:
     name: Calculator behaviour

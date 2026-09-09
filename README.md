@@ -82,9 +82,17 @@ python -m http.server 8000
 
 ### Changing anything in `assets/`
 
-Bump the version in `index.html`. It appears in one place — a stylesheet link, a
-module `src`, and an import map that carries the same version to every module
-the page loads.
+Run `python tools/build_version.py`. The version is a short hash of the
+stylesheet and the modules, and the script writes it into every slot in
+`index.html` — a stylesheet link, a module `src`, and an import map that
+carries the same version to every module the page loads.
+
+It used to be a date with a letter after it, picked by hand, under the rule
+that a value already in use is not a bump. That could only be checked by
+reading every version the page had ever carried, and the letters ran out faster
+than anyone expected; two branches once picked the same one. A hash cannot be
+forgotten or picked twice. CI regenerates it and fails if the committed copy
+differs, the same way it checks `manifest.json`.
 
 GitHub Pages caches every file for ten minutes, and each file's ten minutes
 start when that file was last fetched, so they expire at different times. A
@@ -96,8 +104,10 @@ it shipped with.
 
 The two font files are the exception: they are named from `styles.css`, not
 from `index.html`, and they are immutable — replacing a face means a new
-filename, not a new version string. Do not add a `?v=` to them, or there
-would be a ninth place to keep in step that nothing checks.
+filename, not a new version string. Do not add a `?v=` to them. They are left
+out of the hash for the same reason: including them would move the version
+without moving the URL that would have to change for a new face to reach
+anybody.
 
 `python tools/validate_assets.py` checks that nothing is requested unversioned,
 that every module is in the import map, and that one version is used
