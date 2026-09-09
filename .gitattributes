@@ -18,3 +18,13 @@
 *.cff   text eol=lf
 
 *.ipynb text eol=lf
+
+# Images and fonts are binary. `* text=auto` above would otherwise leave it to
+# content detection, which is reliable but silent; saying so here means a
+# screenshot cannot be corrupted by line-ending translation.
+*.png   -text
+*.jpg   -text
+*.jpeg  -text
+*.gif   -text
+*.webp  -text
+*.woff2 -text
