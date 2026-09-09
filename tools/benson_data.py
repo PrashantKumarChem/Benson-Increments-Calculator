@@ -17,12 +17,19 @@ CSV_DIR = "CSV_data_files"
 MANIFEST_NAME = "manifest.json"
 # Hand-edited, and optional: what a category's numbers are, and where they came
 # from. A category with no row here still works and shows exactly what it always
-# showed, so dropping a CSV into the folder remains the whole of adding one.
+# showed, so dropping a CSV into CSV_DIR remains the whole of adding one.
+#
+# It lives in NOTATION_DIR rather than beside the increments, because that
+# folder is for what the data means rather than for the data. Keeping CSV_DIR
+# to nothing but two-column increment files is not tidiness: the notebook globs
+# it and reads whatever it finds as increments, so a six-column file there
+# would become a category of nonsense buttons in the reference implementation.
+# What the group names are made of, the words students use for them, and what
+# each category of numbers actually is.
+NOTATION_DIR = "notation"
 METADATA_NAME = "categories.csv"
 #: The columns of METADATA_NAME, in order. "File" is the key; the rest may be blank.
 METADATA_FIELDS = ("quantity", "symbol", "unit", "source", "note")
-# What the group names are made of, and the words students use for them.
-NOTATION_DIR = "notation"
 
 # 01_CH_Groups.csv -> ordering prefix, then the category name.
 FILENAME_RE = re.compile(r"^(\d{2})_([A-Za-z0-9_]+)\.csv$")
@@ -119,7 +126,7 @@ def read_pairs(path: str):
                 yield offset + 2, key.strip().strip('"'), value.strip()
 
 
-def read_metadata(csv_dir: str = CSV_DIR) -> dict[str, dict[str, str]]:
+def read_metadata() -> dict[str, dict[str, str]]:
     """What each category holds, keyed by filename. Absent file means no metadata.
 
     Read with the csv module rather than by splitting on commas, because unlike
@@ -127,7 +134,7 @@ def read_metadata(csv_dir: str = CSV_DIR) -> dict[str, dict[str, str]]:
     prose. Unknown columns are ignored so a contributor can annotate the file
     without breaking it; missing ones read as blank.
     """
-    path = os.path.join(csv_dir, METADATA_NAME)
+    path = os.path.join(NOTATION_DIR, METADATA_NAME)
     if not os.path.exists(path):
         return {}
 
@@ -145,13 +152,13 @@ def read_metadata(csv_dir: str = CSV_DIR) -> dict[str, dict[str, str]]:
 
 
 def find_categories(csv_dir: str = CSV_DIR) -> list[Category]:
-    """Every increment CSV in the folder, ordered by filename so the prefix works.
+    """Every CSV in the folder, ordered by filename so the numeric prefix works.
 
-    METADATA_NAME is not an increment file and is skipped: it describes the
-    others rather than holding any values of its own.
+    Everything in CSV_DIR is an increment file. Nothing is filtered out here,
+    which is deliberate: a stray file is reported by validate_data.py rather
+    than quietly ignored, because the notebook would read it as increments.
     """
-    paths = sorted(glob.glob(os.path.join(csv_dir, "*.csv")))
-    return [read_category(p) for p in paths if os.path.basename(p) != METADATA_NAME]
+    return [read_category(p) for p in sorted(glob.glob(os.path.join(csv_dir, "*.csv")))]
 
 
 def manifest_for(categories: list[Category], metadata: dict | None = None) -> dict:

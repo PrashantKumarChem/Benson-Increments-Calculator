@@ -95,7 +95,7 @@ def check_category(category: Category, report: Report) -> None:
 
 
 def check_metadata(categories: list[Category], report: Report) -> None:
-    """CSV_data_files/categories.csv, which says what each category's numbers are.
+    """notation/categories.csv, which says what each category's numbers are.
 
     The file is optional and every column but the filename may be left blank -
     a category nobody has described yet is an ordinary state, and the site
@@ -108,7 +108,7 @@ def check_metadata(categories: list[Category], report: Report) -> None:
     rename is silent otherwise: the row simply stops applying and the category
     quietly loses its heading.
     """
-    path = os.path.join(CSV_DIR, METADATA_NAME)
+    path = os.path.join(NOTATION_DIR, METADATA_NAME)
     if not os.path.exists(path):
         return
 
