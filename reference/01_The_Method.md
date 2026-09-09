@@ -9,12 +9,14 @@ neighbourhood it sits in. So a carbon bonded to one carbon and three
 hydrogens is written `C-(C)(H)3`, and it is worth −42 kJ/mol wherever it
 appears — in propane, in toluene, in a steroid.
 
-The method works because a bond's energy is not quite a constant. A C–H bond
-in a methyl group is not identical to a C–H bond next to a carbonyl, and the
-difference is large enough to matter. What decides it is mostly the
-*next-nearest* neighbours — and the central-atom-plus-ligands group is
-precisely that neighbourhood, written down. Additivity over groups therefore
-captures what additivity over bonds misses.
+Why a group and not an atom or a bond? Because there is a ladder of
+approximations, and the group is the rung that works. Adding up atoms is the
+zeroth-order approximation and is poor. Adding up bonds is first-order and is
+better, but a C–H bond in a methyl group is not identical to a C–H bond next to
+a carbonyl, and the difference is large enough to matter. Adding up groups is
+the second-order approximation: because a group carries the central atom's
+whole neighbourhood, the environment that makes those two C–H bonds differ is
+already written into it.
 
 What it does not capture is anything that depends on the shape of the whole
 molecule: ring strain, two substituents crowding each other, a *cis* double

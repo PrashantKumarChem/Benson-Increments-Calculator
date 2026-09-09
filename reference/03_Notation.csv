@@ -1,15 +1,15 @@
-Notation,What it is,Verified
-`C`,"A saturated carbon: four single bonds.",not yet
-`Cd`,"A carbon of a C=C double bond (""d"" for double), as in an alkene.",not yet
-`Ct`,"A carbon of a C≡C triple bond (""t"" for triple), as in an alkyne.",not yet
-`CB`,"An aromatic carbon in a benzene ring (""B"" for benzene).",not yet
+Notation,What it is,Checked against
+`C`,"A saturated carbon: four single bonds.",Benson 1976
+`Cd`,"A carbon of a C=C double bond (""d"" for double), as in an alkene.",Benson 1976
+`Ct`,"A carbon of a C≡C triple bond (""t"" for triple), as in an alkyne.",Benson 1976
+`CB`,"An aromatic carbon in a benzene ring (""B"" for benzene).",Benson 1976
 `CO`,"A carbonyl carbon taken together with its oxygen, C=O.",not yet
 `O`,"A divalent oxygen: the oxygen of an ether, an alcohol or an ester.",not yet
-`N`,"A trivalent amine nitrogen: three single bonds.",not yet
-`CN`,"The carbon of a nitrile, C≡N, taken together with its nitrogen.",not yet
-`NO2`,"The nitrogen of a nitro group, taken with its two oxygens.",not yet
-`NI`,"A doubly-bonded nitrogen, as in an imine or an oxime. Contributes its nitrogen only; the carbon is counted by its own group.",not yet
-`CdN`,"The carbon of a C=N double bond. In this data set it is taken to contribute its nitrogen as well as its carbon.",not yet
-`NC`,"An isocyanide, R–N≡C. The single value here is `NC-(C)`, at +210 kJ/mol.",not yet
-`ONO`,"A nitrite ester, R–O–N=O.",not yet
+`N`,"An amine nitrogen: three single bonds.",Ashcraft & Green 2008
+`CN`,"The carbon of a nitrile, C≡N, taken together with its nitrogen.",Ashcraft & Green 2008
+`NO2`,"The nitrogen of a nitro group, taken with its two oxygens.",Ashcraft & Green 2008
+`ONO`,"A nitrite ester, R–O–N=O.",Ashcraft & Green 2008
+`NI`,"A doubly-bonded imino nitrogen, as in an imine or an oxime. Contributes its nitrogen only; the carbon of the C=N is counted by its own `CdN` group.",Ashcraft & Green 2008
+`CdN`,"The carbon of a C=N double bond — a `Cd` whose partner is nitrogen. Contributes its carbon only. See the note below.",not yet
+`NC`,"An isocyanide, R–N≡C. The one value here is `NC-(C)`, and `C-(H)3(N)` + `NC-(C)` = −42 + 210 = 168 kJ/mol against a measured 163.5 ± 7.2 for methyl isocyanide.",NIST WebBook
 `[COd]`,"The four ketene rows. How many heavy atoms they stand for is an open question, recorded in `notation/README.md`.",not yet

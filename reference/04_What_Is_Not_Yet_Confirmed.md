@@ -1,25 +1,30 @@
-The `Verified` column in the Notation table records whether a chemist has
-checked that description against Cohen & Benson (1993). **No row has had that
-check yet**, so every row reads *not yet*.
+The last column of the Notation table records what each description was checked
+against. It is about the prose, not the arithmetic: every value in the
+calculator is the published one and is used exactly as it stands, and what is
+being checked is the sentence describing the bonding beside it.
 
-The column is about the prose, not the arithmetic. Every value in the
-calculator is the published one and is used exactly as it stands; what is
-unconfirmed is the sentence describing the bonding beside it. Four entries are
-worth more attention than the rest — `NI`, `CdN`, `NC` and `ONO` — because
-they are the ones where the notation admits more than one reading.
+Four entries still read *not yet*. `CO` and `O` are ordinary and almost
+certainly right; they are simply unchecked. `[COd]` is a genuine open question,
+already recorded in `notation/README.md`. `CdN` is the interesting one.
 
-They are marked rather than quietly asserted because this is a teaching tool,
-and a confident wrong gloss is worse than an admitted gap. Confirming one is a
-matter of editing a single line of `reference/03_Notation.csv` and changing
-*not yet* to *yes*. There is no code to change.
+## The nitrogen in a C=N is counted twice
 
-## An open question in the data itself
+`notation/central_atoms.csv` records `CdN` as contributing a carbon **and** a
+nitrogen, while `NI` contributes a nitrogen. Both appear in the same molecule,
+so the nitrogen is counted twice. Methanimine, CH2=NH, has one nitrogen, and
+the two groups it is made of give two:
 
-`notation/central_atoms.csv` records `CdN` as contributing both a carbon and a
-nitrogen, while `NI` contributes a nitrogen. A molecule written with both would
-have its nitrogen counted twice.
+    CdN-(H)2  +  NI-(H)   ->   C1 N2 H3
 
-Nothing in the calculator is affected today: the atom counting feeds a
+The thermochemistry points the same way. Read with `CdN` contributing only its
+carbon, methanimine is 28 + 64 = 92 kJ/mol, against measurements spanning
+69 ± 8 to 110 ± 8 kJ/mol. Read with `CdN` carrying the nitrogen as well — so
+that no `NI` group is added — it is 28 kJ/mol, far below every measured value.
+
+So `CdN` should almost certainly contribute `C` alone, exactly as `Cd` does.
+That is one cell in `notation/central_atoms.csv`.
+
+Nothing in the calculator is affected today. The atom counting feeds a
 molecular-formula check that is deliberately switched off, and every enthalpy
-value is read straight from the CSV files. It is recorded here so that whoever
-switches that check on meets it first.
+comes straight from the CSV files, untouched by any of this. It is written down
+here so that whoever switches that check on meets it first.
