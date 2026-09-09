@@ -311,6 +311,13 @@ function focusKey(button, kind = button.hasAttribute("data-step-down") ? "less" 
 function focusedButton() {
   const active = document.activeElement;
   if (active?.tagName !== "BUTTON") return null;
+
+  // Undo, Copy and Reset are not redrawn - they are disabled in place once the
+  // selection empties, and a browser blurs a control it has just disabled. The
+  // element is still there, so nothing below would notice; what has to be
+  // checked afterwards is whether it can still hold the focus it had.
+  if (active.closest(".actions")) return { action: active };
+
   const region = active.closest(FOCUS_REGIONS);
   if (!region) return null;
 
@@ -328,8 +335,27 @@ function focusedButton() {
   return { region: region.id, keys, index: buttons.indexOf(active) };
 }
 
+/**
+ * Where focus goes when the panel has nothing left to put it on: the panel
+ * itself, which is labelled and is where the reader already was.
+ *
+ * Not the search box, which is the other always-present control: focusing an
+ * input opens the on-screen keyboard, and taking the last term back on a phone
+ * should not do that.
+ */
+function focusPanel() {
+  el("tally-panel").focus({ preventScroll: true });
+}
+
 function restoreFocus(memory) {
   if (!memory) return;
+
+  if (memory.action) {
+    // Still enabled means focus was never taken from it.
+    if (memory.action.disabled) focusPanel();
+    return;
+  }
+
   const buttons = [...el(memory.region).querySelectorAll("button")];
   for (const key of memory.keys) {
     const again = buttons.find((button) => focusKey(button) === key);
@@ -337,9 +363,14 @@ function restoreFocus(memory) {
     // has not asked to go anywhere, and the button is where it already was.
     if (again) return again.focus({ preventScroll: true });
   }
-  // Nothing does that job any more. Take the place rather than the button, and
-  // where the region has emptied out entirely there is nothing to take.
-  buttons[Math.min(memory.index, buttons.length - 1)]?.focus({ preventScroll: true });
+  // Nothing does that job any more, so take the place rather than the button.
+  const inItsPlace = buttons[Math.min(memory.index, buttons.length - 1)];
+  if (inItsPlace) return inItsPlace.focus({ preventScroll: true });
+
+  // The region has emptied out. Only the contributions list can do that while
+  // holding focus - the chips are fixed, and an empty library is only reached
+  // by typing, which means focus is in the search box and not here.
+  if (memory.region === "picks") focusPanel();
 }
 
 function render() {
@@ -652,7 +683,11 @@ el("copy").addEventListener("click", async (event) => {
  * job now, for every button it redraws rather than only for these two keys.
  */
 function focusableIncrements() {
-  return [...el("library").querySelectorAll("button[data-label]")];
+  // Not the count badges. In the table a badge is a real button and carries
+  // the same file and label as the group it belongs to, so it matched here -
+  // and pressing + on one called addIncrement with the dataset of the control
+  // that takes one away, adding an increment from the remove button.
+  return [...el("library").querySelectorAll("button[data-label]:not([data-step-down])")];
 }
 
 addEventListener("keydown", (event) => {
@@ -664,7 +699,9 @@ addEventListener("keydown", (event) => {
   }
 
   const current = document.activeElement;
-  if (!current?.matches?.("#library button[data-label]")) return;
+  // Tab reaches a badge even though the arrow keys no longer walk onto one,
+  // so the same exclusion has to be written here.
+  if (!current?.matches?.("#library button[data-label]:not([data-step-down])")) return;
 
   const buttons = focusableIncrements();
   const here = buttons.indexOf(current);

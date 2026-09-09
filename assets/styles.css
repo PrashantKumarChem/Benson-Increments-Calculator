@@ -338,6 +338,11 @@ main, .library, .table-wrap { min-width: 0; }
 }
 .search .clear:hover { color: var(--ink); }
 input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* The panel is given focus when the control holding it disappears, so that it
+   does not fall to the body. It is a container and not a control - it is not
+   in the tab order and there is nothing on it to operate - so it is not drawn
+   as one. The heading and the total below it say where you have landed. */
+.tally-panel:focus, .tally-panel:focus-visible { outline: none; }
 
 /* Category filters, not tabs. Several can be on at once, and none being on
    means the whole set is showing rather than nothing - which is why "All"
