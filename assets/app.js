@@ -307,13 +307,39 @@ el("views").addEventListener("click", (event) => {
  * makes the list taller. Transform does not affect offsetHeight, so this reads
  * the same whether the sheet is open or shut.
  */
+/**
+ * Where the panel stops being a column and becomes a sheet.
+ *
+ * The number is the stylesheet's, read from it rather than written here as
+ * well: a breakpoint that disagreed between the two would measure a desktop
+ * panel that never moves, or leave a phone's sheet unmeasured and sitting
+ * across the bottom of the screen for good. tools/validate_css.mjs fails if
+ * this token name or its value stops agreeing with the media queries.
+ *
+ * Read once, into one live MediaQueryList the browser evaluates itself, rather
+ * than building a new one on every resize.
+ */
+const SHEET_MAX = "--sheet-max";
+
+const sheetMax = getComputedStyle(document.documentElement)
+  .getPropertyValue(SHEET_MAX).trim();
+
+// An absent token would make the query invalid, which matches nothing, which
+// silently gives a phone the desktop branch below - so it is said out loud
+// rather than left to be found on a handset.
+if (!sheetMax) {
+  console.error(`assets/styles.css declares no ${SHEET_MAX}, so the sheet cannot be measured.`);
+}
+
+const isSheet = matchMedia(`(max-width: ${sheetMax})`);
+
 function measureSheet() {
   const panel = el("tally-panel");
   const body = el("tally-body");
 
   // Beside the grid the panel is an ordinary block in the layout and neither
   // number means anything, so they are removed rather than left stale.
-  if (!matchMedia("(max-width: 859px)").matches) {
+  if (!isSheet.matches) {
     panel.style.removeProperty("--sheet-hidden");
     document.documentElement.style.removeProperty("--sheet-peek");
     return;

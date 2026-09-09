@@ -103,6 +103,27 @@
   --space-6: 24px;
   --space-7: 32px;
   --space-8: 48px;
+
+  /* The width below which the tally panel stops being a column beside the
+     grid and becomes a sheet at the foot of the page.
+
+     assets/app.js has to agree with this number. It measures how far the
+     sheet slides, and that measurement means nothing on the other side of the
+     line - so a breakpoint that disagreed would either measure a desktop
+     panel that never moves, or leave a phone's sheet unmeasured and sitting
+     permanently across the bottom of the screen. The script reads this token
+     rather than carrying its own copy.
+
+     A media query cannot read a custom property, so the queries below still
+     write the number out: the rail is (min-width) at one pixel more than this.
+     What holds them together is tools/validate_css.mjs, which fails if this
+     token and the queries disagree - the same bargain index.html strikes with
+     the asset version, where one value in eight places is checked rather than
+     pretended away.
+
+     In px deliberately, as the three other breakpoints are (62369df): a
+     breakpoint describes the viewport, not the text in it. */
+  --sheet-max: 859px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -471,8 +492,13 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 .tally-panel {
   background: var(--layer); border: 1px solid var(--line-strong);
   padding: var(--space-5);
+  /* Beside the grid it follows the page down. This needs no media query of
+     its own: the sheet rules further down take the panel out of the flow
+     entirely and win on source order, and they reset top so that a panel
+     pinned to the bottom is not also pinned to the top and stretched between
+     the two. One less place for the breakpoint to be written. */
+  position: sticky; top: var(--space-5);
 }
-@media (min-width: 860px) { .tally-panel { position: sticky; top: var(--space-5); } }
 /* Beside the grid there is nothing to collapse, so neither the disclosure nor
    the drag handle is merely hidden - both are absent, and cannot be tabbed to
    or dragged. */
@@ -616,7 +642,10 @@ ul.picks .sum {
      Both distances are measured rather than guessed - the head is as tall as
      the total is, and the total is as tall as the reader's font makes it. */
   .tally-panel {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 3;
+    /* top: auto undoes the sticky offset above. With both top and bottom set
+       a fixed box is stretched between them, which would make the sheet as
+       tall as the window instead of as tall as its contents. */
+    position: fixed; top: auto; left: 0; right: 0; bottom: 0; z-index: 3;
     margin: 0; padding: var(--space-3) var(--space-4);
     max-height: 80vh; display: flex; flex-direction: column;
     transform: translateY(0);

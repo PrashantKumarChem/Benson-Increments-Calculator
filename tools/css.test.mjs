@@ -20,7 +20,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { checkStructure, checkTokens, withoutComments } from "./validate_css.mjs";
+import { checkBreakpoint, checkStructure, checkTokens, withoutComments } from "./validate_css.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const stylesheet = await readFile(path.join(ROOT, "assets/styles.css"), "utf8");
@@ -132,6 +132,84 @@ test("a token named only inside a comment does not count as declared", () => {
 test("each undeclared token is reported once, however often it is used", () => {
   const css = ".a { color: var(--nik); }\n.b { color: var(--nik); }\n.c { color: var(--nik); }";
   assert.equal(checkTokens(css).length, 1);
+});
+
+/* -------------------------------------------------------------------------- */
+/* The sheet breakpoint, which is written in three languages                    */
+/* -------------------------------------------------------------------------- */
+
+/** A stylesheet and a script that agree, as the shipped pair does. */
+const agreed = {
+  css: ":root { --sheet-max: 859px; }\n"
+    + "@media (max-width: 859px) { .tally-panel { position: fixed; } }\n"
+    + "@media (min-width: 860px) { .layout { grid-template-columns: 1fr 23rem; } }",
+  js: 'const isSheet = matchMedia(`(max-width: ${read("--sheet-max")})`);',
+};
+
+test("the shipped stylesheet and script agree about the breakpoint", () => {
+  assert.deepEqual(checkBreakpoint(stylesheet, { "assets/app.js": appjs }), []);
+});
+
+test("a stylesheet and script that agree pass", () => {
+  assert.deepEqual(checkBreakpoint(agreed.css, { app: agreed.js }), []);
+});
+
+test("moving the token without moving the media queries is caught", () => {
+  const css = agreed.css.replace("--sheet-max: 859px", "--sheet-max: 767px");
+  const problems = checkBreakpoint(css, { app: agreed.js });
+  assert.equal(problems.length, 2, "both the sheet's query and the rail's are now wrong");
+  assert.match(problems[0], /no media query asks for \(max-width: 767px\)/);
+  assert.match(problems[1], /should begin at \(min-width: 768px\)/);
+});
+
+test("moving one media query without the token is caught", () => {
+  const css = agreed.css.replace("(min-width: 860px)", "(min-width: 900px)");
+  const problems = checkBreakpoint(css, { app: agreed.js });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /rail beside the grid should begin at \(min-width: 860px\)/);
+});
+
+test("a breakpoint pair that overlaps by a pixel is caught", () => {
+  const css = agreed.css.replace("(min-width: 860px)", "(min-width: 859px)");
+  const problems = checkBreakpoint(css, { app: agreed.js });
+  assert.ok(problems.some((p) => /overlaps --sheet-max by a pixel/.test(p)));
+});
+
+test("a script that writes the width out instead of reading it is caught", () => {
+  const problems = checkBreakpoint(agreed.css, {
+    app: 'if (!matchMedia("(max-width: 859px)").matches) return;',
+  });
+  assert.equal(problems.length, 2);
+  assert.match(problems[0], /does not name --sheet-max/);
+  assert.match(problems[1], /writes the width query '\(max-width: 859px\)' out in full/);
+});
+
+test("a script that misspells the token name is caught", () => {
+  // The failure this guards: getPropertyValue returns "", the query is
+  // invalid, it matches nothing, and a phone silently takes the desktop path.
+  const problems = checkBreakpoint(agreed.css, {
+    app: 'matchMedia(`(max-width: ${read("--sheet-width")})`);',
+  });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /does not name --sheet-max/);
+});
+
+test("a missing token is caught before anything else is checked", () => {
+  const problems = checkBreakpoint("@media (max-width: 859px) { .a { color: red; } }");
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /--sheet-max is not declared as a px width/);
+});
+
+test("a token declared only in a comment does not count", () => {
+  const problems = checkBreakpoint(`/* ${"--sheet-max"}: 859px; */\n.a { color: red; }`);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /not declared/);
+});
+
+test("the other breakpoints are none of this check's business", () => {
+  const css = `${agreed.css}\n@media (max-width: 520px) { .a { color: red; } }`
+    + "\n@media (max-width: 620px) { .b { color: red; } }";
+  assert.deepEqual(checkBreakpoint(css, { app: agreed.js }), []);
 });
 
 test("stripping comments keeps the line numbering", () => {

@@ -153,6 +153,73 @@ export function checkTokens(css, scripts = {}) {
   return problems;
 }
 
+/** The token naming the width at which the tally panel becomes a sheet. */
+export const SHEET_MAX = "--sheet-max";
+
+const SHEET_MAX_RE = new RegExp(`${SHEET_MAX}\\s*:\\s*(\\d+)px`);
+const MEDIA_WIDTH_RE = /\((max|min)-width:\s*(\d+)px\)/g;
+/** A media query written into a script, which is the copy that goes stale. */
+const SCRIPT_QUERY_RE = /\((?:max|min)-width:\s*\d+px\)/;
+
+/**
+ * One breakpoint, in one place, checked everywhere it had to be written again.
+ *
+ * A media query cannot read a custom property and a script cannot import a
+ * stylesheet, so the sheet's breakpoint is written in three languages: the
+ * token, the queries that use it, and the script that has to agree about which
+ * side of it the page is on. Nothing in CSS or JavaScript can bind those. This
+ * can, and the failure it prevents is a phone whose sheet is never measured -
+ * it then sits across the bottom of the screen permanently, covering the grid.
+ *
+ * The same bargain tools/validate_assets.py strikes with the asset version:
+ * where a value cannot live in one place, it is checked to be one value.
+ */
+export function checkBreakpoint(css, scripts = {}) {
+  const problems = [];
+  const declared = withoutComments(css).match(SHEET_MAX_RE);
+  if (!declared) {
+    return [`${STYLESHEET}: ${SHEET_MAX} is not declared as a px width, so nothing `
+      + "says where the tally panel becomes a sheet"];
+  }
+
+  const max = Number(declared[1]);
+  const min = max + 1;
+  const widths = [...withoutComments(css).matchAll(MEDIA_WIDTH_RE)]
+    .map(([, edge, value]) => ({ edge, value: Number(value) }));
+
+  if (!widths.some((w) => w.edge === "max" && w.value === max)) {
+    problems.push(`${STYLESHEET}: ${SHEET_MAX} is ${max}px, but no media query asks for `
+      + `(max-width: ${max}px) - the sheet's own rules are at another width`);
+  }
+  if (!widths.some((w) => w.edge === "min" && w.value === min)) {
+    problems.push(`${STYLESHEET}: ${SHEET_MAX} is ${max}px, so the rail beside the grid `
+      + `should begin at (min-width: ${min}px), and no media query does`);
+  }
+  // The pair has to meet exactly. One pixel of overlap shows both layouts at
+  // once; one pixel of gap shows neither.
+  for (const { edge, value } of widths) {
+    if (edge === "min" && value === max) {
+      problems.push(`${STYLESHEET}: (min-width: ${max}px) overlaps ${SHEET_MAX} by a pixel`);
+    }
+    if (edge === "max" && value === min) {
+      problems.push(`${STYLESHEET}: (max-width: ${min}px) overlaps the rail by a pixel`);
+    }
+  }
+
+  for (const [path, source] of Object.entries(scripts)) {
+    if (!source.includes(SHEET_MAX)) {
+      problems.push(`${path}: does not name ${SHEET_MAX}, so it is not reading the `
+        + "breakpoint from the stylesheet");
+    }
+    const written = source.match(SCRIPT_QUERY_RE);
+    if (written) {
+      problems.push(`${path}: writes the width query '${written[0]}' out in full - `
+        + `it should be built from ${SHEET_MAX} so there is one of it`);
+    }
+  }
+  return problems;
+}
+
 function read(path) {
   return readFileSync(new URL(path, ROOT), "utf8");
 }
@@ -161,7 +228,11 @@ export function main() {
   const css = read(STYLESHEET);
   const scripts = Object.fromEntries(SCRIPTS.map((path) => [path, read(path)]));
 
-  const problems = [...checkStructure(css), ...checkTokens(css, scripts)];
+  const problems = [
+    ...checkStructure(css),
+    ...checkTokens(css, scripts),
+    ...checkBreakpoint(css, scripts),
+  ];
   if (problems.length) {
     console.error(`${problems.length} problem(s) found:\n`);
     for (const problem of problems) console.error(`  ${problem}`);
