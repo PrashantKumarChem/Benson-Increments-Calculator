@@ -29,7 +29,13 @@
         <button class="clear" id="clear" hidden aria-label="Clear search">&times;</button>
       </div>
 
-      <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+      <div class="controls">
+        <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+        <div class="views" id="views" role="group" aria-label="How to show the increments">
+          <button data-mode="cards" aria-pressed="true">Cards</button>
+          <button data-mode="table" aria-pressed="false">Table</button>
+        </div>
+      </div>
 
       <div class="library" id="library" aria-live="polite">
         <p class="status">Loading increment data&hellip;</p>

@@ -44,6 +44,8 @@ const view = {
   /** Categories by filename, for looking up what a chosen increment is a measure of. */
   byFile: new Map(),
   files: new Set(), query: "",
+  /** "cards" to scan by shape, "table" to compare values and read provenance. */
+  mode: "cards",
 };
 
 /** One increment, as a card. */
@@ -65,6 +67,28 @@ function cardHtml(increment, counts) {
             <span>${asFormula(label)}</span>
             <span class="meta">${valueHtml(increment)}${context}${tally}</span>
           </button>`;
+}
+
+/**
+ * One increment, as a table row.
+ *
+ * The table is where a category's own description earns its place: the same
+ * value, said to come from somewhere and to measure something. Where a
+ * category has declared nothing the cells are an em dash rather than a guess.
+ */
+function rowHtml(increment, counts) {
+  const { label, category } = increment;
+  const count = counts.get(keyOf(category.file, label)) ?? 0;
+  const or = (text) => escapeHtml(text || "\u2014");
+  return `<tr class="${count ? "picked" : ""}">
+      <th scope="row"><button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
+        >${asFormula(label)}</button>${count ? `<span class="tally">&times; ${count}</span>` : ""}</th>
+      <td class="num">${escapeHtml(formatIncrement(increment))}</td>
+      <td class="num soft">${increment.isRange ? escapeHtml(formatRange(increment)) : "&mdash;"}</td>
+      <td class="soft">${or(category.unit)}</td>
+      <td class="soft">${or(category.quantity)}</td>
+      <td class="soft">${or(category.source)}</td>
+    </tr>`;
 }
 
 /**
@@ -109,8 +133,20 @@ function renderLibrary() {
         ? `${escapeHtml(section.category.title)}<span class="n">${section.rows.length}</span>`
         : `${section.rows.length} ${section.rows.length === 1 ? "match" : "matches"}` +
           `<span class="n">best first</span>`;
-      return `<h2 class="section-head">${heading}</h2>` +
-        `<div class="grid">${section.rows.map((row) => cardHtml(row, counts)).join("")}</div>`;
+      const body = view.mode === "table"
+        ? `<div class="table-wrap"><table class="table">
+             <thead><tr>
+               <th scope="col">Group</th>
+               <th scope="col" class="num">Value</th>
+               <th scope="col" class="num">Published range</th>
+               <th scope="col">Unit</th>
+               <th scope="col">Quantity</th>
+               <th scope="col">Source</th>
+             </tr></thead>
+             <tbody>${section.rows.map((row) => rowHtml(row, counts)).join("")}</tbody>
+           </table></div>`
+        : `<div class="grid">${section.rows.map((row) => cardHtml(row, counts)).join("")}</div>`;
+      return `<h2 class="section-head">${heading}</h2>${body}`;
     })
     .join("");
 }
@@ -208,6 +244,16 @@ el("chips").addEventListener("click", (event) => {
   // selecting a category, which is what "no filter" means here.
   view.files = chip.dataset.file ? toggleFilter(view.files, chip.dataset.file) : new Set();
   render();
+});
+
+el("views").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-mode]");
+  if (!button) return;
+  view.mode = button.dataset.mode;
+  for (const other of event.currentTarget.children) {
+    other.setAttribute("aria-pressed", String(other === button));
+  }
+  renderLibrary();
 });
 
 el("about-toggle").addEventListener("click", (event) => {
