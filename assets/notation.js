@@ -205,8 +205,10 @@ export function buildIndex(categories, notation) {
   categories.forEach((category, categoryIndex) => {
     category.rows.forEach((row, rowIndex) => {
       index.push({
-        label: row.label,
-        value: row.value,
+        // The whole row, not a chosen few of its fields: an entry is the one
+        // thing the page renders a card from, so narrowing it here silently
+        // loses how the source wrote the value and rounds -20.9 to -21.
+        ...row,
         category,
         categoryIndex,
         rowIndex,

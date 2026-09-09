@@ -144,3 +144,31 @@ test("toggling leaves the set it was given alone", () => {
   toggleFilter(original, A_VALUES);
   assert.deepEqual([...original], [CH], "the caller's set must not change under it");
 });
+
+/* -------------------------------------------------------------------------- */
+/* What an entry carries                                                        */
+/* -------------------------------------------------------------------------- */
+
+test("a visible increment still knows how its source wrote the value", () => {
+  // The index is the only thing a card is rendered from, so an entry that has
+  // been narrowed to {label, value} loses the source's precision and renders
+  // -20.9 as -21. Every field readValue produced has to survive the trip.
+  const methylene = visibleRows(index).find((row) => row.label === "C-(C)2(H)2");
+  assert.equal(methylene.source, "-20.9");
+  assert.equal(methylene.decimals, 1);
+  assert.equal(methylene.isRange, false);
+});
+
+test("a visible range still knows its bounds", () => {
+  const oh = visibleRows(index).find((row) => row.label === "OH");
+  assert.equal(oh.isRange, true);
+  assert.equal(oh.low, 2.51);
+  assert.equal(oh.high, 4.35);
+});
+
+test("every visible increment carries a source and a precision", () => {
+  for (const row of visibleRows(index)) {
+    assert.equal(typeof row.source, "string", `${row.label} lost its source text`);
+    assert.equal(typeof row.decimals, "number", `${row.label} lost its precision`);
+  }
+});
