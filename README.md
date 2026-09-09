@@ -288,9 +288,27 @@ anything you add.
 
 [AI_USE.md](AI_USE.md) records where generative AI was used in building this.
 
+## Getting help
+
+- **Something is wrong, or a value looks incorrect** — open an
+  [issue](https://github.com/PrashantKumarChem/Benson-Increments-Calculator/issues).
+  For a wrong number, say which group, what you expected, and the source you
+  expected it from; that is the report that can be acted on immediately.
+- **How do I use it, or what does this notation mean** — the
+  [reference page](https://prashantkumarchem.github.io/Benson-Increments-Calculator/reference.html)
+  covers the method, the notation, a glossary and worked examples.
+- **How do I contribute** — see [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Anything else, including using this in your own course** — open an issue.
+  Questions are welcome and are not a nuisance; if something was unclear enough
+  to ask about, the documentation should probably have answered it.
+
 ## License
 
-GNU General Public License v3.0 — see [LICENSE](LICENSE).
+The code is under the GNU General Public License v3.0, and the written material
+— this README, the reference page and everything in `reference/` — is under
+Creative Commons Attribution 4.0, so it can be reused and adapted for another
+course with attribution. See [LICENSES.md](LICENSES.md) for exactly what falls
+under which, and for the provenance of the increment values.
 
 The one thing here that is not ours is the typeface. IBM Plex Mono is
 Copyright © 2017 IBM Corp., used under the SIL Open Font License 1.1 — the
