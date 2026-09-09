@@ -7,7 +7,7 @@ which is not something a plain text search can do, since those four characters
 appear nowhere in the printed name.
 
 Most of the reading is derived from the notation itself, which is why a new
-category of groups is understood without anyone editing code. These three files
+category of groups is understood without anyone editing code. These four files
 hold the part that cannot be derived, so the chemistry stays in data where a
 chemist can change it.
 

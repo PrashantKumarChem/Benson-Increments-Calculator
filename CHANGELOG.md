@@ -51,10 +51,13 @@ here: it still uses `ipywidgets.Tab` for its tabbed interface and still has a
 history panel. The web version released here is a separate front end over the
 same data and has neither; it shows every category at once and filters instead.
 
-One item in that entry was not accurate. It lists a code of conduct, which was
-not added to the repository until this release.
+Two items in that entry are not accurate, and are left as written with the
+correction here rather than edited away. It lists a code of conduct, which was
+not added to the repository until this release. It also lists redo, which the
+notebook has never had: it has an undo that steps back through a history of
+actions, and nothing that steps forward again.
 
-## [1.0.0] - 2024-09-12
+## [1.0.0] - 2025-09-12
 
 ### Added
 - Initial release of Benson Increments Calculator

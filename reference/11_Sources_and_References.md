@@ -52,7 +52,7 @@ The cyclohexane A-values have no source recorded. See The Five Categories.
 
 ## This calculator
 
-- Kumar, P.; Pohl, N. L. B. *Benson Increments Calculator*, 2024.
+- Kumar, P.; Pohl, N. L. B. *Benson Increments Calculator*, version 2.0.0, 2026.
   [github.com/PrashantKumarChem/Benson-Increments-Calculator](https://github.com/PrashantKumarChem/Benson-Increments-Calculator)
 - Written for Chemistry C450/C540, Indiana University Bloomington.
 - Released under the GNU General Public License v3.0.

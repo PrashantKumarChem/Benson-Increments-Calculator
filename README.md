@@ -107,9 +107,9 @@ runs it on every push, so a broken contribution cannot reach the site.
 from. It is **generated** — what you edit is the files in `reference/`:
 
 ```
-reference/01_The_Method.md            prose, in Markdown
-reference/03_Notation.csv             a table, in CSV
-reference/05_Glossary.csv             a table, in CSV
+reference/03_The_Method.md            prose, in Markdown
+reference/05_Notation.csv             a table, in CSV
+reference/07_Glossary.csv             a table, in CSV
 ```
 
 The number sets the order, the rest of the filename becomes the heading, and
@@ -130,7 +130,7 @@ the same `notation/categories.csv` the calculator itself reads rather than a
 second copy that could disagree.
 
 Two things worth knowing. Text in `` ` `` comes out in IBM Plex Mono, which is
-why the notation column of `reference/03_Notation.csv` is written `` `Cd` `` —
+why the notation column of `reference/05_Notation.csv` is written `` `Cd` `` —
 the content decides its own typography, so the renderer never has to know
 which column holds notation. And a CSV cell containing a comma should be
 quoted, which is what a spreadsheet does on its own; these files are meant to
@@ -153,9 +153,10 @@ python -m http.server 8000
 
 ### Changing anything in `assets/`
 
-Bump the version in `index.html`. It appears in one place — a stylesheet link, a
-module `src`, and an import map that carries the same version to every module
-the page loads.
+Bump the version in `index.html`, which is the only file it lives in. Count the
+places rather than assuming a number: it is the stylesheet link, the module
+`src`, and one import-map entry per module, so the count grows whenever a
+module is added. At the time of writing that is ten.
 
 GitHub Pages caches every file for ten minutes, and each file's ten minutes
 start when that file was last fetched, so they expire at different times. A
@@ -168,7 +169,7 @@ it shipped with.
 The two font files are the exception: they are named from `styles.css`, not
 from `index.html`, and they are immutable — replacing a face means a new
 filename, not a new version string. Do not add a `?v=` to them, or there
-would be a ninth place to keep in step that nothing checks.
+would be two more places to keep in step that nothing checks.
 
 `python tools/validate_assets.py` checks that nothing is requested unversioned,
 that every module is in some page's import map, and that one version is used

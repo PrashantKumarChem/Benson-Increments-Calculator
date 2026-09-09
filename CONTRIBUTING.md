@@ -154,9 +154,10 @@ so a hand-edit of `reference.html` is reported rather than merely lost.
   a stylesheet checker, and there are tests.
 - Comments should say *why*, not *what*. The existing comments are long
   because the reasons are the part that is expensive to reconstruct.
-- The five files without any DOM access hold everything worth testing, which
-  is why the test suite needs no browser. Keep new logic testable that way if
-  you can.
+- The seven files without any DOM access are the ones the test suite covers,
+  which is why it needs no browser. Keep new logic testable that way if you
+  can: what is left in `app.js` is wiring, and a decision that ends up there
+  is a decision no test can reach.
 - Nothing has a corner radius, notation and numerals are set in the mono face
   and prose is not, and no rule uses `text-transform: uppercase` on a
   chemistry symbol — uppercasing renders ΔHf° as ΔHF°.
