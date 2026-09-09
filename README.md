@@ -25,8 +25,20 @@ so the reasoning stays visible and the arithmetic stays honest.
 - Narrow to one category or several at once; choosing a molecule's groups
   usually crosses two or three of them
 - Click a group to add it; adjust the count rather than clicking eight times
-- Running total in kJ/mol and kcal/mol, always on screen
+- Switch to the table to see each value beside its unit, quantity and source
+- Running total in kJ/mol and kcal/mol, always on screen, headed by what it is
+  a total *of* — and told plainly when it mixes two different quantities
 - Remove any single entry, undo the last addition, or reset
+- Copy the whole working out as text, for pasting into a report
+
+### Keyboard
+
+| | |
+|---|---|
+| `Ctrl`/`Cmd` + `K` | jump to the search box |
+| arrow keys | move through the increments |
+| `Enter` | add the one in focus |
+| `+` / `-` | adjust its count |
 
 ## Adding or changing increments
 
