@@ -188,10 +188,17 @@ node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing
 node tools/check_parity.mjs     # every increment, notebook vs. site
 ```
 
-`check_parity.mjs` loads all 236 increments twice — once through the notebook's
-own code, once through the site's — and fails on any difference. Because a
-molecule's total is a sum of these values, agreement on every increment means
-agreement on every total.
+`check_parity.mjs` loads all 236 increments twice — once through the site's
+code, once through the notebook's parsing rules — and fails on any difference.
+Because a molecule's total is a sum of these values, agreement on every
+increment means agreement on every total.
+
+It does not execute the notebook. It runs `tools/export_reference_values.py`,
+which holds a verbatim copy of the notebook's `parse_value`, reproduced with
+its quirks intact so the comparison is against what the notebook really does
+rather than a tidied version of it. `tools/notebook.test.mjs` reads the
+notebook and fails if that copy and the original have drifted apart, so the
+copy cannot quietly stop standing for the notebook.
 
 ## Layout
 

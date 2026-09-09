@@ -116,3 +116,7 @@ dmypy.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Editor settings are personal to whoever is editing.
+.vscode/
+.idea/
