@@ -124,6 +124,22 @@
      In px deliberately, as the three other breakpoints are (62369df): a
      breakpoint describes the viewport, not the text in it. */
   --sheet-max: 859px;
+
+  /* How long the sheet takes to arrive and how long it takes to leave.
+     Material's emphasized pair: it leaves quickly and arrives gently, which
+     is what "native" turns out to mean when you slow it down and look.
+
+     --sheet-close is a token because two rules have to agree on it. The panel
+     slides out over this long, and the contributions inside it are made
+     invisible after exactly this long - a delay rather than a fade, so they
+     stay readable for precisely as long as they are still sliding past.
+     visibility is what stops a shut sheet being tabbed into, so the two
+     numbers disagreeing is a keyboard bug either way round: shorter and the
+     panel goes untabbable while it is still on screen, longer and it stays
+     tabbable after it has gone. They were written out separately before and
+     nothing held them together. */
+  --sheet-open: .34s;
+  --sheet-close: .25s;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -649,13 +665,11 @@ ul.picks .sum {
     margin: 0; padding: var(--space-3) var(--space-4);
     max-height: 80vh; display: flex; flex-direction: column;
     transform: translateY(0);
-    /* Material's emphasized pair: it leaves quickly and arrives gently, which
-       is what "native" turns out to mean when you slow it down and look. */
-    transition: transform .34s cubic-bezier(.05, .7, .1, 1);
+    transition: transform var(--sheet-open) cubic-bezier(.05, .7, .1, 1);
   }
   .tally-panel:not([data-open="true"]) {
     transform: translateY(var(--sheet-hidden, 0px));
-    transition-duration: .25s;
+    transition-duration: var(--sheet-close);
     transition-timing-function: cubic-bezier(.3, 0, .8, .15);
   }
   body { padding-bottom: calc(var(--sheet-peek, 0px) + var(--space-5)); }
@@ -724,7 +738,7 @@ ul.picks .sum {
     visibility: visible; transition: visibility 0s;
   }
   .tally-panel:not([data-open="true"]) .tally-body {
-    visibility: hidden; transition: visibility 0s linear .25s;
+    visibility: hidden; transition: visibility 0s linear var(--sheet-close);
   }
   /* The list no longer needs its own cap - the sheet caps the whole thing, and
      one scrolling region is easier to use than two nested ones. */
@@ -780,12 +794,22 @@ footer a { color: var(--ink-soft); }
 .search input::-webkit-search-cancel-button,
 .search input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
 
-/* Animation is a preference. Everything here is decorative, so it all goes. */
+/* Animation is a preference. Everything here is decorative, so it all goes.
+
+   The delay goes with the duration, and not only for tidiness. The sheet
+   holds its contributions visible for --sheet-close after it starts closing,
+   as a delay rather than a fade, so they are readable while they slide past.
+   Killing the duration alone left that delay standing: the panel vanished in
+   a frame and the contributions stayed visible - and so stayed tabbable -
+   for a quarter of a second after it had gone, which is the exact keyboard
+   fault the shared token above exists to prevent. With no motion to cover,
+   there is nothing to wait for. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }
