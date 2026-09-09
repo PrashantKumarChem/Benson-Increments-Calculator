@@ -29,6 +29,39 @@
    1px hairline let the increments read as one continuous table. Radius is also
    the cheapest way to look like a generic web app, which this is not. */
 
+/* IBM Plex Mono, shipped with the site rather than fetched from anywhere.
+
+   The design language names Plex Mono, and until now the page asked for
+   "whatever mono this machine has", which is three different typefaces: SF
+   Mono on a Mac, Consolas on Windows, usually a Courier clone on Linux. They
+   differ in width, weight and x-height, so the one thing the mono is here to
+   do - line the ligands up in a column and make the values comparable down the
+   grid - came out differently for every student in the class.
+
+   Self-hosting keeps both properties the project has held on to. There is no
+   build step: these are two files in assets/. And there is still no external
+   dependency - no CDN, no Google Fonts, no third-party request and nothing for
+   a reader to be tracked by, which also means the page works in a lab with no
+   internet once it has been loaded.
+
+   Only the two weights actually used are shipped, and both are declared, so
+   the browser never synthesises a weight from the other one. Every mono rule
+   below asks for 400 or 600 and nothing else.
+
+   SIL Open Font License 1.1 - assets/fonts/OFL.txt. The system stack stays
+   behind it, both for the moment before the font arrives and for the rare
+   glyph Plex does not carry, such as the Mac command key in the search hint. */
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: local("IBM Plex Mono"), url("fonts/IBMPlexMono-Regular.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: local("IBM Plex Mono SemiBold"), url("fonts/IBMPlexMono-SemiBold.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+
 :root {
   --bg: #e9ecee;
   --layer: #fcfdfd;
@@ -51,12 +84,15 @@
   --focus: #0b5d63;
 
   /* Two stacks, two jobs. --font-mono is notation and numerals and nothing
-     else; --font-sans is everything the page says about them. Both are the
-     system's own faces rather than webfonts: this page has no external
-     dependencies and no build step, and keeping it that way is worth more here
-     than the particular shapes of any one typeface. */
+     else; --font-sans is everything the page says about them.
+
+     The mono is shipped with the site so it is the same everywhere, because
+     the columns it lines up are the point. The sans is the reader's own UI
+     face on purpose: it is chrome, it should look like the rest of their
+     machine, and shipping a second file to restyle the word "Contributions"
+     would be 40KB spent on nothing. */
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
   /* One spacing scale, so the density pass is not fifty separate judgements. */
   --space-1: 2px;
@@ -362,7 +398,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
    card - and it shares the notation's mono, which is what puts the sign and
    the decimal point in the same place on every card in the row. */
 .grid .meta {
-  font-family: var(--font-mono); color: var(--ink); font-weight: 700;
+  font-family: var(--font-mono); color: var(--ink); font-weight: 600;
   font-variant-numeric: tabular-nums;
   display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
 }
@@ -372,7 +408,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 /* How many are chosen, as a filled badge: a count set inline in the accent was
    read as part of the value. This cannot be missed and cannot be misread. */
 .grid .tally {
-  margin-left: auto; font-size: .6875rem; font-weight: 700;
+  margin-left: auto; font-size: .6875rem; font-weight: 600;
   background: var(--accent); color: var(--on-accent); padding: 1px 5px;
 }
 /* The bounds an averaged value came from, beside the average itself. */
@@ -410,21 +446,31 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
 }
 .mixed b { color: var(--ink); font-weight: 600; }
 
-/* The answer, and the largest thing on the page - the tight tracking is what
-   keeps a five-digit total from reading as loose at 30px. */
+/* The answer, and the largest thing on the page.
+
+   No negative tracking. It was carried over from a spec written for a
+   proportional face, and on a monospace one it fought the typeface twice: the
+   advance widths are already uniform so tightening them only crowded the
+   digits, and it pulled the total out of column with the kcal figure below -
+   which is the whole reason both are set in tabular figures. */
 .kj {
-  font-family: var(--font-mono); font-size: 1.875rem; font-weight: 700;
-  letter-spacing: -1px; font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono); font-size: 1.875rem; font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 /* The unit is not a figure, so it is not mono and does not take the tracking. */
 .kj span {
   font-family: var(--font-sans); font-size: .5em; font-weight: 400; color: var(--ink-soft);
   margin-left: var(--space-2); letter-spacing: 0;
 }
+/* The figure is mono so it stays in column with the kJ total above it; the
+   unit is not a figure, so it is set like the kJ unit is. Both were mono here
+   because the number and the words were written as one string, which put
+   "kcal/mol" in a code face two lines under a sans "kJ/mol". */
 .kcal {
   font-family: var(--font-mono); color: var(--ink-soft); font-size: .875rem;
   font-variant-numeric: tabular-nums; margin-top: 1px;
 }
+.kcal span { font-family: var(--font-sans); margin-left: var(--space-2); }
 
 ul.picks { list-style: none; margin: var(--space-3) 0 0; padding: 0; max-height: 46vh; overflow-y: auto; }
 ul.picks li { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; border-top: 1px solid var(--line); }
@@ -441,7 +487,7 @@ ul.picks .each {
 /* Right-aligned in a fixed column so the signs line up down the list, which is
    how you spot the one term that is pulling the total the wrong way. */
 ul.picks .sum {
-  font-family: var(--font-mono); font-size: .8125rem; font-weight: 700;
+  font-family: var(--font-mono); font-size: .8125rem; font-weight: 600;
   font-variant-numeric: tabular-nums; min-width: 3.875rem; text-align: right;
 }
 /* One boundary around the pair, rather than one around each button: the group
@@ -475,7 +521,7 @@ ul.picks .sum {
   margin: var(--space-4) 0 0; padding-top: var(--space-3);
   border-top: 1px solid var(--line);
 }
-.band b { font-family: var(--font-mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+.band b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* On a phone the panel sits at the foot of the page rather than beside the
    grid, and there it has to earn every pixel of its height.
