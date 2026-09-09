@@ -121,6 +121,72 @@ export function withoutComments(css) {
   return css.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, " "));
 }
 
+/**
+ * The same for a script, which also has comments this file cannot see through.
+ *
+ * The one above is CSS's, and CSS has no `//`. A line comment showing what an
+ * assignment looks like - `// el("layout").dataset.tally = "gone"` - was read
+ * by checkAttributeValues as an assignment, which took "gone" into the set of
+ * words the script writes and stopped it reporting a stylesheet that genuinely
+ * disagreed with the running code. The fault the check exists for, walking in
+ * through the check.
+ *
+ * Not a tokeniser, and not wanted as one. Strings are tracked because the `//`
+ * in a URL is not a comment and blanking from `https://` onward would quietly
+ * truncate the source being scanned; a backslash outside a string is stepped
+ * over so an escaped slash in a regular expression does not open one either;
+ * and an unterminated quote gives up at the newline, because a mis-read of one
+ * line should stay on that line. Nothing inside a comment is read for quotes,
+ * so an apostrophe in prose ends nothing. Newlines survive, as they do above.
+ */
+export function withoutScriptComments(source) {
+  let out = "";
+  let index = 0;
+
+  while (index < source.length) {
+    const char = source[index];
+    const pair = source.slice(index, index + 2);
+
+    if (pair === "//") {
+      while (index < source.length && source[index] !== "\n") { out += " "; index += 1; }
+      continue;
+    }
+    if (pair === "/*") {
+      while (index < source.length && source.slice(index, index + 2) !== "*/") {
+        out += source[index] === "\n" ? "\n" : " ";
+        index += 1;
+      }
+      if (index < source.length) { out += "  "; index += 2; }
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      const quote = char;
+      out += char;
+      index += 1;
+      while (index < source.length && source[index] !== quote) {
+        if (source[index] === "\n" && quote !== "`") break;
+        out += source[index];
+        if (source[index] === "\\" && index + 1 < source.length) {
+          out += source[index + 1];
+          index += 1;
+        }
+        index += 1;
+      }
+      if (index < source.length && source[index] === quote) { out += quote; index += 1; }
+      continue;
+    }
+    if (char === "\\" && index + 1 < source.length) {
+      out += source.slice(index, index + 2);
+      index += 2;
+      continue;
+    }
+
+    out += char;
+    index += 1;
+  }
+  return out;
+}
+
 const DECLARED_RE = /(--[A-Za-z0-9_-]+)\s*:/g;
 const USED_RE = /var\(\s*(--[A-Za-z0-9_-]+)/g;
 /** `element.style.setProperty("--name", ...)`, wherever a script does it. */
@@ -278,13 +344,19 @@ export function checkAttributeValues(css, scripts = {}, markup = "") {
     }
 
     for (const [path, source] of Object.entries(scripts)) {
+      // Comments first: an assignment quoted in prose is not one the page ever
+      // runs, and reading it as one widens what the script is taken to write.
+      const script = withoutScriptComments(source);
       const written = new Set();
       const tested = new Set();
-      for (const [, operator, rhs] of source.matchAll(datasetRe(property))) {
+      for (const [, operator, rhs] of script.matchAll(datasetRe(property))) {
         for (const value of literalsIn(rhs)) (operator === "=" ? written : tested).add(value);
         // String() of a boolean has exactly two spellings, and this is the one
         // assignment that does not write its values out. Naming them here is
-        // what lets the check see a value the source never says.
+        // what lets the check see a value the source never says. It is an
+        // assumption about a boolean, not about String() in general: String()
+        // of anything else - a count, a key - has no fixed vocabulary, and a
+        // value written that way would have to be spelled out to be checked.
         if (operator === "=" && /\bString\(/.test(rhs)) {
           written.add("true").add("false");
         }

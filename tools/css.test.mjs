@@ -26,6 +26,7 @@ import {
   checkStructure,
   checkTokens,
   withoutComments,
+  withoutScriptComments,
 } from "./validate_css.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -333,6 +334,53 @@ test("an attribute whose name merely starts the same is not this one", () => {
 test("an unquoted attribute value reads the same as a quoted one", () => {
   const css = mutate(bound.css, '[data-open="true"]', "[data-open=true]");
   assert.deepEqual(checkAttributeValues(css, { app: bound.js }, bound.html), []);
+});
+
+test("a value the script only mentions in a line comment is not one it writes", () => {
+  // The hole this closes, and the dangerous direction: the comment taught the
+  // check a word, the stylesheet had genuinely drifted, and the check passed.
+  const css = mutate(bound.css, 'data-tally="empty"', 'data-tally="gone"');
+  const js = `${bound.js}\n// example: el("layout").dataset.tally = "gone";`;
+  const problems = checkAttributeValues(css, { app: js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /selects on \[data-tally="gone"\], but app only ever writes/);
+});
+
+test("a value mentioned in a block comment is not one it writes either", () => {
+  const css = mutate(bound.css, 'data-open="true"', 'data-open="ajar"');
+  const js = `/* it read dataset.open = "ajar" until the sheet arrived */\n${bound.js}`;
+  const problems = checkAttributeValues(css, { app: js }, bound.html);
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /selects on \[data-open="ajar"\], but app only ever writes/);
+});
+
+test("an apostrophe in a comment does not run on into the code below it", () => {
+  const js = `// the sheet's own word, and the stylesheet's\n${bound.js}`;
+  assert.deepEqual(checkAttributeValues(bound.css, { app: js }, bound.html), []);
+});
+
+test("the // in a URL is not a comment, and the code after it still counts", () => {
+  // app.js has one of these. Blanking from https:// onward would truncate the
+  // source being scanned, and the check would report a script that assigns
+  // nothing - a fault invented by the reading of it.
+  const js = 'const REPO = "https://example.com/x"; el("p").dataset.open = String(open);\n'
+    + 'el("layout").dataset.tally = isEmpty ? "empty" : "filled";';
+  assert.deepEqual(checkAttributeValues(bound.css, { app: js }, bound.html), []);
+});
+
+test("stripping a script's comments keeps the line numbering", () => {
+  const js = "const a = 1;\n// one\n/* two\n   lines */\nconst b = 2;";
+  const stripped = withoutScriptComments(js);
+  assert.equal(stripped.split("\n").length, js.split("\n").length);
+  assert.match(stripped, /^const a = 1;\n\s*\n\s*\n\s*\nconst b = 2;$/);
+});
+
+test("the shipped script keeps every line, and its comments none of their words", () => {
+  const stripped = withoutScriptComments(appjs);
+  assert.equal(stripped.split("\n").length, appjs.split("\n").length);
+  assert.ok(stripped.includes('dataset.open = String(open)'), "the code is still there");
+  assert.ok(stripped.includes("https://github.com/"), "and so is the URL");
+  assert.ok(!/:has\(\) selector/.test(stripped), "and the prose is not");
 });
 
 test("stripping comments keeps the line numbering", () => {
