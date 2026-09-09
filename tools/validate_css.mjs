@@ -11,15 +11,30 @@
  * That is the class of fault this file exists for: not style, not opinion, but
  * the stylesheet no longer meaning what it says. Two structural mistakes can
  * cause it - an unbalanced comment and an unbalanced brace - and both are
- * cheap to find. A third check follows the same bargain from the other side: a
- * `var(--name)` whose `--name` was never declared is not an error to a browser
- * either. It resolves to nothing and the declaration is dropped, so a typo in a
- * token name is invisible until somebody looks at the page.
+ * cheap to find. The rest follow the same bargain from the other side, and
+ * none of them is an error to a browser:
+ *
+ *   - a `var(--name)` whose `--name` was never declared resolves to nothing
+ *     and the declaration is dropped, so a typo in a token name is invisible
+ *     until somebody looks at the page
+ *   - a breakpoint written in a token, in a query and in a script can stop
+ *     agreeing, and the phone whose sheet is never measured says nothing
+ *   - an attribute value spelled one way in the stylesheet and another in the
+ *     script leaves a rule matching nothing, and a control that does nothing
+ *   - a transform mixing a percentage with a token a script rewrites is not
+ *     re-resolved once composited, and the element stays where the percentage
+ *     alone put it - which is how the running total left the screen entirely
  *
  * There is no dependency here on purpose. The project ships no build step and
  * has no package.json, and a linter that needs one would be a larger change
- * than the bug it guards. The three checks below are the ones that have
- * actually broken this site.
+ * than the bug it guards. Every check below is one that has actually broken
+ * this site.
+ *
+ * tools/check_render.mjs is the other half of this, and needs a browser: it
+ * opens the page and asks where its furniture ended up. Between them they
+ * cover most of what a screenshot used to be the only way to see - though the
+ * transform check exists precisely because neither a parser nor a headless
+ * render could see that one.
  *
  *     node tools/validate_css.mjs
  *
@@ -328,6 +343,95 @@ const literalsIn = (text) =>
  * The same bargain checkBreakpoint strikes with the sheet's width: where a
  * value cannot live in one place, it is checked to be one value.
  */
+/** Which line of the source an index falls on, for a message worth reading. */
+const lineAt = (css, index) => css.slice(0, index).split("\n").length;
+
+const TRANSFORM_RE = /(-webkit-)?transform\s*:\s*([^;}]*)/g;
+
+/**
+ * Pull out the body of every `calc(` in a value, parentheses balanced.
+ *
+ * A regexp cannot do this: `calc(100% - var(--x, 0px))` has nested parens, and
+ * matching to the first `)` would stop inside the var and miss the percentage
+ * that is the whole point.
+ */
+function calcBodies(value) {
+  const bodies = [];
+  const re = /calc\(/g;
+  let match;
+  while ((match = re.exec(value))) {
+    let depth = 1;
+    let index = match.index + match[0].length;
+    const start = index;
+    while (index < value.length && depth > 0) {
+      if (value[index] === "(") depth += 1;
+      else if (value[index] === ")") depth -= 1;
+      index += 1;
+    }
+    bodies.push(value.slice(start, index - 1));
+  }
+  return bodies;
+}
+
+/**
+ * A transform may not mix a percentage with a token a script rewrites.
+ *
+ * This one is here because it shipped. The phone sheet's slide was written the
+ * tidy way - `translateY(calc(100% - var(--sheet-peek)))`, so the stylesheet
+ * did the arithmetic instead of app.js handing over a pixel count - and the
+ * sheet went off the bottom of the screen and stayed there.
+ *
+ * A percentage in a transform resolves against the element's own border box,
+ * and the computed value keeps the percentage rather than the resolved length.
+ * That is fine until the transform is composited, at which point Chrome does
+ * not necessarily re-resolve it when a custom property inside the calc
+ * changes. The sheet was left translated a full 100% - `var()` falling back to
+ * its own default - with the total, which the README promises is always on
+ * screen, simply gone.
+ *
+ * Nothing else here could see it. The stylesheet parses, every token it names
+ * exists, the breakpoint agrees with the script, and every attribute value is
+ * spelled the same in all three places. tools/check_render.mjs cannot see it
+ * either: headless Chromium resolves the transform correctly, because the bug
+ * needs the compositor of a browser on a desk. It is a fault with no symptom
+ * anywhere it can be looked for, which leaves the one place it can be
+ * described - the shape of the declaration that causes it.
+ *
+ * Narrow on purpose. A percentage beside a *static* token in a transform is
+ * fine: `calc(50% - var(--space-5))` resolves once and nothing ever moves it.
+ * What is not fine is a percentage beside a token something rewrites at
+ * runtime, because a value that changes is the whole mechanism. So this reads
+ * the scripts for the tokens they actually set and reports only those - which
+ * is the same list checkTokens already builds, used the other way round. A
+ * checker that banned the legal case as well is one somebody switches off.
+ */
+export function checkTransforms(css, scripts = {}) {
+  const mutated = new Set();
+  for (const source of Object.values(scripts)) {
+    for (const [, name] of withoutScriptComments(source).matchAll(SET_FROM_SCRIPT_RE)) {
+      mutated.add(name);
+    }
+  }
+  if (mutated.size === 0) return [];
+
+  const problems = [];
+  const code = withoutComments(css);
+  for (const [, , value] of code.matchAll(TRANSFORM_RE)) {
+    const at = lineAt(code, code.indexOf(value));
+    for (const body of calcBodies(value)) {
+      if (!body.includes("%")) continue;
+      for (const [, name] of body.matchAll(USED_RE)) {
+        if (!mutated.has(name)) continue;
+        problems.push(`${STYLESHEET}:${at}: transform mixes a percentage with var(${name}), `
+          + `which a script rewrites - a composited transform is not re-resolved when it `
+          + `changes, so the element stays where the percentage alone put it. Hand the `
+          + `distance over as a length instead.`);
+      }
+    }
+  }
+  return problems;
+}
+
 export function checkAttributeValues(css, scripts = {}, markup = "") {
   const problems = [];
   const code = withoutComments(css);
@@ -402,6 +506,7 @@ export function main() {
     ...checkStructure(css),
     ...checkTokens(css, scripts),
     ...checkBreakpoint(css, scripts),
+    ...checkTransforms(css, scripts),
     ...checkAttributeValues(css, scripts, markup),
   ];
   if (problems.length) {
