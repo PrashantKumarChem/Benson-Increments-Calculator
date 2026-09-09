@@ -253,8 +253,21 @@ h1 { margin: 0; font-size: 1.0625rem; letter-spacing: -.01em; font-weight: 620; 
   cursor: pointer; text-decoration: none;
   background: transparent; color: var(--ink-soft); border: 0;
   padding: var(--space-2) var(--space-3);
+  display: inline-flex; align-items: center; justify-content: center;
+  /* The same height as the square one beside them. Left to their text they
+     came to 29px against the theme button's 32px, so the three sat in a row
+     at two different heights - close enough to look like a mistake rather
+     than a difference. It is also the floor for a touch target on the widths
+     between a phone in landscape and a laptop, where these are still words
+     and a thumb is still what presses them. */
+  min-height: 2rem;
 }
 .ghost:hover { background: var(--layer-accent); color: var(--ink); }
+/* Words while there is room for words. The glyph ships on every screen and is
+   shown on the narrow ones by the rule further down; a word is unambiguous and
+   a glyph has to be learnt, so the glyph is what a shortage of width buys, not
+   a default. */
+.ghost-icon { display: none; }
 
 /* Which theme is on is something the page already shows by being that theme,
    so this needs no label - only a target big enough to hit and a glyph saying
@@ -275,6 +288,50 @@ h1 { margin: 0; font-size: 1.0625rem; letter-spacing: -.01em; font-weight: 620; 
 :root[data-theme="dark"] .theme-toggle .sun { display: block; }
 /* A thumb needs more than 32px, and the row it sits in has the width to give. */
 @media (max-width: 859px) { .theme-toggle { width: 2.25rem; height: 2.25rem; } }
+
+/* Below this the title and the three words stop sharing a line, so the two
+   that are words become the glyphs they already ship, and the row fits beside
+   the title again instead of dropping underneath it.
+
+   440px is measured rather than chosen. The title is 224px, the nav reading
+   About / Reference / theme is 160px, the gap between them is 12px and the
+   page keeps 16px each side: 428px, below which they cannot share a line. The
+   next ten pixels up are slack, because a reader who has raised their browser
+   font makes both of those numbers larger and there is no width at which that
+   is still exactly true.
+
+   As glyphs the same row is 112px, so the title has 348px of the 358px a
+   390px phone leaves - it fits, with the pixels to spare that the word version
+   did not have. Narrower than about 370px the title wraps to two lines rather
+   than the row breaking apart, which is why h1 is allowed to be narrower than
+   its text here: a wrapped title with the controls still beside it reads
+   better than a title alone above a row of three glyphs.
+
+   The word is hidden, never dropped. It is still the button's accessible name,
+   so a screen reader on a phone still meets "About" and "Reference" - and the
+   markup carries no aria-label repeating what the element already says. */
+@media (max-width: 440px) {
+  /* nowrap, and it is the whole of why the title wraps instead of the row
+     breaking apart. A wrapping flex container moves an item to the next line
+     before it will shrink one that is already on this line, so min-width alone
+     did nothing: the nav went underneath while the title sat on a line of its
+     own with room to spare beside it. Told it may not wrap, the container has
+     to shrink something instead, and min-width: 0 is what says the title is
+     the one that gives. The nav is held out of that: three 36px targets are
+     the floor here, not the slack. */
+  .appbar-inner { flex-wrap: nowrap; }
+  .appnav { flex: none; }
+  h1 { font-size: 1rem; min-width: 0; }
+  .ghost { width: 2.25rem; height: 2.25rem; padding: 0; }
+  .ghost-icon { display: block; }
+  .ghost-label {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden; clip-path: inset(50%);
+    white-space: nowrap; border: 0;
+  }
+}
 
 /* ---------------- toolbar ---------------- */
 
@@ -299,9 +356,17 @@ h1 { margin: 0; font-size: 1.0625rem; letter-spacing: -.01em; font-weight: 620; 
    beside it. Asking for most of a line rather than all of one is the whole
    change: Cards/Table then rides along on the same row instead of being
    pushed onto a row of its own, which on a phone is 37px of chrome for one
-   control. */
+   control.
+
+   The floor comes down with it, and that is the half that actually mattered.
+   A flex basis only decides who wraps when there is room to negotiate; a
+   min-width decides it outright. At 320px the row has 288px, Cards/Table takes
+   120px and the gap 12px, so a field refusing to go below 12rem could not fit
+   whatever its basis said - and the toggle went back onto a row of its own on
+   the narrowest screens, which are the ones that could least afford it. 9rem
+   still shows enough of the placeholder to say what the field is for. */
 @media (max-width: 620px) {
-  .toolbar .search { flex: 1 1 60%; }
+  .toolbar .search { flex: 1 1 45%; min-width: 9rem; }
 }
 
 .about { margin-bottom: var(--space-5); }
@@ -382,7 +447,15 @@ main, .library, .table-wrap { min-width: 0; }
   font: inherit; cursor: pointer; padding: var(--space-2) var(--space-3); line-height: 1;
 }
 .search .clear:hover { color: var(--ink); }
-input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Links are in this list too, and were not. Reference is an <a> because it goes
+   to a page, so it took the browser's default ring while the button beside it
+   took this one - two controls in the same row of three, focused the same way
+   by the same key, drawn differently. Nothing here can see that: it is a
+   selector that does not mention a tag, and the page looks right until
+   somebody navigates it by keyboard. */
+input:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px;
+}
 /* The panel is given focus when the control holding it disappears, so that it
    does not fall to the body. It is a container and not a control - it is not
    in the tab order and there is nothing on it to operate - so it is not drawn
@@ -823,17 +896,6 @@ ul.picks .sum {
   }
   .panel-toggle .caret { transition: transform .12s ease; }
   .tally-panel[data-open="true"] .panel-toggle .caret { transform: rotate(180deg); }
-  /* It used to open and shut with display, which cannot be animated - the
-     sheet appeared and vanished in one frame, and a sheet that teleports does
-     not read as a sheet. Height and opacity can be animated, and visibility
-     still does the job display was there for: collapsed, nothing inside can be
-     tabbed to and nothing is announced, so the keyboard order matches what is
-     on the screen. Its own transition is a delay rather than a fade, so the
-     body stays visible for exactly as long as it takes to close.
-
-     overscroll-behavior stops a flick that reaches the end of the list from
-     continuing into the page behind it - the same chaining that turns into
-     pull-to-refresh at the top. */
   /* The body no longer animates anything. It keeps its full height at all
      times - that height is exactly how far the panel slides - and simply ends
      up below the bottom of the screen when the sheet is shut.
