@@ -23,6 +23,7 @@ import {
   formatIncrement,
   formatKcal,
   formatRange,
+  formatSelectionAsText,
   formatTotal,
   rangeSpread,
 } from "../assets/format.js";
@@ -168,4 +169,45 @@ test("a category that has not declared its quantity leaves the total unlabelled"
 
 test("no metadata at all still produces a usable heading", () => {
   assert.equal(describeTotal([pick(CH.file)]).label, "Total");
+});
+
+/* -------------------------------------------------------------------------- */
+/* Copying the working out                                                      */
+/* -------------------------------------------------------------------------- */
+
+const entry = (label, value, count, categoryFile = CH.file) =>
+  ({ label, value, count, categoryFile });
+
+test("nothing chosen copies as nothing", () => {
+  assert.equal(formatSelectionAsText([], { totalKj: 0, kcal: 0, described: describeTotal([]) }), "");
+});
+
+test("copied text lines the values up in a column", () => {
+  const entries = [entry("C-(C)(H)3", -42, 2), entry("C-(C)2(H)2", -20.9, 5)];
+  const text = formatSelectionAsText(entries, {
+    totalKj: -188.5, kcal: -45.05, described: describeTotal(entries, declared),
+  });
+  const lines = text.split("\n");
+  assert.ok(lines[0].startsWith("C-(C)(H)3 x2"), "a repeated group says how many");
+  // Right-aligned, so the values end in the same column rather than start there.
+  assert.equal(lines[0].length, lines[1].length, "value columns should end flush");
+  assert.ok(lines[0].endsWith("84.0") && lines[1].endsWith("104.5"));
+});
+
+test("copied text is headed by what the total is a total of", () => {
+  const entries = [entry("C-(C)(H)3", -42, 1)];
+  const text = formatSelectionAsText(entries, {
+    totalKj: -42, kcal: -10.04, described: describeTotal(entries, declared),
+  });
+  assert.ok(text.includes("ΔHf°"), "the heading should carry the declared symbol");
+  assert.ok(text.includes("kJ/mol") && text.includes("kcal/mol"), "both units are copied");
+});
+
+test("a mixed total carries its caveat into the copied text", () => {
+  const entries = [entry("C-(C)(H)3", -42, 1), entry("OH", 3.43, 1, A_VALUES.file)];
+  const text = formatSelectionAsText(entries, {
+    totalKj: -38.57, kcal: -9.22, described: describeTotal(entries, declared),
+  });
+  assert.ok(text.includes("Mixes"), "the caveat must survive being copied out");
+  assert.ok(text.includes("conformational preference"));
 });

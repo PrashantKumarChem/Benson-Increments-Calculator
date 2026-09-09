@@ -116,3 +116,33 @@ export function describeTotal(entries, categoriesByFile = new Map()) {
   // list what is in it, rather than claiming it is any one of them.
   return { label: "Total", quantities, mixed: true };
 }
+
+/**
+ * The chosen increments as plain text, for pasting into a report.
+ *
+ * Laid out as a column so the values line up when it lands in a monospaced
+ * box, and headed by whatever describeTotal() concluded the sum is - including
+ * the note when it is a sum of more than one quantity, because that caveat
+ * should survive being copied out of the page.
+ */
+export function formatSelectionAsText(entries, { totalKj, kcal, described }) {
+  if (!entries.length) return "";
+
+  const names = entries.map((entry) => entry.label + (entry.count > 1 ? ` x${entry.count}` : ""));
+  const sums = entries.map((entry) => formatTotal(entry.value * entry.count));
+  const nameWidth = Math.max(...names.map((name) => name.length), 8);
+  const sumWidth = Math.max(...sums.map((sum) => sum.length), 8);
+
+  const lines = names.map((name, i) => `${name.padEnd(nameWidth)}  ${sums[i].padStart(sumWidth)}`);
+  lines.push("-".repeat(nameWidth + 2 + sumWidth));
+  lines.push(`${described.label.padEnd(nameWidth)}  ${formatTotal(totalKj).padStart(sumWidth)} kJ/mol`);
+  lines.push(`${"".padEnd(nameWidth)}  ${formatKcal(kcal).padStart(sumWidth)} kcal/mol`);
+
+  if (described.mixed) {
+    lines.push("");
+    lines.push("Mixes " + described.quantities
+      .map((quantity) => `${quantity.count} x ${quantity.quantity}`)
+      .join(", ") + ".");
+  }
+  return lines.join("\n");
+}

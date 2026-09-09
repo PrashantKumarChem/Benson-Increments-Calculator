@@ -7,7 +7,8 @@
 import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
 import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "./browse.js";
 import {
-  describeTotal, formatIncrement, formatKcal, formatRange, formatTotal, rangeSpread,
+  describeTotal, formatIncrement, formatKcal, formatRange, formatSelectionAsText,
+  formatTotal, rangeSpread,
 } from "./format.js";
 import { buildIndex, emptyNotation, loadNotation } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
@@ -198,6 +199,7 @@ function renderTally() {
   el("layout").dataset.tally = isEmpty ? "empty" : "filled";
   el("empty").hidden = !isEmpty;
   el("undo").disabled = isEmpty;
+  el("copy").disabled = isEmpty;
   el("reset").disabled = isEmpty;
 
   el("picks").innerHTML = entries
@@ -262,15 +264,18 @@ el("about-toggle").addEventListener("click", (event) => {
   event.currentTarget.setAttribute("aria-expanded", String(open));
 });
 
+/** Add one of the increment named by a category file and a label. */
+function addIncrement(file, label) {
+  const category = view.byFile.get(file);
+  const row = category?.rows.find((candidate) => candidate.label === label);
+  if (!row) return;
+  selection.add({ ...row, categoryFile: category.file, categoryTitle: category.title });
+}
+
 el("library").addEventListener("click", (event) => {
   const button = event.target.closest("button[data-label]");
   if (!button) return;
-
-  const category = view.categories.find((candidate) => candidate.file === button.dataset.file);
-  const row = category?.rows.find((candidate) => candidate.label === button.dataset.label);
-  if (!row) return;
-
-  selection.add({ ...row, categoryFile: category.file, categoryTitle: category.title });
+  addIncrement(button.dataset.file, button.dataset.label);
   render();
 });
 
@@ -291,6 +296,99 @@ el("clear").addEventListener("click", () => {
   el("filter").value = "";
   setQuery("");
   el("filter").focus();
+});
+
+/**
+ * Copy the working out, not just the answer.
+ *
+ * What a student does next with a total is paste it into a report, and the
+ * total on its own does not show which groups produced it. The caveat about
+ * mixed quantities goes too, because a warning that does not survive being
+ * copied is not much of a warning.
+ */
+el("copy").addEventListener("click", async (event) => {
+  const totalKj = selection.totalKj;
+  const text = formatSelectionAsText(selection.entries, {
+    totalKj,
+    kcal: totalKj * KJ_TO_KCAL,
+    described: describeTotal(selection.entries, view.byFile),
+  });
+
+  const button = event.currentTarget;
+  const said = button.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = "Copied";
+  } catch {
+    // Some browsers refuse the clipboard outside a secure context. Say so
+    // rather than appearing to have worked.
+    button.textContent = "Cannot copy";
+  }
+  setTimeout(() => { button.textContent = said; }, 1500);
+});
+
+/**
+ * The keyboard path.
+ *
+ * Someone working through a molecule adds a dozen increments, and reaching for
+ * the mouse for each one is the slow part. Ctrl+K (Cmd+K on a Mac) puts the
+ * cursor in the search box from anywhere; the arrow keys walk the increments;
+ * Enter adds the focused one, which buttons already do; and + and - adjust it
+ * without leaving the keyboard.
+ *
+ * Re-rendering replaces the button that had focus, so the position is restored
+ * afterwards rather than the focus being allowed to fall back to the body.
+ */
+function focusableIncrements() {
+  return [...el("library").querySelectorAll("button[data-label]")];
+}
+
+addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    el("filter").focus();
+    el("filter").select();
+    return;
+  }
+
+  const current = document.activeElement;
+  if (!current?.matches?.("#library button[data-label]")) return;
+
+  const buttons = focusableIncrements();
+  const here = buttons.indexOf(current);
+  if (here < 0) return;
+
+  // How many share a row, so up and down move by a row rather than by one.
+  // In the table that is one per row, which falls out of the same measurement.
+  const topOf = (button) => Math.round(button.getBoundingClientRect().top);
+  const firstRowTop = topOf(buttons[0]);
+  const perRow = Math.max(1, buttons.filter((button) => topOf(button) === firstRowTop).length);
+
+  const moveTo = (index) => {
+    const target = buttons[index];
+    if (!target) return;
+    event.preventDefault();
+    target.focus();
+  };
+
+  const adjust = (delta) => {
+    event.preventDefault();
+    const key = keyOf(current.dataset.file, current.dataset.label);
+    if (delta > 0) addIncrement(current.dataset.file, current.dataset.label);
+    else selection.step(key, -1);
+    render();
+    focusableIncrements()[here]?.focus();
+  };
+
+  switch (event.key) {
+    case "ArrowRight": moveTo(here + 1); break;
+    case "ArrowLeft": moveTo(here - 1); break;
+    case "ArrowDown": moveTo(here + perRow); break;
+    case "ArrowUp": moveTo(here - perRow); break;
+    case "+": case "=": adjust(1); break;
+    case "-": adjust(-1); break;
+    default: break;
+  }
 });
 
 el("undo").addEventListener("click", () => {
@@ -335,6 +433,9 @@ try {
     (unreadable.length
       ? `<br><strong>${unreadable.length} row(s) could not be read:</strong> ${escapeHtml(unreadable.join(", "))}`
       : "");
+
+  // Say Cmd where that is the key, so the hint is not wrong on half the class.
+  if (/Mac|iPhone|iPad/i.test(navigator.platform ?? "")) el("shortcut").textContent = "\u2318 K";
 
   render();
 } catch (error) {

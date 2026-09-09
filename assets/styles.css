@@ -129,6 +129,15 @@ h1 { margin: 0; font-size: 1.25rem; letter-spacing: -.015em; font-weight: 620; }
   padding: var(--space-4) var(--space-8) var(--space-4) var(--space-4);
 }
 .search input::placeholder { color: var(--ink-helper); }
+/* The shortcut is a hint, so it steps out of the way as soon as it is used. */
+.shortcut {
+  position: absolute; right: var(--space-8); top: 50%; transform: translateY(-50%);
+  pointer-events: none; font: inherit; font-size: .7rem; color: var(--ink-helper);
+  border: 1px solid var(--line); border-radius: 4px; padding: 0 var(--space-2);
+  background: var(--layer-accent);
+}
+.search input:not(:placeholder-shown) ~ .shortcut { display: none; }
+@media (max-width: 520px) { .shortcut { display: none; } }
 .search .clear {
   position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
   border: 0; background: transparent; color: var(--ink-helper);
