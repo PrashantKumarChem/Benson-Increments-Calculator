@@ -13,6 +13,38 @@ Designed for Chemistry C450/C540 at Indiana University Bloomington by Prashant
 Kumar and Dr. Nicola L. B. Pohl. Values follow Cohen &amp; Benson, *Chem. Rev.*
 **1993**, *93*, 2419.
 
+## Statement of need
+
+Benson group additivity is taught because it makes the relationship between
+structure and enthalpy explicit. A student who can decompose a molecule into
+groups has understood something that the number alone does not convey, and the
+decomposition — not the sum — is the part being learned.
+
+Existing open-source implementations do the decomposition for you. RMG-Py's
+thermochemistry estimator and pGrAdd both assign Benson groups automatically
+from a SMILES or InChI string. That is the right design for building kinetic
+mechanisms over thousands of species, and the wrong one for a course: it
+performs the step the student is meant to perform. Both also require a Python
+environment and some programming, which is a barrier in a teaching lab and an
+obstacle to a student working on a phone.
+
+The alternative students are otherwise left with is a printed table. The 236
+values in Cohen and Benson's 1993 review are spread across several tables in
+notation that is unfamiliar at first sight, and the look-up is slow and easy
+to get wrong in ways that are invisible in the final answer.
+
+This calculator sits between the two. It presents every published increment as
+a searchable, clickable value, requires the user to decide which ones the
+molecule needs, and shows the working so the reasoning stays visible and
+checkable. It runs in a browser with nothing to install, on a laptop or a
+phone, and it is deliberate about its own limits: a cyclohexane A-value is a
+free energy and the running total says so rather than adding it silently to an
+enthalpy, published ranges are shown alongside the average used in the sum, and
+notation whose meaning has not been confirmed against a source is marked as
+unconfirmed rather than guessed at.
+
+It is used in Chemistry C450/C540 at Indiana University Bloomington.
+
 ## What it does
 
 The method is deliberately left in the student's hands: the calculator does not
