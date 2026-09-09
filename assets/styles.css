@@ -441,9 +441,10 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); out
   padding: var(--space-5);
 }
 @media (min-width: 860px) { .tally-panel { position: sticky; top: var(--space-5); } }
-/* Beside the grid there is nothing to collapse, so the disclosure is not just
-   hidden - it is absent, and cannot be tabbed to. */
-.panel-toggle { display: none; }
+/* Beside the grid there is nothing to collapse, so neither the disclosure nor
+   the drag handle is merely hidden - both are absent, and cannot be tabbed to
+   or dragged. */
+.panel-toggle, .sheet-grip { display: none; }
 /* What the number underneath is a measure of. Written from the data rather
    than hardcoded, so a category that has declared nothing reads "Total".
    Deliberately not uppercased: the content is a quantity symbol, and the
@@ -574,11 +575,24 @@ ul.picks .sum {
   }
   /* A sheet with a handle is a sheet you know you can drag. Without one the
      swipe would be a secret, and a gesture nobody finds is not a feature. The
-     button beside the total does the same job for anyone who does not. */
-  .tally-panel::before {
-    content: ""; flex: none; width: 2rem; height: 3px;
-    background: var(--line-strong); margin: 0 auto var(--space-2);
+     button beside the total does the same job for anyone who does not.
+
+     touch-action: none on the two parts you drag - the handle and the head -
+     is what makes the gesture work on a real phone rather than only in a
+     simulation. Without it the browser claimed the same downward swipe:
+     the page scrolled under the finger, and at the top of the page a downward
+     drag was pull-to-refresh, which reloaded the document and threw away every
+     increment chosen. The list below keeps its own scrolling, which is why
+     this sits on the grip and the head and not on the panel. */
+  .sheet-grip {
+    display: block; flex: none; touch-action: none; cursor: grab;
+    padding: var(--space-1) 0 var(--space-2);
   }
+  .sheet-grip::before {
+    content: ""; display: block; width: 2rem; height: 3px;
+    background: var(--line-strong); margin: 0 auto;
+  }
+  .tally-head { touch-action: none; }
   /* The label, the total and the disclosure read as one row, so the button is
      beside the number it summarises rather than below the whole panel. */
   .tally-head {
@@ -596,10 +610,26 @@ ul.picks .sum {
   }
   .panel-toggle .caret { transition: transform .12s ease; }
   .tally-panel[data-open="true"] .panel-toggle .caret { transform: rotate(180deg); }
-  /* Collapsed, the body is not merely invisible: nothing inside it can be
-     tabbed to, so the keyboard order matches what is on the screen. */
-  .tally-panel:not([data-open="true"]) .tally-body { display: none; }
-  .tally-body { min-height: 0; overflow-y: auto; }
+  /* It used to open and shut with display, which cannot be animated - the
+     sheet appeared and vanished in one frame, and a sheet that teleports does
+     not read as a sheet. Height and opacity can be animated, and visibility
+     still does the job display was there for: collapsed, nothing inside can be
+     tabbed to and nothing is announced, so the keyboard order matches what is
+     on the screen. Its own transition is a delay rather than a fade, so the
+     body stays visible for exactly as long as it takes to close.
+
+     overscroll-behavior stops a flick that reaches the end of the list from
+     continuing into the page behind it - the same chaining that turns into
+     pull-to-refresh at the top. */
+  .tally-body {
+    min-height: 0; max-height: 70vh; overflow-y: auto; overscroll-behavior: contain;
+    opacity: 1; visibility: visible;
+    transition: max-height .22s ease, opacity .16s ease, visibility 0s;
+  }
+  .tally-panel:not([data-open="true"]) .tally-body {
+    max-height: 0; opacity: 0; visibility: hidden; overflow: hidden;
+    transition: max-height .22s ease, opacity .16s ease, visibility 0s linear .22s;
+  }
   /* The list no longer needs its own cap - the sheet caps the whole thing, and
      one scrolling region is easier to use than two nested ones. */
   ul.picks { max-height: none; margin-top: var(--space-2); }
