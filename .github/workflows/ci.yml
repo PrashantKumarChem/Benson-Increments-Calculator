@@ -49,6 +49,17 @@ jobs:
       - name: Run tests
         run: node --test tools/*.test.mjs
 
+      # CSS has no compiler and fails quietly. A comment closed early once, fed
+      # its own prose to the parser, and the browser's error recovery swallowed
+      # the whole media query that followed - the tally panel stopped existing
+      # on desktop. Every check in this file passed; a screenshot caught it.
+      #
+      # The tests above already run these checks against the stylesheet. This
+      # step is here so that when the stylesheet is what broke, the job that
+      # goes red says so by name.
+      - name: Validate the stylesheet
+        run: node tools/validate_css.mjs
+
   parity:
     name: Parity with the notebook
     runs-on: ubuntu-latest
