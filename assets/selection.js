@@ -40,11 +40,20 @@ export function createSelection() {
       return new Map(entries.map((entry) => [entry.key, entry.count]));
     },
 
-    add({ categoryFile, categoryTitle, label, value }) {
-      const key = keyOf(categoryFile, label);
+    /**
+     * Add one of an increment.
+     *
+     * The whole increment is kept, not just its value: the panel needs to say
+     * that 3.43 is the middle of a published range, and which category a row
+     * came from, and neither can be recovered from a number. Only `value` and
+     * `count` take part in the arithmetic - everything else is carried along
+     * for whoever is doing the describing.
+     */
+    add(increment) {
+      const key = keyOf(increment.categoryFile, increment.label);
       const existing = find(key);
       if (existing) existing.count += 1;
-      else entries.push({ key, categoryFile, categoryTitle, label, value, count: 1 });
+      else entries.push({ ...increment, key, count: 1 });
       clicks.push(key);
     },
 

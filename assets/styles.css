@@ -137,6 +137,8 @@ nav.tabs .n { opacity: .6; font-size: .82em; margin-left: var(--space-3); }
 .grid button.picked { border-color: var(--accent); background: var(--accent-soft); }
 .grid .meta { color: var(--ink); font-size: .82em; font-weight: 600; font-variant-numeric: tabular-nums; }
 .grid .tally { color: var(--accent); font-weight: 600; }
+/* The bounds an averaged value came from, beside the average itself. */
+.grid .range { color: var(--ink-soft); font-weight: 400; }
 .status { grid-column: 1/-1; color: var(--ink-helper); font-size: .9rem; padding: var(--space-6) var(--space-1); }
 
 /* ---------------- tally ---------------- */
@@ -164,6 +166,15 @@ ul.picks .sum { font-size: .87rem; font-variant-numeric: tabular-nums; min-width
 .stepper .n { min-width: 1.625rem; text-align: center; font-size: .87rem; font-variant-numeric: tabular-nums; }
 .rm { width: 1.875rem; font-size: 1.05rem; }
 .empty { color: var(--ink-helper); font-size: .87rem; margin: var(--space-5) 0 var(--space-1); }
+
+/* How far the total would move if every averaged range were read at its
+   bounds. Only shown when something chosen was published as a range. */
+.band {
+  color: var(--ink-soft); font-size: .78rem; line-height: 1.45;
+  margin: var(--space-4) 0 0; padding-top: var(--space-3);
+  border-top: 1px solid var(--line);
+}
+.band b { color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* On a phone the panel sits at the foot of the page rather than beside the
    grid, so it has to earn its height: the list of picks is capped to leave the

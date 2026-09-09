@@ -5,6 +5,7 @@
  * data into a page and keeps the selection in sync with what is displayed.
  */
 import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
+import { formatIncrement, formatKcal, formatRange, formatTotal, rangeSpread } from "./format.js";
 import { buildIndex, emptyNotation, loadNotation, search } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
 
@@ -19,7 +20,12 @@ const escapeHtml = (value) =>
 /** Render trailing digits as subscripts so C-(C)2(H)2 reads like printed notation. */
 const asFormula = (name) => escapeHtml(name).replace(/([A-Za-z)\]])(\d+)/g, "$1<sub>$2</sub>");
 
-const signed = (value) => `${value > 0 ? "+" : ""}${value.toFixed(2)}`;
+/** A card's value, plus the published range when the value is an average of one. */
+function valueHtml(reading) {
+  const range = formatRange(reading);
+  return `${escapeHtml(formatIncrement(reading))}` +
+    (range ? ` <span class="range" title="published range">${escapeHtml(range)}</span>` : "");
+}
 
 /* -------------------------------------------------------------------------- */
 /* View                                                                        */
@@ -64,7 +70,8 @@ function renderGrid() {
   }
 
   el("grid").innerHTML = increments
-    .map(({ label, value, category, matchedSynonym }) => {
+    .map((increment) => {
+      const { label, category, matchedSynonym } = increment;
       const count = counts.get(keyOf(category.file, label)) ?? 0;
       // While searching, name the group in the student's own words when that is
       // what they typed, so finding C-(C)(H)3 under "methyl" teaches the
@@ -73,10 +80,12 @@ function renderGrid() {
         ? ` &middot; ${escapeHtml(matchedSynonym ?? category.title)}`
         : "";
       const tally = count ? ` <span class="tally">&times; ${count}</span>` : "";
+      const hover = `${label} — ${increment.source} kJ/mol` +
+        (increment.isRange ? " (published as a range; the average is used)" : "");
       return `<button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
-                class="${count ? "picked" : ""}" title="${escapeHtml(label)} — ${value.toFixed(2)} kJ/mol">
+                class="${count ? "picked" : ""}" title="${escapeHtml(hover)}">
                 <span>${asFormula(label)}</span>
-                <span class="meta">${signed(value)}${context}${tally}</span>
+                <span class="meta">${valueHtml(increment)}${context}${tally}</span>
               </button>`;
     })
     .join("");
@@ -84,26 +93,45 @@ function renderGrid() {
 
 function renderTally() {
   const totalKj = selection.totalKj;
-  el("kj").innerHTML = `${totalKj.toFixed(2)}<span>kJ/mol</span>`;
-  el("kcal").textContent = `${(totalKj * KJ_TO_KCAL).toFixed(2)} kcal/mol`;
+  const entries = selection.entries;
+  el("kj").innerHTML = `${escapeHtml(formatTotal(totalKj))}<span>kJ/mol</span>`;
+  el("kcal").textContent = `${formatKcal(totalKj * KJ_TO_KCAL)} kcal/mol`;
+
+  // An averaged range is a soft number, and how soft is worth saying: this is
+  // how far the total would move if every one of them were read at its bounds.
+  const spread = rangeSpread(entries);
+  const ranged = entries.filter((entry) => entry.isRange).length;
+  const band = el("band");
+  band.hidden = ranged === 0;
+  if (ranged) {
+    band.innerHTML =
+      `${ranged} ${ranged === 1 ? "value is" : "values are"} published as a range. ` +
+      `Across the full range the total runs ` +
+      `<b>${escapeHtml(formatTotal(totalKj - spread))}</b> to ` +
+      `<b>${escapeHtml(formatTotal(totalKj + spread))}</b> kJ/mol.`;
+  }
 
   const isEmpty = selection.isEmpty;
   el("empty").hidden = !isEmpty;
   el("undo").disabled = isEmpty;
   el("reset").disabled = isEmpty;
 
-  el("picks").innerHTML = selection.entries
+  el("picks").innerHTML = entries
     .map((entry) => `
       <li>
         <span class="name">${asFormula(entry.label)}
-          <span class="each">${escapeHtml(entry.categoryTitle)} &middot; ${signed(entry.value)} each</span>
+          <span class="each">${escapeHtml(entry.categoryTitle)} &middot; ${
+            entry.isRange
+              ? `midpoint of ${escapeHtml(formatRange(entry))}`
+              : escapeHtml(formatIncrement(entry))
+          }</span>
         </span>
         <span class="stepper">
           <button data-step="-1" data-key="${escapeHtml(entry.key)}" aria-label="One fewer ${escapeHtml(entry.label)}">&minus;</button>
           <span class="n">${entry.count}</span>
           <button data-step="1" data-key="${escapeHtml(entry.key)}" aria-label="One more ${escapeHtml(entry.label)}">+</button>
         </span>
-        <span class="sum">${signed(entry.value * entry.count)}</span>
+        <span class="sum">${escapeHtml(formatTotal(entry.value * entry.count))}</span>
         <button class="rm" data-remove="${escapeHtml(entry.key)}" aria-label="Remove ${escapeHtml(entry.label)}">&times;</button>
       </li>`)
     .join("");
@@ -141,12 +169,7 @@ el("grid").addEventListener("click", (event) => {
   const row = category?.rows.find((candidate) => candidate.label === button.dataset.label);
   if (!row) return;
 
-  selection.add({
-    categoryFile: category.file,
-    categoryTitle: category.title,
-    label: row.label,
-    value: row.value,
-  });
+  selection.add({ ...row, categoryFile: category.file, categoryTitle: category.title });
   render();
 });
 
