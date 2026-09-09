@@ -190,6 +190,31 @@ test("a molecule's formula is the sum of the groups chosen for it", () => {
   }
 });
 
+// A C=N is written as two groups, one for each end: the carbon is a `CdN` and
+// the nitrogen an `NI`. Each end must contribute only its own atom, exactly as
+// the two carbons of a C=C do. central_atoms.csv once gave `CdN` a nitrogen as
+// well, so every imine came out with one nitrogen too many - methanimine, which
+// has one, summarised to CH3N2. Nothing displayed it, because the formula is
+// not shown yet, so only a test can keep this from coming back.
+test("the nitrogen of a C=N is counted once, by NI and not also by CdN", () => {
+  assert.deepEqual(read("CdN-(H)2", notation).atoms, { C: 1, H: 2 });
+  assert.deepEqual(read("NI-(H)", notation).atoms, { N: 1, H: 1 });
+
+  // `CdN` is a `Cd` whose partner happens to be nitrogen, so the two central
+  // notations stand for the same atoms.
+  assert.deepEqual(
+    read("CdN-(H)2", notation).atoms,
+    read("Cd-(H)2", notation).atoms,
+    "CdN should contribute what Cd contributes",
+  );
+
+  assert.equal(molecule([["CdN-(H)2", 1], ["NI-(H)", 1]]).formula, "CH3N");   // methanimine
+  assert.equal(
+    molecule([["CdN-(H)2", 1], ["NI-(C)", 1], ["C-(H)3(N)", 1]]).formula,
+    "C2H5N",
+  );                                                                          // N-methylmethanimine
+});
+
 test("a ring correction adds energy but no atoms", () => {
   const summary = molecule([["C-(C)2(H)2", 6], ["cyclohexane", 1]]);
   assert.equal(summary.formula, "C6H12");
