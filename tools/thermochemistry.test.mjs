@@ -56,7 +56,7 @@ const CORRECTIONS = "04_Corrections.csv";
  * checkable against the literature rather than only against itself.
  *
  * Neither number was chosen from the observed spread, which is the point. The
- * set currently sits near 1.2 kJ/mol mean absolute error with a worst case of
+ * set currently sits near 1.1 kJ/mol mean absolute error with a worst case of
  * 5.7, so both bounds have room above the data. This is a guard against an
  * increment that disagrees with the published thermochemistry, not a
  * change-detector for the CSV files - check_parity.mjs and validate_data.py
@@ -71,8 +71,7 @@ const MAX_UNCERTAINTY = 3.0;
  * Every experimental value below was retrieved from the NIST Chemistry WebBook
  * in the session that wrote this file. Nothing here is recalled or estimated: a
  * remembered number would assert that a wrong value is right while looking
- * like verification, which is worse than having no test at all. The rule this
- * follows is written out in .claude/rules/citations.md.
+ * like verification, which is worse than having no test at all.
  *
  * Each entry carries four things, because a value needs to be both
  * attributable and retrievable and no single field is both:
@@ -80,7 +79,13 @@ const MAX_UNCERTAINTY = 3.0;
  *   `url`       the NIST page the value was read from, which shows the value
  *   `reference` the short form NIST prints, for finding the row on that page
  *   `citation`  authors, title, journal, year, volume, pages
- *   `doi`       a resolvable link to the paper itself, or null
+ *   `doi`       a resolvable link to that work, or null with a `noDoiReason`
+ *
+ * NIST's Comment column is part of the row, and it can change whose number a
+ * value is: "Hf by ...", "see ...", "Reanalyzed by ..., Original value = ...".
+ * Where a comment says more than a data-source code it is kept verbatim as
+ * `nistComment`, and any work it names is cited as `commentCites`. The citation
+ * test below refuses a comment that names a work without citing it.
  *
  * The short form alone is not enough, and this data set is where that stops
  * being theoretical. `Prosen and Rossini, 1945` is two different papers here -
@@ -91,18 +96,23 @@ const MAX_UNCERTAINTY = 3.0;
  * year, same journal. Only the full citation and the DOI tell them apart.
  *
  * Bibliographic fields were quoted from the References section of each
- * molecule's own NIST page. Every DOI was then resolved through Crossref and
- * accepted only when the returned title, journal, volume, first page and year
- * all matched that citation - so each one is corroborated by two independent
- * records rather than asserted from one. No DOI was composed by hand; they are
- * opaque strings and a guessed suffix points at a real but different paper.
+ * molecule's own NIST page. Each DOI was found by search and accepted only after
+ * an exact lookup of that DOI returned the same title, year, record type and
+ * authors, and the same journal, volume and first page where the work has them -
+ * so each is corroborated by two independent records rather than asserted from
+ * one. A title alone proves nothing: the only records carrying the exact title
+ * of Cox and Pilcher's 1970 monograph are reviews of it in two journals. No DOI
+ * was composed by hand; a guessed suffix points at a real but different paper.
+ *
+ * The two records disagree twice, and both entries keep what NIST prints.
+ * Crossref lists Baldt before Hall for Hall and Baldt 1971, and names Springer
+ * Netherlands rather than Chapman and Hall as the publisher of Pedley, Naylor
+ * and Kirby 1986. Title, year, type and authors agree in both cases.
  *
  * The two NIST compiled averages have no primary paper, so they cite the
- * database itself, whose own DOI resolves to it. One entry carries `doi: null`
- * rather than a plausible guess: Issoire and Long 1960, whose Bull. Soc. Chim.
- * France volume Crossref does not index - its best match was a 1984
- * encyclopedia entry, so none is claimed and the NIST page is the only
- * retrievable record for that value.
+ * database itself, whose own DOI resolves to it. Where no DOI could be found the
+ * entry says `doi: null` and records why in `noDoiReason`, rather than carrying
+ * a plausible guess.
  *
  * Where a page offered several gas-phase rows, one rule picked between them,
  * fixed before the values were inspected and applied to every molecule:
@@ -188,6 +198,13 @@ const MOLECULES = [
       "Prosen, E.J.; Rossini, F.D., 'Heats of combustion and formation of the paraffin " +
       "hydrocarbons at 25 degrees C', J. Res. NBS, 1945, 34, 263-267",
     doi: "10.6028/jres.034.013",
+    nistComment: "see Prosen and Rossini, 1944; ALS",
+    commentCites: {
+      citation:
+        "Prosen, E.J.; Rossini, F.D., 'Heats of combustion of eight normal paraffin hydrocarbons " +
+        "in the liquid state', J. Res. NBS, 1944, 33, 255-272",
+      doi: "10.6028/jres.033.011",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111659&Units=SI&Mask=1",
   },
   {
@@ -234,8 +251,14 @@ const MOLECULES = [
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110827&Units=SI&Mask=1",
   },
   {
+    // The two ring carbons beside the double bond each bond to a Cd, so they are
+    // C-(Cd)(C)(H)2 - the group 1-butene below uses for the same kind of carbon -
+    // and only the two carbons opposite the double bond are C-(C)2(H)2.
     name: "cyclohexene",
-    groups: [[CH, "C-(C)2(H)2", 4], [CH, "Cd-(C)(H)", 2], [CORRECTIONS, "cyclohexene", 1]],
+    groups: [
+      [CH, "C-(C)2(H)2", 2], [CH, "C-(Cd)(C)(H)2", 2], [CH, "Cd-(C)(H)", 2],
+      [CORRECTIONS, "cyclohexene", 1],
+    ],
     experimental: -4.32,
     uncertainty: 0.98,
     method: "Ccr",
@@ -303,6 +326,10 @@ const MOLECULES = [
       "Thermochemical Properties of Polycyclic Aromatic Hydrocarbons', J. Phys. Chem. Ref. " +
       "Data, 2008, 37, 1855-1996",
     doi: "10.1063/1.2955570",
+    nistComment:
+      "There are sufficient high-quality literature values to make a good evaluation with a " +
+      "high degree of confidence. In general, the evaluated uncertainty limits are on the " +
+      "order of (0.5 to 2.5) kJ/mol.; DRB",
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C71432&Units=SI&Mask=1",
   },
   {
@@ -317,6 +344,10 @@ const MOLECULES = [
       "Thermochemical Properties of Polycyclic Aromatic Hydrocarbons', J. Phys. Chem. Ref. " +
       "Data, 2008, 37, 1855-1996",
     doi: "10.1063/1.2955570",
+    nistComment:
+      "There are sufficient high-quality literature values to make a good evaluation with a " +
+      "high degree of confidence. In general, the evaluated uncertainty limits are on the " +
+      "order of (0.5 to 2.5) kJ/mol.; DRB",
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108883&Units=SI&Mask=1",
   },
   {
@@ -331,6 +362,14 @@ const MOLECULES = [
       "ethylbenzene, o-xylene, m-xylene, p-xylene, n-propylbenzene, and styrene', J. Res. NBS, " +
       "1945, 34, 65-70",
     doi: "10.6028/jres.034.034",
+    nistComment: "Hf by Prosen, Johnson, et al., 1946; ALS",
+    commentCites: {
+      citation:
+        "Prosen, E.J.; Johnson, W.H.; Rossini, F.D., 'Heats of combustion and formation at 25 " +
+        "degrees C of the alkylbenzenes through C10H14, and of the higher normal " +
+        "monoalkylbenzenes', J. Res. NBS, 1946, 36, 455-461",
+      doi: "10.6028/jres.036.025",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C100414&Units=SI&Mask=1",
   },
   {
@@ -367,10 +406,10 @@ const MOLECULES = [
     groups: [[CH, "C-(C)(H)3", 1], [CHO, "C-(H)2(O)(C)", 1], [CHO, "O-(H)(C)", 1]],
     experimental: -234.0,
     uncertainty: 2.0,
-    // NIST's own average of nine values; the page lists no single primary
-    // reference for it, so the WebBook page is the citation.
-    method: "AVG of 9 values",
-    reference: "NIST Chemistry WebBook compilation",
+    // NIST's own average of nine values; the page names no primary reference for
+    // it, so the database itself is the cited work.
+    method: "AVG",
+    reference: "N/A",
     citation:
       "NIST Chemistry WebBook, NIST Standard Reference Database Number 69, National Institute " +
       "of Standards and Technology, Gaithersburg MD, last update 2025 - this compound page's " +
@@ -378,6 +417,7 @@ const MOLECULES = [
       "Reference column for the averaged row, so the database itself is the cited work and " +
       "no primary paper is claimed",
     doi: "10.18434/T4D303",
+    nistComment: "Average of 9 values; Individual data points",
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64175&Units=SI&Mask=1",
   },
   {
@@ -391,6 +431,16 @@ const MOLECULES = [
       "Pihlaja, K.; Heikkila, J., 'Heats of combustion: diethyl ether and 1,1-diethoxyethane', " +
       "Acta Chem. Scand., 1968, 22, 2731-2732",
     doi: "10.3891/acta.chem.scand.22-2731",
+    nistComment:
+      "Reanalyzed by Pedley, Naylor, et al., 1986, Original value = -250.3 \u00b1 1.8 kJ/mol; ALS",
+    // -252.7 is the reanalysed figure NIST lists, taken by the same rule as every
+    // other row: the measurement is Pihlaja and Heikkila's, the number Pedley's.
+    commentCites: {
+      citation:
+        "Pedley, J.B.; Naylor, R.D.; Kirby, S.P., 'Thermochemical Data of Organic Compounds', " +
+        "Chapman and Hall, New York, 1986, 1-792",
+      doi: "10.1007/978-94-009-4099-4",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C60297&Units=SI&Mask=1",
   },
   {
@@ -426,8 +476,8 @@ const MOLECULES = [
     groups: [[CHO, "C-(H)3(CO)", 1], [CHO, "CO-(C)(O)", 1], [CHO, "O-(H)(CO)", 1]],
     experimental: -433.0,
     uncertainty: 3.0,
-    method: "AVG of 8 values",
-    reference: "NIST Chemistry WebBook compilation",
+    method: "AVG",
+    reference: "N/A",
     citation:
       "NIST Chemistry WebBook, NIST Standard Reference Database Number 69, National Institute " +
       "of Standards and Technology, Gaithersburg MD, last update 2025 - this compound page's " +
@@ -435,6 +485,7 @@ const MOLECULES = [
       "Reference column for the averaged row, so the database itself is the cited work and " +
       "no primary paper is claimed",
     doi: "10.18434/T4D303",
+    nistComment: "Average of 8 values; Individual data points",
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64197&Units=SI&Mask=1",
   },
   {
@@ -499,13 +550,24 @@ const MOLECULES = [
     experimental: -23.7,
     uncertainty: 0.75,
     method: "Eqk",
-    reference: "Issoire and Long, 1960, heat of formation derived by Cox and Pilcher, 1970",
+    reference: "Issoire and Long, 1960",
     citation:
       "Issoire, J.; Long, C., 'Etude de la thermodynamique chimique de la reaction de formation " +
-      "des methylamines', Bull. Soc. Chim. France, 1960, 2004-2012; enthalpy of formation " +
-      "derived by Cox, J.D.; Pilcher, G., 'Thermochemistry of Organic and Organometallic " +
-      "Compounds', Academic Press, New York, 1970",
+      "des methylamines', Bull. Soc. Chim. France, 1960, 2004-2012",
     doi: null,
+    noDoiReason:
+      "Crossref does not index this volume; its best bibliographic match was a 1984 encyclopedia " +
+      "entry, so no DOI is claimed. The NIST page is the retrievable record.",
+    nistComment: "Heat of formation derived by Cox and Pilcher, 1970; ALS",
+    commentCites: {
+      citation:
+        "Cox, J.D.; Pilcher, G., 'Thermochemistry of Organic and Organometallic Compounds', " +
+        "Academic Press, New York, 1970, 1-636",
+      doi: null,
+      noDoiReason:
+        "Crossref has no record of the book. The only records carrying its title are reviews of " +
+        "it in J. Organomet. Chem. and Ber. Bunsenges. Phys. Chem., which are not the book.",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75503&Units=SI&Mask=1",
   },
   {
@@ -581,6 +643,23 @@ test("the whole set stays within the method's published mean absolute error", ()
   );
 });
 
+/**
+ * `null` is the honest value when no DOI could be found, and it must say why.
+ * Otherwise the DOI must be well-formed - and that is all this checks. It cannot
+ * tell a wrong DOI from a right one: changing methyl acetate's ja00730a025 to
+ * ja00730a026 gives a well-formed DOI for a real, unrelated paper in the same
+ * journal, volume and year, and this still passes. Every DOI here was matched to
+ * its citation by exact lookup when it was written and again at review; nothing
+ * in this file repeats that lookup.
+ */
+function assertDoi(label, source) {
+  if (source.doi === null) {
+    assert.ok(source.noDoiReason?.trim(), `${label} has no DOI and gives no reason why`);
+    return;
+  }
+  assert.match(source.doi, /^10\.\d{4,9}\/\S+$/, `${label} has '${source.doi}', which is not a well-formed DOI`);
+}
+
 test("every experimental value carries a retrievable citation", () => {
   for (const molecule of MOLECULES) {
     assert.match(
@@ -603,15 +682,24 @@ test("every experimental value carries a retrievable citation", () => {
       `${molecule.name}'s citation states no year`,
     );
 
-    // `null` is the honest value when no DOI could be resolved. What is not
-    // allowed is a string that merely looks like one: a composed DOI resolves
-    // to a real but different paper, which is the failure this guards.
-    if (molecule.doi !== null) {
-      assert.match(
-        molecule.doi,
-        /^10\.\d{4,9}\/\S+$/,
-        `${molecule.name} has '${molecule.doi}', which is not a well-formed DOI`,
+    assertDoi(molecule.name, molecule);
+
+    // A comment that names another work changes whose number this is, so that
+    // work must be cited too. These are the words NIST uses to point at one.
+    if (/\b(by|see|reanaly[sz]ed)\b/i.test(molecule.nistComment ?? "")) {
+      assert.ok(
+        molecule.commentCites,
+        `${molecule.name}'s NIST comment names another work ('${molecule.nistComment}') ` +
+        "but the entry does not cite it",
       );
+    }
+    if (molecule.commentCites) {
+      assert.match(
+        molecule.commentCites.citation ?? "",
+        /(1[89]|20)\d{2}/,
+        `${molecule.name}: the work its NIST comment names has no dated citation`,
+      );
+      assertDoi(`${molecule.name} (the work its NIST comment names)`, molecule.commentCites);
     }
 
     // The curation rule above, enforced rather than merely described: a value
