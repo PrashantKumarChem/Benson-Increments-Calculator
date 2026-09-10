@@ -118,9 +118,8 @@ test("the whole set stays within the method's published mean absolute error", ()
  * Otherwise the DOI must be well-formed - and that is all this checks. It cannot
  * tell a wrong DOI from a right one: changing methyl acetate's ja00730a025 to
  * ja00730a026 gives a well-formed DOI for a real, unrelated paper in the same
- * journal, volume and year, and this still passes. Every DOI here was matched to
- * its citation by exact lookup when it was written and again at review; nothing
- * in this file repeats that lookup.
+ * journal, volume and year, and this still passes. tools/doi_lock.test.mjs is the
+ * check that sees it, by comparing each citation with what its DOI resolved to.
  */
 function assertDoi(label, source) {
   if (source.doi === null) {

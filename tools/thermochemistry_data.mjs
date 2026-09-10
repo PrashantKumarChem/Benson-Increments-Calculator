@@ -2,8 +2,9 @@
  * The molecules tools/thermochemistry.test.mjs compares with experiment, and the
  * citation behind every experimental value.
  *
- * They live apart from the test so that a script can read the citations without
- * running it: importing a test module registers and runs its tests.
+ * They live apart from the test so that tools/build_doi_lock.mjs and
+ * tools/doi_lock.test.mjs can read the citations without running it: importing a
+ * test module registers and runs its tests.
  *
  * This module imports nothing. A reader of the citations should not break when
  * the way the increment data is loaded changes.
@@ -28,6 +29,11 @@ const CORRECTIONS = "04_Corrections.csv";
  *   `citation`  authors, title, journal, year, volume, pages
  *   `doi`       a resolvable link to that work, or null with a `noDoiReason`
  *
+ * A citation with a DOI also carries `work`: the parts of its own text that the
+ * DOI's record is compared on - for an article, the type, title, the authors'
+ * family names, year, volume and first page. tools/doi_lock.test.mjs refuses a
+ * `work` field that cannot be read off the citation, so the two cannot drift.
+ *
  * NIST's Comment column is part of the row, and it can change whose number a
  * value is: "Hf by ...", "see ...", "Reanalyzed by ..., Original value = ...".
  * Where a comment says more than a data-source code it is kept verbatim as
@@ -51,11 +57,20 @@ const CORRECTIONS = "04_Corrections.csv";
  * one. A title alone proves nothing: the only records carrying the exact title
  * of Cox and Pilcher's 1970 monograph are reviews of it in two journals. No DOI
  * was composed by hand; a guessed suffix points at a real but different paper.
+ * That lookup is now repeated rather than trusted: tools/build_doi_lock.mjs
+ * records what each DOI resolves to in tools/doi_lock.json, and
+ * tools/doi_lock.test.mjs compares every `work` with it.
  *
- * The two records disagree twice, and both entries keep what NIST prints.
- * Crossref lists Baldt before Hall for Hall and Baldt 1971, and names Springer
+ * Where NIST and a DOI record disagree, the entry keeps what NIST prints and the
+ * disagreement is recorded, not smoothed over. Where a registry writes a title
+ * in a form that normalizing does not forgive - Pittam and Pilcher, Furuyama et
+ * al., Ambrose et al., the WebBook - `work.registryTitle` holds the registry's
+ * title exactly. Where a record lists names NIST does not - Pihlaja and
+ * Heikkila - `work.registryExtraAuthors` holds them. Both are compared exactly,
+ * so either fails the moment its record changes. Crossref also lists Baldt
+ * before Hall, which is reported rather than failed, and names Springer
  * Netherlands rather than Chapman and Hall as the publisher of Pedley, Naylor
- * and Kirby 1986. Title, year, type and authors agree in both cases.
+ * and Kirby 1986, which is not compared: see MUST_MATCH in tools/doi_lock.mjs.
  *
  * The two NIST compiled averages have no primary paper, so they cite the
  * database itself, whose own DOI resolves to it. Where no DOI could be found the
@@ -93,6 +108,20 @@ export const MOLECULES = [
       "Part 8. Methane, ethane, propane, n-butane and 2-methylpropane', J. Chem. Soc. Faraday " +
       "Trans. 1, 1972, 68, 2224-2229",
     doi: "10.1039/f19726802224",
+    work: {
+      type: "journal-article",
+      title:
+        "Measurements of heats of combustion by flame calorimetry. Part 8. Methane, ethane, " +
+        "propane, n-butane and 2-methylpropane",
+      authors: ["Pittam", "Pilcher"],
+      year: 1972,
+      volume: "68",
+      firstPage: "2224",
+      // Crossref writes "Part 8.—Methane" where NIST prints "Part 8. Methane".
+      registryTitle:
+        "Measurements of heats of combustion by flame calorimetry. Part 8.—Methane, ethane, " +
+        "propane, n-butane and 2-methylpropane",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106978&Units=SI&Mask=1",
   },
   {
@@ -107,6 +136,20 @@ export const MOLECULES = [
       "Part 8. Methane, ethane, propane, n-butane and 2-methylpropane', J. Chem. Soc. Faraday " +
       "Trans. 1, 1972, 68, 2224-2229",
     doi: "10.1039/f19726802224",
+    work: {
+      type: "journal-article",
+      title:
+        "Measurements of heats of combustion by flame calorimetry. Part 8. Methane, ethane, " +
+        "propane, n-butane and 2-methylpropane",
+      authors: ["Pittam", "Pilcher"],
+      year: 1972,
+      volume: "68",
+      firstPage: "2224",
+      // Crossref writes "Part 8.—Methane" where NIST prints "Part 8. Methane".
+      registryTitle:
+        "Measurements of heats of combustion by flame calorimetry. Part 8.—Methane, ethane, " +
+        "propane, n-butane and 2-methylpropane",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75285&Units=SI&Mask=1",
   },
   {
@@ -120,6 +163,14 @@ export const MOLECULES = [
       "Good, W.D., 'The enthalpies of combustion and formation of the isomeric pentanes', J. " +
       "Chem. Thermodyn., 1970, 2, 237-244",
     doi: "10.1016/0021-9614(70)90088-1",
+    work: {
+      type: "journal-article",
+      title: "The enthalpies of combustion and formation of the isomeric pentanes",
+      authors: ["Good"],
+      year: 1970,
+      volume: "2",
+      firstPage: "237",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C109660&Units=SI&Mask=1",
   },
   {
@@ -133,6 +184,14 @@ export const MOLECULES = [
       "Prosen, E.J.; Rossini, F.D., 'Heats of combustion and formation of the paraffin " +
       "hydrocarbons at 25 degrees C', J. Res. NBS, 1945, 34, 263-267",
     doi: "10.6028/jres.034.013",
+    work: {
+      type: "journal-article",
+      title: "Heats of combustion and formation of the paraffin hydrocarbons at 25 degrees C",
+      authors: ["Prosen", "Rossini"],
+      year: 1945,
+      volume: "34",
+      firstPage: "263",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110543&Units=SI&Mask=1",
   },
   {
@@ -146,12 +205,28 @@ export const MOLECULES = [
       "Prosen, E.J.; Rossini, F.D., 'Heats of combustion and formation of the paraffin " +
       "hydrocarbons at 25 degrees C', J. Res. NBS, 1945, 34, 263-267",
     doi: "10.6028/jres.034.013",
+    work: {
+      type: "journal-article",
+      title: "Heats of combustion and formation of the paraffin hydrocarbons at 25 degrees C",
+      authors: ["Prosen", "Rossini"],
+      year: 1945,
+      volume: "34",
+      firstPage: "263",
+    },
     nistComment: "see Prosen and Rossini, 1944; ALS",
     commentCites: {
       citation:
         "Prosen, E.J.; Rossini, F.D., 'Heats of combustion of eight normal paraffin hydrocarbons " +
         "in the liquid state', J. Res. NBS, 1944, 33, 255-272",
       doi: "10.6028/jres.033.011",
+      work: {
+        type: "journal-article",
+        title: "Heats of combustion of eight normal paraffin hydrocarbons in the liquid state",
+        authors: ["Prosen", "Rossini"],
+        year: 1944,
+        volume: "33",
+        firstPage: "255",
+      },
     },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C111659&Units=SI&Mask=1",
   },
@@ -168,6 +243,14 @@ export const MOLECULES = [
       "Knowlton, J.W.; Rossini, F.D., 'Heats of combustion and formation of cyclopropane', J. " +
       "Res. NBS, 1949, 43, 113-115",
     doi: "10.6028/jres.043.013",
+    work: {
+      type: "journal-article",
+      title: "Heats of combustion and formation of cyclopropane",
+      authors: ["Knowlton", "Rossini"],
+      year: 1949,
+      volume: "43",
+      firstPage: "113",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75194&Units=SI&Mask=1",
   },
   {
@@ -182,6 +265,16 @@ export const MOLECULES = [
       "'Thermodynamics of cyclopentane, methylcyclopentane and 1,cis-3-dimethylcyclopentane: " +
       "Verification of the concept of pseudorotation', J. Am. Chem. Soc., 1959, 81, 5880-5883",
     doi: "10.1021/ja01531a009",
+    work: {
+      type: "journal-article",
+      title:
+        "Thermodynamics of cyclopentane, methylcyclopentane and 1,cis-3-dimethylcyclopentane: " +
+        "Verification of the concept of pseudorotation",
+      authors: ["McCullough", "Pennington", "Smith", "Hossenlopp", "Waddington"],
+      year: 1959,
+      volume: "81",
+      firstPage: "5880",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C287923&Units=SI&Mask=1",
   },
   {
@@ -196,6 +289,16 @@ export const MOLECULES = [
       "normal alkylcyclopentanes and cyclohexanes and the increment per CH2 group for several " +
       "homologous series of hydrocarbons', J. Res. NBS, 1946, 37, 51-56",
     doi: "10.6028/jres.037.031",
+    work: {
+      type: "journal-article",
+      title:
+        "Heats of formation and combustion of the normal alkylcyclopentanes and cyclohexanes and " +
+        "the increment per CH2 group for several homologous series of hydrocarbons",
+      authors: ["Prosen", "Johnson", "Rossini"],
+      year: 1946,
+      volume: "37",
+      firstPage: "51",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110827&Units=SI&Mask=1",
   },
   {
@@ -218,6 +321,17 @@ export const MOLECULES = [
       "trioctylamine, phenyl isocyanate, and 1,4,5,6-tetrahydropyrimidine', J. Chem. Eng. Data, " +
       "1996, 41, 1269-1284",
     doi: "10.1021/je960093t",
+    work: {
+      type: "journal-article",
+      title:
+        "Thermodynamic properties and ideal-gas enthalpies of formation for cyclohexene, " +
+        "phthalan (2,5-dihydrobenzo-3,4-furan), isoxazole, octylamine, dioctylamine, " +
+        "trioctylamine, phenyl isocyanate, and 1,4,5,6-tetrahydropyrimidine",
+      authors: ["Steele", "Chirico", "Knipmeyer", "Nguyen", "Smith", "Tasker"],
+      year: 1996,
+      volume: "41",
+      firstPage: "1269",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110838&Units=SI&Mask=1",
   },
   {
@@ -234,6 +348,20 @@ export const MOLECULES = [
       "i-C3H7I = C3H6 + HI, n-C3H7I = i-C3H7I, and C3H6 + 2HI = C3H8 + I2', J. Chem. " +
       "Thermodyn., 1969, 1, 363-375",
     doi: "10.1016/0021-9614(69)90066-4",
+    work: {
+      type: "journal-article",
+      title:
+        "Thermochemistry of the gas phase equilibria i-C3H7I = C3H6 + HI, n-C3H7I = i-C3H7I, and " +
+        "C3H6 + 2HI = C3H8 + I2",
+      authors: ["Furuyama", "Golden", "Benson"],
+      year: 1969,
+      volume: "1",
+      firstPage: "363",
+      // Crossref's title has U+E5FB, a private-use character, where NIST prints each "=".
+      registryTitle:
+        "Thermochemistry of the gas phase equilibria i-C3H7I \uE5FB C3H6 + HI, n-C3H7I \uE5FB " +
+        "i-C3H7I, and C3H6 + 2HI \uE5FB C3H8 + I2",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C115071&Units=SI&Mask=1",
   },
   {
@@ -247,6 +375,14 @@ export const MOLECULES = [
       "Prosen, E.J.; Maron, F.W.; Rossini, F.D., 'Heats of combustion, formation, and " +
       "insomerization of ten C4 hydrocarbons', J. Res. NBS, 1951, 46, 106-112",
     doi: "10.6028/jres.046.015",
+    work: {
+      type: "journal-article",
+      title: "Heats of combustion, formation, and insomerization of ten C4 hydrocarbons",
+      authors: ["Prosen", "Maron", "Rossini"],
+      year: 1951,
+      volume: "46",
+      firstPage: "106",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106989&Units=SI&Mask=1",
   },
   {
@@ -260,6 +396,14 @@ export const MOLECULES = [
       "Prosen, E.J.; Maron, F.W.; Rossini, F.D., 'Heats of combustion, formation, and " +
       "insomerization of ten C4 hydrocarbons', J. Res. NBS, 1951, 46, 106-112",
     doi: "10.6028/jres.046.015",
+    work: {
+      type: "journal-article",
+      title: "Heats of combustion, formation, and insomerization of ten C4 hydrocarbons",
+      authors: ["Prosen", "Maron", "Rossini"],
+      year: 1951,
+      volume: "46",
+      firstPage: "106",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106990&Units=SI&Mask=1",
   },
   {
@@ -274,6 +418,14 @@ export const MOLECULES = [
       "Thermochemical Properties of Polycyclic Aromatic Hydrocarbons', J. Phys. Chem. Ref. " +
       "Data, 2008, 37, 1855-1996",
     doi: "10.1063/1.2955570",
+    work: {
+      type: "journal-article",
+      title: "Critically Evaluated Thermochemical Properties of Polycyclic Aromatic Hydrocarbons",
+      authors: ["Roux", "Temprado", "Chickos", "Nagano"],
+      year: 2008,
+      volume: "37",
+      firstPage: "1855",
+    },
     nistComment:
       "There are sufficient high-quality literature values to make a good evaluation with a " +
       "high degree of confidence. In general, the evaluated uncertainty limits are on the " +
@@ -292,6 +444,14 @@ export const MOLECULES = [
       "Thermochemical Properties of Polycyclic Aromatic Hydrocarbons', J. Phys. Chem. Ref. " +
       "Data, 2008, 37, 1855-1996",
     doi: "10.1063/1.2955570",
+    work: {
+      type: "journal-article",
+      title: "Critically Evaluated Thermochemical Properties of Polycyclic Aromatic Hydrocarbons",
+      authors: ["Roux", "Temprado", "Chickos", "Nagano"],
+      year: 2008,
+      volume: "37",
+      firstPage: "1855",
+    },
     nistComment:
       "There are sufficient high-quality literature values to make a good evaluation with a " +
       "high degree of confidence. In general, the evaluated uncertainty limits are on the " +
@@ -310,6 +470,16 @@ export const MOLECULES = [
       "ethylbenzene, o-xylene, m-xylene, p-xylene, n-propylbenzene, and styrene', J. Res. NBS, " +
       "1945, 34, 65-70",
     doi: "10.6028/jres.034.034",
+    work: {
+      type: "journal-article",
+      title:
+        "Heats of combustion of benzene, toluene, ethylbenzene, o-xylene, m-xylene, p-xylene, " +
+        "n-propylbenzene, and styrene",
+      authors: ["Prosen", "Gilmont", "Rossini"],
+      year: 1945,
+      volume: "34",
+      firstPage: "65",
+    },
     nistComment: "Hf by Prosen, Johnson, et al., 1946; ALS",
     commentCites: {
       citation:
@@ -317,6 +487,16 @@ export const MOLECULES = [
         "degrees C of the alkylbenzenes through C10H14, and of the higher normal " +
         "monoalkylbenzenes', J. Res. NBS, 1946, 36, 455-461",
       doi: "10.6028/jres.036.025",
+      work: {
+        type: "journal-article",
+        title:
+          "Heats of combustion and formation at 25 degrees C of the alkylbenzenes through " +
+          "C10H14, and of the higher normal monoalkylbenzenes",
+        authors: ["Prosen", "Johnson", "Rossini"],
+        year: 1946,
+        volume: "36",
+        firstPage: "455",
+      },
     },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C100414&Units=SI&Mask=1",
   },
@@ -334,6 +514,16 @@ export const MOLECULES = [
       "degrees C of the alkylbenzenes through C10H14, and of the higher normal " +
       "monoalkylbenzenes', J. Res. NBS, 1946, 36, 455-461",
     doi: "10.6028/jres.036.025",
+    work: {
+      type: "journal-article",
+      title:
+        "Heats of combustion and formation at 25 degrees C of the alkylbenzenes through C10H14, " +
+        "and of the higher normal monoalkylbenzenes",
+      authors: ["Prosen", "Johnson", "Rossini"],
+      year: 1946,
+      volume: "36",
+      firstPage: "455",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106423&Units=SI&Mask=1",
   },
   {
@@ -347,6 +537,14 @@ export const MOLECULES = [
       "Prosen, E.J.; Rossini, F.D., 'Heats of formation and combustion of 1,3-butadiene and " +
       "styrene', J. Res. NBS, 1945, 34, 59-63",
     doi: "10.6028/jres.034.031",
+    work: {
+      type: "journal-article",
+      title: "Heats of formation and combustion of 1,3-butadiene and styrene",
+      authors: ["Prosen", "Rossini"],
+      year: 1945,
+      volume: "34",
+      firstPage: "59",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C100425&Units=SI&Mask=1",
   },
   {
@@ -365,6 +563,14 @@ export const MOLECULES = [
       "Reference column for the averaged row, so the database itself is the cited work and " +
       "no primary paper is claimed",
     doi: "10.18434/T4D303",
+    work: {
+      type: "dataset",
+      title: "NIST Chemistry WebBook, NIST Standard Reference Database Number 69",
+      publisher: "National Institute of Standards and Technology",
+      // NIST's DataCite record for the WebBook says "Database 69"; NIST's own citation
+      // guide, like the citation here, says "Database Number 69".
+      registryTitle: "NIST Chemistry WebBook, NIST Standard Reference Database 69",
+    },
     nistComment: "Average of 9 values; Individual data points",
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64175&Units=SI&Mask=1",
   },
@@ -379,6 +585,17 @@ export const MOLECULES = [
       "Pihlaja, K.; Heikkila, J., 'Heats of combustion: diethyl ether and 1,1-diethoxyethane', " +
       "Acta Chem. Scand., 1968, 22, 2731-2732",
     doi: "10.3891/acta.chem.scand.22-2731",
+    work: {
+      type: "journal-article",
+      title: "Heats of combustion: diethyl ether and 1,1-diethoxyethane",
+      authors: ["Pihlaja", "Heikkila"],
+      year: 1968,
+      volume: "22",
+      firstPage: "2731",
+      // Crossref lists two names beyond the two NIST cites. The journal's own page for
+      // this article, where the DOI leads, names only Pihlaja and Heikkilä.
+      registryExtraAuthors: ["Buchardt", "Norin"],
+    },
     nistComment:
       "Reanalyzed by Pedley, Naylor, et al., 1986, Original value = -250.3 \u00b1 1.8 kJ/mol; ALS",
     // -252.7 is the reanalysed figure NIST lists, taken by the same rule as every
@@ -388,6 +605,12 @@ export const MOLECULES = [
         "Pedley, J.B.; Naylor, R.D.; Kirby, S.P., 'Thermochemical Data of Organic Compounds', " +
         "Chapman and Hall, New York, 1986, 1-792",
       doi: "10.1007/978-94-009-4099-4",
+      work: {
+        type: "book",
+        title: "Thermochemical Data of Organic Compounds",
+        authors: ["Pedley", "Naylor", "Kirby"],
+        year: 1986,
+      },
     },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C60297&Units=SI&Mask=1",
   },
@@ -403,6 +626,16 @@ export const MOLECULES = [
       "compounds. 5. Enthalpies of reduction of carbonyl groups', J. Am. Chem. Soc., 1991, 113, " +
       "3447-3450",
     doi: "10.1021/ja00009a033",
+    work: {
+      type: "journal-article",
+      title:
+        "Thermochemical studies of carbonyl compounds. 5. Enthalpies of reduction of carbonyl " +
+        "groups",
+      authors: ["Wiberg", "Crocker", "Morgan"],
+      year: 1991,
+      volume: "113",
+      firstPage: "3447",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C67641&Units=SI&Mask=1",
   },
   {
@@ -417,6 +650,16 @@ export const MOLECULES = [
       "compounds. 5. Enthalpies of reduction of carbonyl groups', J. Am. Chem. Soc., 1991, 113, " +
       "3447-3450",
     doi: "10.1021/ja00009a033",
+    work: {
+      type: "journal-article",
+      title:
+        "Thermochemical studies of carbonyl compounds. 5. Enthalpies of reduction of carbonyl " +
+        "groups",
+      authors: ["Wiberg", "Crocker", "Morgan"],
+      year: 1991,
+      volume: "113",
+      firstPage: "3447",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75070&Units=SI&Mask=1",
   },
   {
@@ -433,6 +676,14 @@ export const MOLECULES = [
       "Reference column for the averaged row, so the database itself is the cited work and " +
       "no primary paper is claimed",
     doi: "10.18434/T4D303",
+    work: {
+      type: "dataset",
+      title: "NIST Chemistry WebBook, NIST Standard Reference Database Number 69",
+      publisher: "National Institute of Standards and Technology",
+      // NIST's DataCite record for the WebBook says "Database 69"; NIST's own citation
+      // guide, like the citation here, says "Database Number 69".
+      registryTitle: "NIST Chemistry WebBook, NIST Standard Reference Database 69",
+    },
     nistComment: "Average of 8 values; Individual data points",
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64197&Units=SI&Mask=1",
   },
@@ -447,6 +698,14 @@ export const MOLECULES = [
       "Hall, H.K., Jr.; Baldt, J.H., 'Thermochemistry of strained-ring bridgehead nitriles and " +
       "esters', J. Am. Chem. Soc., 1971, 93, 140-145",
     doi: "10.1021/ja00730a025",
+    work: {
+      type: "journal-article",
+      title: "Thermochemistry of strained-ring bridgehead nitriles and esters",
+      authors: ["Hall", "Baldt"],
+      year: 1971,
+      volume: "93",
+      firstPage: "140",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C79209&Units=SI&Mask=1",
   },
   {
@@ -460,6 +719,14 @@ export const MOLECULES = [
       "Cox, J.D., 'The heats of combustion of phenol and the three cresols', Pure Appl. Chem., " +
       "1961, 2, 125-128",
     doi: "10.1351/pac196102010125",
+    work: {
+      type: "journal-article",
+      title: "The heats of combustion of phenol and the three cresols",
+      authors: ["Cox"],
+      year: 1961,
+      volume: "2",
+      firstPage: "125",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C108952&Units=SI&Mask=1",
   },
   {
@@ -474,6 +741,20 @@ export const MOLECULES = [
       "'Thermodynamic properties of organic oxygen compounds. 42. Physical and thermodynamic " +
       "properties of benzaldehyde', J. Chem. Thermodyn., 1975, 7, 1143-1157",
     doi: "10.1016/0021-9614(75)90035-x",
+    work: {
+      type: "journal-article",
+      title:
+        "Thermodynamic properties of organic oxygen compounds. 42. Physical and thermodynamic " +
+        "properties of benzaldehyde",
+      authors: ["Ambrose", "Connett", "Green", "Hales", "Head", "Martin"],
+      year: 1975,
+      volume: "7",
+      firstPage: "1143",
+      // Crossref's title has no full stop after "compounds".
+      registryTitle:
+        "Thermodynamic properties of organic oxygen compounds 42. Physical and thermodynamic " +
+        "properties of benzaldehyde",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C100527&Units=SI&Mask=1",
   },
   {
@@ -490,6 +771,16 @@ export const MOLECULES = [
       "coefficients of pyridine and benzene, and certain of their methyl homologues', Trans. " +
       "Faraday Soc., 1957, 53, 1074",
     doi: "10.1039/tf9575301074",
+    work: {
+      type: "journal-article",
+      title:
+        "The second virial coefficients of pyridine and benzene, and certain of their methyl " +
+        "homologues",
+      authors: ["Andon", "Cox", "Herington", "Martin"],
+      year: 1957,
+      volume: "53",
+      firstPage: "1074",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C110861&Units=SI&Mask=1",
   },
   {
@@ -529,6 +820,14 @@ export const MOLECULES = [
       "Hall, H.K., Jr.; Baldt, J.H., 'Thermochemistry of strained-ring bridgehead nitriles and " +
       "esters', J. Am. Chem. Soc., 1971, 93, 140-145",
     doi: "10.1021/ja00730a025",
+    work: {
+      type: "journal-article",
+      title: "Thermochemistry of strained-ring bridgehead nitriles and esters",
+      authors: ["Hall", "Baldt"],
+      year: 1971,
+      volume: "93",
+      firstPage: "140",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107120&Units=SI&Mask=1",
   },
   {
@@ -542,6 +841,31 @@ export const MOLECULES = [
       "Hatton, W.E.; Hildenbrand, D.L.; Sinke, G.C.; Stull, D.R., 'Chemical thermodynamic " +
       "properties of aniline', J. Chem. Eng. Data, 1962, 7, 229-231",
     doi: "10.1021/je60013a021",
+    work: {
+      type: "journal-article",
+      title: "Chemical thermodynamic properties of aniline",
+      authors: ["Hatton", "Hildenbrand", "Sinke", "Stull"],
+      year: 1962,
+      volume: "7",
+      firstPage: "229",
+    },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C62533&Units=SI&Mask=1",
   },
 ];
+
+/**
+ * Every citation above as one list: each molecule's own, and the work its NIST
+ * comment names where it has one. tools/build_doi_lock.mjs resolves the DOIs in
+ * it, and tools/doi_lock.test.mjs checks each against what its DOI resolved to;
+ * neither needs to know where a citation sits in a molecule entry.
+ */
+export const CITATIONS = MOLECULES.flatMap((molecule) => {
+  const own = { citedBy: molecule.name, ...citationOf(molecule) };
+  if (!molecule.commentCites) return [own];
+  const named = `${molecule.name} (the work its NIST comment names)`;
+  return [own, { citedBy: named, ...citationOf(molecule.commentCites) }];
+});
+
+function citationOf({ citation, doi, noDoiReason, work }) {
+  return { citation, doi, noDoiReason, work };
+}
