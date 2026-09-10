@@ -12,11 +12,19 @@ export const KJ_TO_KCAL = 0.239006;
 
 const NUMBER_RE = /^-?\d*\.?\d+$/;
 /**
- * "1.05-1.76" is a published range and is averaged. The dash only separates a
- * range when it sits between two numbers, so a leading minus stays a negative
- * number rather than being read as an empty lower bound.
+ * "1.05 to 1.76" is a published range and is averaged. The separator is a word
+ * rather than a hyphen because a hyphen also starts a negative number: reading
+ * `-42` needs to know that its dash is a sign, and every implementation that
+ * has to work that out is one that can work it out differently. `to` cannot be
+ * a sign, so the two forms stop overlapping and the rule stops needing care.
  */
-const RANGE_RE = /^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$/;
+const RANGE_RE = /^(-?\d*\.?\d+)\s+to\s+(-?\d*\.?\d+)$/;
+/**
+ * The form this replaced. Matched only so it can be refused by name: falling
+ * through to "neither a number nor a range" would tell a contributor their row
+ * is unreadable without telling them it used to be the house style.
+ */
+const HYPHEN_RANGE_RE = /^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$/;
 
 export class InvalidValueError extends Error {}
 
@@ -30,7 +38,7 @@ const decimalsOf = (text) => (text.split(".")[1] ?? "").length;
  * range is still averaged, a negative is still negative. What is new is that
  * the reading also carries the source's own precision and, for a range, its
  * two bounds, so the page can show `-42` rather than `-42.00` and can say that
- * 3.43 is the middle of 2.51-4.35 rather than a published figure.
+ * 3.43 is the middle of 2.51 to 4.35 rather than a published figure.
  *
  * Throws if the cell is neither a number nor a range, exactly as before, so a
  * bad row is still reported rather than silently dropped.
@@ -61,7 +69,15 @@ export function readValue(raw) {
     return { value: Number.parseFloat(text), source: text, decimals: decimalsOf(text), isRange: false };
   }
 
-  throw new InvalidValueError(`'${text}' is neither a number nor a range like 1.05-1.76`);
+  const hyphenated = HYPHEN_RANGE_RE.exec(text);
+  if (hyphenated) {
+    throw new InvalidValueError(
+      `'${text}' writes a range with a hyphen, which also starts a negative number. ` +
+      `Write it as '${hyphenated[1]} to ${hyphenated[2]}'.`,
+    );
+  }
+
+  throw new InvalidValueError(`'${text}' is neither a number nor a range like '1.05 to 1.76'`);
 }
 
 /**

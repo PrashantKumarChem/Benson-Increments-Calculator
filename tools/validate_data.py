@@ -94,13 +94,19 @@ def check_category(category: Category, report: Report) -> None:
         except ValueError as exc:
             report.add(name, line, f"{label or 'row'}: {exc}")
 
-    # The notebook is the reference implementation that check_parity.mjs holds
-    # this data to, and its parse_value splits any string containing "-" into
-    # two halves. pandas hands it strings for a whole column as soon as one
-    # cell is a range, so a negative value sharing a file with a range becomes
-    # float("") and raises. The two readings of the data would then disagree
-    # about a file neither of them could load. No category mixes them today;
-    # this is what keeps that true.
+    # While a range was written with a hyphen, this combination was unreadable.
+    # The notebook splits a string cell on the range separator, and pandas types
+    # a whole column as strings as soon as one cell is a range - so a negative
+    # sharing a file with a range arrived as "-42", split on its own minus sign,
+    # and became float(""). The separator is now the word "to", which cannot be
+    # a sign, and the notebook reads such a file correctly: checked by running
+    # its own parse_value over one, through pandas.
+    #
+    # The rule is kept until the notebook stops reading the data with a parser of
+    # its own. Two independent readings still exist, this is the one combination
+    # that has already driven them apart, and no category mixes them today - so
+    # holding the data inside what both are known to agree on costs nothing while
+    # the rules are being moved into one place.
     written = [(offset + 2, row[0], row[1])
                for offset, row in enumerate(category.rows) if len(row) == 2]
     ranges = [(line, label) for line, label, raw in written if is_range(raw)]
@@ -109,9 +115,9 @@ def check_category(category: Category, report: Report) -> None:
     if ranges and negatives:
         report.add(name, ranges[0][0],
                    f"{ranges[0][1]!r} is a range, and {negatives[0][1]!r} on line "
-                   f"{negatives[0][0]} is negative. The notebook cannot read a file holding "
-                   "both, so the site and the notebook would stop agreeing about it. Put them "
-                   "in separate category files.")
+                   f"{negatives[0][0]} is negative. Put them in separate category files. "
+                   "The parser this protected has since been fixed; the restriction is held "
+                   "only until the notebook stops reading the data with a parser of its own.")
 
 
 

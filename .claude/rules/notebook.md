@@ -20,30 +20,33 @@ how the notebook reads a value changes what parity means**, so run
 node tools/check_parity.mjs      # needs a PYTHON env var, interpreter with pandas
 ```
 
-## The parser trap
+## The parser, and the trap it used to hold
 
-The notebook's `parse_value` is four readable lines, and that simplicity is a
-feature — students read it. It splits any string containing `-` into two halves:
+The notebook's `parse_value` is a few readable lines, and that simplicity is a
+feature — students read it. It splits a string cell on the range separator:
 
 ```python
-if '-' in v:
-    parts = v.split('-')
-    return (float(parts[0]) + float(parts[1])) / 2
+if ' to ' in v:
+    low, high = v.split(' to ')
+    return (float(low) + float(high)) / 2
 ```
 
-pandas types a whole column as strings as soon as one cell is a range, so in a
-file mixing ranges and negatives, a negative value reaches that branch as a
-string and becomes `float("")`:
+While that separator was a hyphen, this was a trap. pandas types a whole column
+as strings as soon as one cell is a range, so in a file mixing ranges and
+negatives a negative value reached that branch as a string and split on its own
+minus sign:
 
 ```
 '1.05-1.76'  -> 1.405
 '-42'        -> ValueError: could not convert string to float: ''
 ```
 
-`tools/validate_data.py` rejects any category file containing both, which is
-what keeps this unreachable. **Do not "fix" this by porting the website's regex
-in** — the right fix is unambiguous notation in the data, which keeps the
-notebook's parser readable. Raise it rather than deciding unilaterally.
+Writing ranges as `1.05 to 1.76` is what closed it — `to` cannot be a sign, so
+there is nothing left to tell apart. **That was the fix, and porting the
+website's regex in here was not**: the parser has to stay short enough to read.
+
+`tools/validate_data.py` still refuses a file holding both, and will until the
+notebook stops parsing on its own. It is a hold rather than a trap now.
 
 ## Running it
 

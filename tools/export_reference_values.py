@@ -23,20 +23,19 @@ import pandas as pd
 def notebook_parse_value(v):
     """Verbatim from 'Benson Increments Calculator.ipynb' - warts included.
 
-    Splitting on any dash mis-reads a negative written as text; that never fires
-    on the current data because pandas hands those columns over as numbers. It
-    is reproduced here so the comparison is against what the notebook really
-    does, not a tidied version of it.
+    Copied rather than imported, because a notebook is not importable and the
+    comparison has to be against what the notebook really does. That makes this
+    the one place a notebook edit has to be repeated by hand: change parse_value
+    there and not here, and the parity check starts comparing the site against a
+    reading nothing performs.
     """
     if isinstance(v, str):
         v = v.strip()
-        if '-' in v:
-            parts = v.split('-')
-            return (float(parts[0]) + float(parts[1])) / 2
-        else:
-            return float(v)
-    else:
+        if ' to ' in v:
+            low, high = v.split(' to ')
+            return (float(low) + float(high)) / 2
         return float(v)
+    return float(v)
 
 
 def main() -> int:

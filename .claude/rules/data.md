@@ -29,7 +29,10 @@ capitalisation in the filename is what users see, which is why no list of
 chemical acronyms lives in the code.
 
 Exactly two columns: the group name, then its value in kJ/mol. A published range
-is written `1.05-1.76` and is averaged.
+is written `1.05 to 1.76` and is averaged. **The separator is the word `to`, not
+a hyphen** — a hyphen also starts a negative number, and a form that has to work
+out which one it is in front of is a form two implementations can work out
+differently. A row still written `1.05-1.76` is refused by name.
 
 **The files have no trailing newline.** Appending a row with `>>` corrupts the
 last existing row. It fails loudly rather than silently, but it wastes a cycle.
@@ -39,12 +42,15 @@ last existing row. It fails loudly rather than silently, but it wastes a cycle.
 - **A group name must be unique across every file, not just within one.**
   Anything that annotates a group from outside these files — a source, an
   uncertainty, a synonym — can only key on the name.
-- **No file may contain both a published range and a negative value.** The
-  notebook is the reference implementation `check_parity.mjs` holds this data to,
-  and its parser cannot read that combination: pandas types a whole column as
-  strings as soon as one cell is a range, and the notebook then splits every cell
-  on `-`, so a negative value becomes `float("")` and raises. Put them in
-  separate category files.
+- **No file may contain both a published range and a negative value.** This was
+  once unreadable: pandas types a whole column as strings as soon as one cell is
+  a range, and the notebook split those strings on the range separator, so while
+  that separator was a hyphen a negative value became `float("")` and raised.
+  Writing ranges with `to` fixed it, and the notebook now reads such a file
+  correctly. The rule is kept anyway until the notebook stops reading the data
+  with a parser of its own — two independent readings still exist, and this is
+  the combination that has already driven them apart. Put them in separate
+  category files.
 
 ## After changing anything here
 
