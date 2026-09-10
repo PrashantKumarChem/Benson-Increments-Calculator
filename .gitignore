@@ -121,3 +121,6 @@ Thumbs.db
 # (tools/check_render.mjs). Anyone who runs it locally gets this directory too.
 node_modules/
 package-lock.json
+
+# Private planning and roadmap notes. Not published.
+/Plan/
