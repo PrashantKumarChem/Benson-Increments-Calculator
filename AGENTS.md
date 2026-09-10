@@ -63,6 +63,7 @@ node   tools/validate_css.mjs     # the stylesheet parses; every token exists
 node --test tools/*.test.mjs      # unit tests
 node   tools/check_parity.mjs     # every increment: notebook vs. site
 node   tools/check_render.mjs     # the page, in a real browser
+node   tools/build_doi_lock.mjs   # what each cited DOI resolves to; CI fails on a diff
 ```
 
 Notes:
@@ -73,6 +74,11 @@ Notes:
 - `check_render.mjs` is the only check needing a browser:
   `npm install --no-save playwright && npx playwright install chromium`.
   Install it outside the repository so nothing here is polluted.
+- `build_doi_lock.mjs` is the only check needing the network: it asks doi.org
+  about every DOI the tests cite. If the resolver cannot be reached it fails,
+  says so, and writes nothing — report it as a check you could not run, not as
+  one that passed. The unit tests compare the citations with the file it writes,
+  and need no network.
 
 If you cannot run a check, say so explicitly and name which one. Do not imply
 coverage you do not have.
@@ -97,6 +103,7 @@ than none — it teaches contributors to distrust the tooling.
 |---|---|
 | `CSV_data_files/manifest.json` | `tools/build_data.py` |
 | the asset version in `index.html` | `tools/build_version.py` |
+| `tools/doi_lock.json` | `tools/build_doi_lock.mjs` |
 
 Regenerate them; commit the result. CI regenerates independently and fails if
 the committed copy differs. Hand-editing one produces a change that passes
