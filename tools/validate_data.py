@@ -24,6 +24,7 @@ from benson_data import (
     Category,
     build_manifest_comparable,
     find_categories,
+    is_range,
     parse_value,
     read_metadata,
     read_pairs,
@@ -92,6 +93,26 @@ def check_category(category: Category, report: Report) -> None:
             parse_value(raw_value)
         except ValueError as exc:
             report.add(name, line, f"{label or 'row'}: {exc}")
+
+    # The notebook is the reference implementation that check_parity.mjs holds
+    # this data to, and its parse_value splits any string containing "-" into
+    # two halves. pandas hands it strings for a whole column as soon as one
+    # cell is a range, so a negative value sharing a file with a range becomes
+    # float("") and raises. The two readings of the data would then disagree
+    # about a file neither of them could load. No category mixes them today;
+    # this is what keeps that true.
+    written = [(offset + 2, row[0], row[1])
+               for offset, row in enumerate(category.rows) if len(row) == 2]
+    ranges = [(line, label) for line, label, raw in written if is_range(raw)]
+    negatives = [(line, label) for line, label, raw in written
+                 if not is_range(raw) and str(raw).strip().strip('"').startswith("-")]
+    if ranges and negatives:
+        report.add(name, ranges[0][0],
+                   f"{ranges[0][1]!r} is a range, and {negatives[0][1]!r} on line "
+                   f"{negatives[0][0]} is negative. The notebook cannot read a file holding "
+                   "both, so the site and the notebook would stop agreeing about it. Put them "
+                   "in separate category files.")
+
 
 
 def check_metadata(categories: list[Category], report: Report) -> None:
@@ -244,6 +265,27 @@ def check_notation(categories: list[Category], report: Report) -> None:
                                             "counts, like 'C', 'N O2' or 'C2'")
 
 
+def check_unique_names(categories: list[Category], report: Report) -> None:
+    """A group name must identify one increment across the whole data set.
+
+    check_category already rejects a name repeated inside one file. This is the
+    wider rule: anything that annotates a group from outside CSV_DIR - a source,
+    an uncertainty, a synonym - can only key on the name, so the same name in
+    two categories would make such a row ambiguous about which it describes.
+    No two categories share a name today, and this is what keeps it that way.
+    """
+    seen: dict[str, str] = {}
+    for category in categories:
+        for offset, row in enumerate(category.rows):
+            if len(row) != 2 or not row[0]:
+                continue
+            owner = seen.setdefault(row[0], category.file)
+            if owner != category.file:
+                report.add(category.file, offset + 2,
+                           f"{row[0]!r} is already defined in {owner} - a group name has to be "
+                           "unique across categories, not just within one file")
+
+
 def main() -> int:
     categories = find_categories()
     if not categories:
@@ -253,6 +295,7 @@ def main() -> int:
     report = Report()
     for category in categories:
         check_category(category, report)
+    check_unique_names(categories, report)
     check_metadata(categories, report)
     check_manifest(categories, report)
     check_notation(categories, report)

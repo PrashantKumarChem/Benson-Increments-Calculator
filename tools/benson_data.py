@@ -61,6 +61,16 @@ def parse_value(raw: str) -> float:
     raise ValueError_(f"{text!r} is neither a number nor a range like 1.05-1.76")
 
 
+def is_range(raw) -> bool:
+    """Whether a cell is written as a published range rather than a single number.
+
+    Used by the validator to keep ranges and negative values out of the same
+    file: pandas reads a column holding any range as text, and the notebook
+    then splits every cell in it on "-", which a negative value cannot survive.
+    """
+    return RANGE_RE.match(str(raw).strip().strip('"')) is not None
+
+
 def title_for(stem: str) -> str:
     """01_CH_Groups -> 'CH Groups'.
 
