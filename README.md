@@ -50,7 +50,8 @@ Adding a category needs no code changes:
    becomes the "CHNO Groups" section, so capitalisation in the filename is what
    you get.
 2. Give it exactly two columns: the group name, and its value in kJ/mol.
-   A published range is written `1.05-1.76` and is averaged.
+   A published range is written `1.05 to 1.76` and is averaged. The separator is
+   the word, not a hyphen, because a hyphen also starts a negative number.
 3. Regenerate the category index and check the file:
 
    ```bash

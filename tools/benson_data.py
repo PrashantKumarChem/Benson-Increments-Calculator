@@ -39,9 +39,16 @@ FILENAME_RE = re.compile(r"^(\d{2})_([A-Za-z0-9_]+)\.csv$")
 COMPOSITION_RE = re.compile(r"^[A-Z][a-z]?\d*(?:\s+[A-Z][a-z]?\d*)*$")
 
 NUMBER_RE = re.compile(r"^-?\d*\.?\d+$")
-# "1.05-1.76" is a published range and is averaged. The dash is only a range
-# separator between two numbers, so a leading minus stays a negative number.
-RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$")
+# "1.05 to 1.76" is a published range and is averaged. The separator is a word
+# rather than a hyphen because a hyphen also starts a negative number: reading
+# "-42" needs to know that its dash is a sign, and every implementation that
+# has to work that out is one that can work it out differently. "to" cannot be
+# a sign, so the two forms stop overlapping and the rule stops needing care.
+RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s+to\s+(-?\d*\.?\d+)$")
+# The form this replaced. Matched only so it can be refused by name: falling
+# through to "neither a number nor a range" would tell a contributor their row
+# is unreadable without telling them it used to be the house style.
+HYPHEN_RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$")
 
 
 class ValueError_(ValueError):
@@ -58,15 +65,20 @@ def parse_value(raw: str) -> float:
         return (float(match.group(1)) + float(match.group(2))) / 2
     if NUMBER_RE.match(text):
         return float(text)
-    raise ValueError_(f"{text!r} is neither a number nor a range like 1.05-1.76")
+    hyphenated = HYPHEN_RANGE_RE.match(text)
+    if hyphenated:
+        raise ValueError_(
+            f"{text!r} writes a range with a hyphen, which also starts a negative "
+            f"number. Write it as '{hyphenated.group(1)} to {hyphenated.group(2)}'."
+        )
+    raise ValueError_(f"{text!r} is neither a number nor a range like '1.05 to 1.76'")
 
 
 def is_range(raw) -> bool:
     """Whether a cell is written as a published range rather than a single number.
 
-    Used by the validator to keep ranges and negative values out of the same
-    file: pandas reads a column holding any range as text, and the notebook
-    then splits every cell in it on "-", which a negative value cannot survive.
+    Asked by the rule in validate_data.py that keeps ranges and negative values
+    in separate category files, which is where the reason for that rule lives.
     """
     return RANGE_RE.match(str(raw).strip().strip('"')) is not None
 
