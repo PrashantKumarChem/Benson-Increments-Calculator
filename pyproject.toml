@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "benson"
+version = "0.1.0"
+description = "Benson group-additivity data rules, shared by the calculator's website and notebook"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "Prashant Kumar" },
+    { name = "Nicola L. B. Pohl" },
+]
+keywords = ["chemistry", "thermochemistry", "benson", "group additivity", "education"]
+classifiers = [
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+# Empty, and checked rather than assumed. `pip install` from a git URL has to be
+# instant in Colab, the package has to be able to run under Pyodide in a browser,
+# and it has to import where a compiled wheel could not - all three fail the
+# moment this list is not empty. The csv module is enough for what goes in here.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
+Repository = "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
+
+# Named rather than discovered. The repository root holds several directories
+# that are not this package - the archives, the tools, the data - and setuptools
+# refuses to guess between them.
+[tool.setuptools]
+packages = ["benson", "benson.tests"]
