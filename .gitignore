@@ -124,3 +124,6 @@ package-lock.json
 
 # Private planning and roadmap notes. Not published.
 /Plan/
+
+# Claude Code local settings. The tracked part of .claude/ is rules/ only.
+.claude/settings.local.json
