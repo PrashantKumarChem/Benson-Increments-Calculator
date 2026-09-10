@@ -50,8 +50,31 @@ test("parseValue reads plain numbers, including negatives", () => {
 });
 
 test("parseValue averages a published range", () => {
-  assert.equal(parseValue("1.05-1.76"), (1.05 + 1.76) / 2);
-  assert.equal(parseValue("19.66-20.50"), (19.66 + 20.5) / 2);
+  assert.equal(parseValue("1.05 to 1.76"), (1.05 + 1.76) / 2);
+  assert.equal(parseValue("19.66 to 20.50"), (19.66 + 20.5) / 2);
+});
+
+test("a range written with a hyphen is refused, and says what to write instead", () => {
+  // The form this data used to be written in. It is refused rather than read,
+  // because the alternative is a rule that has to decide whether the dash in
+  // '-42' is a sign - and that is the decision two implementations get to make
+  // differently. The message has to name the old form specifically: falling
+  // through to 'neither a number nor a range' would leave a contributor with a
+  // row that is unreadable for no stated reason.
+  assert.throws(() => parseValue("1.05-1.76"), (error) => {
+    assert.ok(error instanceof InvalidValueError);
+    assert.match(error.message, /hyphen/, "the message has to name what is wrong with the row");
+    assert.match(error.message, /'1\.05 to 1\.76'/, "and quote the row rewritten correctly");
+    return true;
+  });
+});
+
+test("refusing the hyphen form does not refuse a negative number", () => {
+  // The rule above and the minus sign are the same character. If the refusal
+  // ever widened to cover a leading minus, 195 of the 236 increments would stop
+  // loading - so the two are pinned together rather than in separate tests.
+  assert.equal(parseValue("-42"), -42);
+  assert.equal(parseValue("-20.9"), -20.9);
 });
 
 test("parseValue rejects anything that is not a number or a range", () => {

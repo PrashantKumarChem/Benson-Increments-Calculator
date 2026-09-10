@@ -1,0 +1,33 @@
+{
+  "_comment": [
+    "The contract both implementations are held to. Empty on purpose: WP4 fills it.",
+    "",
+    "A generated artifact removes drift from the data and everything derived from",
+    "it, but not from the handful of rules that stay written twice - the tally",
+    "arithmetic, how a total is formatted, how a query is matched, and whether an",
+    "uncertainty propagates. This file pins those as input and expected output, so",
+    "the Python suite and the JavaScript suite are checking one agreed answer",
+    "rather than checking each other. That is the difference between preventing",
+    "drift and detecting it; it also survives the notebook being rewritten, which",
+    "tools/check_parity.mjs does not.",
+    "",
+    "It replaces check_parity.mjs at WP4 and not before: until then the parity",
+    "check is the safety net under the extraction, and a fixture covering less",
+    "than it does would be a downgrade dressed as an upgrade.",
+    "",
+    "Each entry of 'cases' is one question with one answer:",
+    "",
+    "  id       a stable name, so a failure says which rule broke",
+    "  rule     which rule it pins - tally | total | query | uncertainty",
+    "  why      what would be wrong if this case ever changed",
+    "  input    the arguments, shaped by 'rule'",
+    "  expect   the expected result",
+    "",
+    "One case is required and is the reason this file is worth having: ten groups",
+    "each carrying an uncertainty of 3 must report the whole-total figure, not the",
+    "quadrature sum. That decision is exactly the kind a second implementation",
+    "reinvents wrongly six months later, and a wrong error bar looks like a right",
+    "one."
+  ],
+  "cases": []
+}
