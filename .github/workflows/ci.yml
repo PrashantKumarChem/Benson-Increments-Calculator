@@ -129,3 +129,36 @@ jobs:
         run: node tools/check_parity.mjs
         env:
           PYTHON: python
+
+  citations:
+    name: Cited DOIs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The unit tests above already compare every citation with
+      # tools/doi_lock.json. That comparison is only as honest as the file, and a
+      # file edited to agree with a wrong DOI passes it. This asks doi.org again,
+      # and fails if the committed file is not what the DOIs resolve to - the same
+      # bargain as the manifest and the asset version, with the registries in
+      # place of the source files.
+      #
+      # It is a job of its own because it is the only one that needs the network.
+      # When the resolver is down this job goes red and says the resolver could
+      # not be reached, and the jobs that test the calculator stay green. It has
+      # no path filter, so it runs whenever this workflow does and cannot sit
+      # waiting for a change that never touches a citation.
+      - name: Resolve every cited DOI
+        run: node tools/build_doi_lock.mjs
+
+      # Against the records just fetched, not the committed ones: a file edited to
+      # agree with a wrong DOI is refused here by name, with both titles, before
+      # the diff below shows the same thing as raw JSON.
+      - name: Compare every citation with what its DOI resolves to
+        run: node --test tools/doi_lock.test.mjs
+
+      - name: Confirm the committed DOI lock is current
+        run: git diff --exit-code tools/doi_lock.json
