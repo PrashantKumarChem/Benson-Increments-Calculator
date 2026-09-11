@@ -27,6 +27,10 @@ RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s+to\s+(-?\d*\.?\d+)$")
 # through to "neither a number nor a range" would tell a contributor their row
 # is unreadable without telling them it used to be the house style.
 HYPHEN_RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$")
+# A spreadsheet may quote a cell. One quote comes off each end and no more, which
+# is how the site reads a cell: taking every quote off would accept '""-42""'
+# here while the site refuses it.
+QUOTE_PAIR_RE = re.compile(r'\A"|"\Z')
 
 
 class InvalidValueError(ValueError):
@@ -52,8 +56,9 @@ class Value:
     high: Optional[float] = None
 
 
-def _cell_text(raw) -> str:
-    return str(raw).strip().strip('"')
+def cell_text(raw) -> str:
+    """A cell as written: the space around it trimmed, then one quote off each end."""
+    return QUOTE_PAIR_RE.sub("", str(raw).strip())
 
 
 def _decimals_of(text: str) -> int:
@@ -63,7 +68,7 @@ def _decimals_of(text: str) -> int:
 
 def read_value(raw) -> Value:
     """Read one cell. Ranges are averaged; negatives are preserved."""
-    text = _cell_text(raw)
+    text = cell_text(raw)
     if not text:
         raise InvalidValueError("empty value")
     match = RANGE_RE.match(text)
@@ -95,13 +100,3 @@ def parse_value(raw) -> float:
     that can drift apart.
     """
     return read_value(raw).value
-
-
-def is_range(raw) -> bool:
-    """Whether a cell is written as a published range rather than a single number.
-
-    Asked by the rule in tools/validate_data.py that keeps ranges and negative
-    values in separate category files, which is where the reason for that rule
-    lives.
-    """
-    return RANGE_RE.match(_cell_text(raw)) is not None

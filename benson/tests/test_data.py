@@ -89,8 +89,55 @@ class ReadingACategory(Fixture):
         self.assertEqual(read_category(path).columns, ["Group", "Value"])
 
     def test_a_blank_line_is_not_a_row(self):
+        # Nor a line to report: a malformed line is kept so the validator can
+        # name it, and an empty line or one of spaces is not malformed.
         path = self.write("01_A.csv", "Group,Value\nC-(C)(H)3,-42\n\n   \nC-(C)2(H)2,-20.9")
-        self.assertEqual(read_category(path).rows, [("C-(C)(H)3", "-42"), ("C-(C)2(H)2", "-20.9")])
+        category = read_category(path)
+        self.assertEqual([cells for _, cells in category.records], [("C-(C)(H)3", "-42"), ("C-(C)2(H)2", "-20.9")],
+                         "a blank line, or one of spaces, is not kept")
+        self.assertEqual(category.rows, [("C-(C)(H)3", "-42"), ("C-(C)2(H)2", "-20.9")])
+
+    def test_each_line_keeps_the_number_it_has_in_the_file(self):
+        # The validator reports a fault by line. Counted from the rows alone,
+        # every line after the first blank one was reported one too early, and
+        # the site, which counts the file's own lines, named a different line.
+        path = self.write("01_A.csv", "Group,Value\nC-(C)(H)3,-42\n\n   \nC-(C)2(H)2,-20.9")
+        self.assertEqual(read_category(path).records,
+                         [(2, ("C-(C)(H)3", "-42")), (5, ("C-(C)2(H)2", "-20.9"))],
+                         "a line is numbered as it is in the file, blank lines counted")
+
+    def test_a_quoted_cell_over_two_lines_does_not_move_the_lines_after_it(self):
+        path = self.write("01_A.csv", 'Group,Value\n"C-(C)\n(H)3",-42\nC-(C)2(H)2,-20.9')
+        self.assertEqual([line for line, _ in read_category(path).records], [2, 4],
+                         "a line is numbered by where it starts in the file")
+
+    def test_a_line_with_more_than_two_cells_is_kept_whole_and_is_not_a_row(self):
+        # D,5,0.03 used to be read as D with the value 5: the third cell was
+        # dropped before anything could see it, so the validator's stray-comma
+        # message could never fire. The site reads the same line as a group
+        # called "D,5".
+        path = self.write("01_A.csv", "Group,Value\nD,5,0.03\nC-(C)(H)3,-42")
+        category = read_category(path)
+        self.assertEqual(category.records, [(2, ("D", "5", "0.03")), (3, ("C-(C)(H)3", "-42"))],
+                         "every cell of the line is kept, so the validator can count them")
+        self.assertEqual(category.rows, [("C-(C)(H)3", "-42")],
+                         "a line of three cells is not a group and a value")
+
+    def test_a_line_with_no_group_name_is_kept_and_is_not_a_row(self):
+        # It used to be dropped, so the validator's "missing group name" could
+        # never fire either; the site reports this line by that name.
+        path = self.write("01_A.csv", "Group,Value\n,0.03\nC-(C)(H)3,-42")
+        category = read_category(path)
+        self.assertEqual(category.records, [(2, ("", "0.03")), (3, ("C-(C)(H)3", "-42"))],
+                         "a line with a value and no name is kept")
+        self.assertEqual(category.rows, [("C-(C)(H)3", "-42")],
+                         "a value without a name is not a row")
+
+    def test_a_line_with_one_cell_is_kept_and_is_not_a_row(self):
+        path = self.write("01_A.csv", "Group,Value\nC-(C)(H)3 -42")
+        category = read_category(path)
+        self.assertEqual(category.records, [(2, ("C-(C)(H)3 -42",))], "a line with no comma is kept")
+        self.assertEqual(category.rows, [], "and is not a row")
 
     def test_a_quoted_group_name_may_hold_a_comma(self):
         path = self.write("01_A.csv", 'Group,Value\n"Ct-(CB), CB-(Ct)",25')
@@ -104,6 +151,7 @@ class ReadingACategory(Fixture):
         except Exception as error:
             self.fail(f"an empty file has to read as empty, not raise: {error!r}")
         self.assertEqual(category.columns, [])
+        self.assertEqual(category.records, [])
         self.assertEqual(category.rows, [])
 
 
@@ -119,6 +167,12 @@ class ReadingPairs(Fixture):
     def test_a_quoted_key_is_unquoted(self):
         path = self.write("pairs.csv", 'Key,Value\n"Cis- (one t-butyl)",none')
         self.assertEqual(list(read_pairs(path)), [(2, "Cis- (one t-butyl)", "none")])
+
+    def test_one_quote_comes_off_each_end_of_a_key_and_no_more(self):
+        # As the site reads a notation file, so that both look up the same name.
+        path = self.write("pairs.csv", 'Key,Value\n""Cis- (one t-butyl)"",none')
+        self.assertEqual(list(read_pairs(path)), [(2, '"Cis- (one t-butyl)"', "none")],
+                         "a doubled quote keeps one, as the site keeps it")
 
     def test_a_line_with_no_comma_is_a_key_with_no_value(self):
         # Reported by the validator as a key with no value, rather than skipped.

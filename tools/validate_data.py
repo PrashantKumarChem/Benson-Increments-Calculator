@@ -31,7 +31,7 @@ from benson.data import (
     read_pairs,
 )
 from benson.notation import NOTATION_FILES, load_notation
-from benson.values import is_range, parse_value
+from benson.values import Value, read_value
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
 # cannot print one. Reporting a problem must not itself become one.
@@ -72,14 +72,13 @@ def check_category(category: Category, report: Report) -> None:
     if not all(category.columns):
         report.add(name, 1, "header has an empty column title")
 
-    if not category.rows:
+    if not category.records:
         report.add(name, 0, "file has a header but no data rows")
         return
 
     first_seen: dict[str, int] = {}
-    for offset, row in enumerate(category.rows):
-        line = offset + 2  # header is line 1
-
+    readings: list[tuple[int, str, Value]] = []
+    for line, row in category.records:
         if len(row) != 2:
             report.add(name, line, f"{len(row)} columns, expected 2 - a stray comma in the group name?")
             continue
@@ -93,9 +92,12 @@ def check_category(category: Category, report: Report) -> None:
             first_seen[label] = line
 
         try:
-            parse_value(raw_value)
+            reading = read_value(raw_value)
         except ValueError as exc:
             report.add(name, line, f"{label or 'row'}: {exc}")
+            continue
+        if label:
+            readings.append((line, label, reading))
 
     # While a range was written with a hyphen, this combination was unreadable.
     # The notebook splits a string cell on the range separator, and pandas types
@@ -110,11 +112,13 @@ def check_category(category: Category, report: Report) -> None:
     # that has already driven them apart, and no category mixes them today - so
     # holding the data inside what both are known to agree on costs nothing while
     # the rules are being moved into one place.
-    written = [(offset + 2, row[0], row[1])
-               for offset, row in enumerate(category.rows) if len(row) == 2]
-    ranges = [(line, label) for line, label, raw in written if is_range(raw)]
-    negatives = [(line, label) for line, label, raw in written
-                 if not is_range(raw) and str(raw).strip().strip('"').startswith("-")]
+    #
+    # It asks the reading the value check above already made, rather than
+    # reading the cell a second way; a cell that could not be read has been
+    # reported, and is neither.
+    ranges = [(line, label) for line, label, reading in readings if reading.is_range]
+    negatives = [(line, label) for line, label, reading in readings
+                 if not reading.is_range and reading.source.startswith("-")]
     if ranges and negatives:
         report.add(name, ranges[0][0],
                    f"{ranges[0][1]!r} is a range, and {negatives[0][1]!r} on line "
@@ -244,12 +248,12 @@ def check_unique_names(categories: list[Category], report: Report) -> None:
     """
     seen: dict[str, str] = {}
     for category in categories:
-        for offset, row in enumerate(category.rows):
+        for line, row in category.records:
             if len(row) != 2 or not row[0]:
                 continue
             owner = seen.setdefault(row[0], category.file)
             if owner != category.file:
-                report.add(category.file, offset + 2,
+                report.add(category.file, line,
                            f"{row[0]!r} is already defined in {owner} - a group name has to be "
                            "unique across categories, not just within one file")
 
