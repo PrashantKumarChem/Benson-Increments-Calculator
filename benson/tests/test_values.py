@@ -14,6 +14,9 @@ from benson.values import InvalidValueError, parse_value, read_value
 
 class PlainNumbers(unittest.TestCase):
     def test_reads_plain_numbers_including_negatives(self):
+        # The hyphen-form refusal below and the minus sign are the same
+        # character. If the refusal ever widened to cover a leading minus, most
+        # of the data would stop loading, and this is the test that goes red.
         self.assertEqual(parse_value("-42"), -42)
         self.assertEqual(parse_value("-20.9"), -20.9)
         self.assertEqual(parse_value("2"), 2)
@@ -73,13 +76,6 @@ class Ranges(unittest.TestCase):
                       "the message has to name what is wrong with the row")
         self.assertIn("'1.05 to 1.76'", str(caught.exception),
                       "and quote the row rewritten correctly")
-
-    def test_refusing_the_hyphen_form_does_not_refuse_a_negative_number(self):
-        # The refusal and the minus sign are the same character. If the refusal
-        # ever widened to cover a leading minus, most of the data would stop
-        # loading - so the two are pinned together.
-        self.assertEqual(parse_value("-42"), -42)
-        self.assertEqual(parse_value("-20.9"), -20.9)
 
     def test_a_range_is_recognised_as_one(self):
         # validate_data.py keeps ranges and negative values in separate files by
