@@ -118,13 +118,16 @@ throughout. CI runs it.
 
 ```bash
 node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing, notation
-node tools/check_parity.mjs     # every increment, notebook vs. site
+python -m unittest discover -s benson/tests -t .   # the benson package's rules
 node tools/validate_css.mjs     # the stylesheet parses, and every token it names exists
 ```
 
-Those need nothing installed. One more does:
+Those need nothing installed. Two more do. `check_parity.mjs` runs the
+notebook's own code, so it needs pandas, in `python` or in whichever interpreter
+a `PYTHON` variable names. `check_render.mjs` needs a browser:
 
 ```bash
+node tools/check_parity.mjs     # every increment, notebook vs. site
 npm install --no-save playwright && npx playwright install chromium
 node tools/check_render.mjs     # open the page and ask where its furniture ended up
 ```
