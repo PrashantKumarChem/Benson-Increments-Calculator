@@ -9,7 +9,7 @@ Those stay, and keep testing assets/benson.js, until the website stops parsing.
 """
 import unittest
 
-from benson.values import InvalidValueError, is_range, parse_value, read_value
+from benson.values import InvalidValueError, parse_value, read_value
 
 
 class PlainNumbers(unittest.TestCase):
@@ -21,6 +21,27 @@ class PlainNumbers(unittest.TestCase):
 
     def test_a_quoted_cell_reads_as_what_it_quotes(self):
         self.assertEqual(parse_value('"-42"'), -42)
+
+    def test_one_quote_comes_off_each_end_and_no_more(self):
+        # As the site reads a cell. Taking every quote off read '""-42""' as -42
+        # here, while the site refused it; a validator that accepts what the
+        # site refuses is checking a different file from the one served.
+        for text in ['"-42', '-42"']:
+            with self.subTest(text=text):
+                try:
+                    self.assertEqual(read_value(text).source, "-42", "a quote at either end comes off")
+                except InvalidValueError as error:
+                    self.fail(f"a quote at either end comes off, and {text!r} did not read: {error}")
+        with self.assertRaises(InvalidValueError, msg="'\"\"-42\"\"' holds '\"-42\"', which is not a number"):
+            parse_value('""-42""')
+
+    def test_the_space_around_a_quoted_cell_comes_off_first(self):
+        try:
+            self.assertEqual(read_value(' "-42" ').source, "-42", "space outside the quotes is not part of the cell")
+        except InvalidValueError as error:
+            self.fail(f"space outside the quotes is not part of the cell, and ' \"-42\" ' did not read: {error}")
+        with self.assertRaises(InvalidValueError, msg="space inside the quotes is part of what they quote"):
+            parse_value('" -42 "')
 
     def test_rejects_anything_that_is_not_a_number_or_a_range(self):
         for bad in ["", "   ", "abc", "1.2.3", "--4"]:
@@ -62,16 +83,20 @@ class Ranges(unittest.TestCase):
 
     def test_a_range_is_recognised_as_one(self):
         # validate_data.py keeps ranges and negative values in separate files by
-        # asking this. Were it to answer False for everything, that rule would
-        # stop firing with every check still green.
+        # asking a cell's reading this. Were it to answer False for everything,
+        # that rule would stop firing with every check still green.
         for text in ["1.05 to 1.76", ' "2.51 to 4.35" ', "-5.2 to -3.1"]:
             with self.subTest(text=text):
-                self.assertTrue(is_range(text), f"{text!r} is a published range")
+                try:
+                    reading = read_value(text)
+                except InvalidValueError as error:
+                    self.fail(f"{text!r} is a published range, and did not read: {error}")
+                self.assertTrue(reading.is_range, f"{text!r} is a published range")
 
-    def test_a_number_or_the_hyphen_form_is_not_a_range(self):
-        for text in ["-42", "13.8", "1.05-1.76"]:
+    def test_a_number_is_not_a_range(self):
+        for text in ["-42", "13.8"]:
             with self.subTest(text=text):
-                self.assertFalse(is_range(text), f"{text!r} is not a range")
+                self.assertFalse(read_value(text).is_range, f"{text!r} is not a range")
 
 
 class HowTheSourceWroteIt(unittest.TestCase):

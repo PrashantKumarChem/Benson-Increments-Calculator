@@ -16,6 +16,8 @@ import os
 import re
 from dataclasses import dataclass, field
 
+from benson.values import cell_text
+
 CSV_DIR = "CSV_data_files"
 MANIFEST_NAME = "manifest.json"
 # Hand-edited, and optional: what a category's numbers are, and where they came
@@ -107,7 +109,8 @@ def read_pairs(path: str):
     """Read a two-column file as (line number, key, value).
 
     Split on the last comma, which is what assets/notation.js does, so a group
-    name may contain a comma even though a value may not.
+    name may contain a comma even though a value may not. A key is a cell as the
+    site reads one, so one quote comes off each end.
     """
     with open(path, encoding="utf-8-sig") as handle:
         for offset, line in enumerate(handle.read().splitlines()[1:]):
@@ -117,7 +120,7 @@ def read_pairs(path: str):
             if not comma:
                 yield offset + 2, line.strip(), ""
             else:
-                yield offset + 2, key.strip().strip('"'), value.strip()
+                yield offset + 2, cell_text(key), value.strip()
 
 
 def read_metadata(notation_dir: str = NOTATION_DIR) -> dict[str, dict[str, str]]:

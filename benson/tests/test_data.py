@@ -168,6 +168,12 @@ class ReadingPairs(Fixture):
         path = self.write("pairs.csv", 'Key,Value\n"Cis- (one t-butyl)",none')
         self.assertEqual(list(read_pairs(path)), [(2, "Cis- (one t-butyl)", "none")])
 
+    def test_one_quote_comes_off_each_end_of_a_key_and_no_more(self):
+        # As the site reads a notation file, so that both look up the same name.
+        path = self.write("pairs.csv", 'Key,Value\n""Cis- (one t-butyl)"",none')
+        self.assertEqual(list(read_pairs(path)), [(2, '"Cis- (one t-butyl)"', "none")],
+                         "a doubled quote keeps one, as the site keeps it")
+
     def test_a_line_with_no_comma_is_a_key_with_no_value(self):
         # Reported by the validator as a key with no value, rather than skipped.
         path = self.write("pairs.csv", "Key,Value\n just a name ")
