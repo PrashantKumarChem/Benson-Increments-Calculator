@@ -16,7 +16,12 @@ import sys
 # cannot print one. Reporting is not worth crashing a build over.
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-from benson_data import CSV_DIR, MANIFEST_NAME, find_categories, manifest_for, read_metadata
+# Run as a script, Python puts tools/ on the path and not the repository root,
+# so the package is not importable until the root is added. First, so a checkout
+# is always built by its own rules rather than by a copy installed elsewhere.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from benson.data import CSV_DIR, MANIFEST_NAME, find_categories, manifest_for, read_metadata
 
 
 def main() -> int:
