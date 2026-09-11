@@ -72,14 +72,12 @@ def check_category(category: Category, report: Report) -> None:
     if not all(category.columns):
         report.add(name, 1, "header has an empty column title")
 
-    if not category.rows:
+    if not category.records:
         report.add(name, 0, "file has a header but no data rows")
         return
 
     first_seen: dict[str, int] = {}
-    for offset, row in enumerate(category.rows):
-        line = offset + 2  # header is line 1
-
+    for line, row in category.records:
         if len(row) != 2:
             report.add(name, line, f"{len(row)} columns, expected 2 - a stray comma in the group name?")
             continue
@@ -110,8 +108,7 @@ def check_category(category: Category, report: Report) -> None:
     # that has already driven them apart, and no category mixes them today - so
     # holding the data inside what both are known to agree on costs nothing while
     # the rules are being moved into one place.
-    written = [(offset + 2, row[0], row[1])
-               for offset, row in enumerate(category.rows) if len(row) == 2]
+    written = [(line, row[0], row[1]) for line, row in category.records if len(row) == 2 and row[0]]
     ranges = [(line, label) for line, label, raw in written if is_range(raw)]
     negatives = [(line, label) for line, label, raw in written
                  if not is_range(raw) and str(raw).strip().strip('"').startswith("-")]
@@ -244,12 +241,12 @@ def check_unique_names(categories: list[Category], report: Report) -> None:
     """
     seen: dict[str, str] = {}
     for category in categories:
-        for offset, row in enumerate(category.rows):
+        for line, row in category.records:
             if len(row) != 2 or not row[0]:
                 continue
             owner = seen.setdefault(row[0], category.file)
             if owner != category.file:
-                report.add(category.file, offset + 2,
+                report.add(category.file, line,
                            f"{row[0]!r} is already defined in {owner} - a group name has to be "
                            "unique across categories, not just within one file")
 

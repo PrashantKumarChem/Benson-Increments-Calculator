@@ -52,11 +52,20 @@ def title_for(stem: str) -> str:
 
 @dataclass
 class Category:
-    """One CSV file: its identity on disk and the rows it holds."""
+    """One CSV file: its identity on disk and what was read from it."""
 
     path: str
     columns: list[str] = field(default_factory=list)
-    rows: list[tuple[str, str]] = field(default_factory=list)
+    #: Every line after the header that is not blank, as (line number, cells),
+    #: whether or not it is a usable row. A malformed line is kept so that it can
+    #: be reported, and numbered as it is in the file so that it is reported where
+    #: it is.
+    records: list[tuple[int, tuple[str, ...]]] = field(default_factory=list)
+
+    @property
+    def rows(self) -> list[tuple[str, str]]:
+        """The lines that are a group name and a value, which is what the category holds."""
+        return [cells for _, cells in self.records if len(cells) == 2 and cells[0]]
 
     @property
     def file(self) -> str:
@@ -78,12 +87,20 @@ class Category:
 def read_category(path: str) -> Category:
     """Read one CSV without judging it: validation is validate_data.py's job."""
     with open(path, encoding="utf-8-sig", newline="") as handle:
-        raw = list(csv.reader(handle))
-    if not raw:
-        return Category(path=path)
-    header = [c.strip() for c in raw[0]]
-    rows = [tuple(c.strip() for c in row[:2]) for row in raw[1:] if row and row[0].strip()]
-    return Category(path=path, columns=header, rows=rows)
+        reader = csv.reader(handle)
+        header = next(reader, None)
+        if header is None:
+            return Category(path=path)
+        records = []
+        # Where the next line starts. The reader's own count is where the last
+        # one ended, which is further on when a quoted cell ran over a line break.
+        start = reader.line_num + 1
+        for cells in reader:
+            cells = tuple(c.strip() for c in cells)
+            if len(cells) > 1 or (cells and cells[0]):
+                records.append((start, cells))
+            start = reader.line_num + 1
+    return Category(path=path, columns=[c.strip() for c in header], records=records)
 
 
 def read_pairs(path: str):
