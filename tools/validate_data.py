@@ -12,7 +12,6 @@ import csv
 import json
 import os
 import sys
-from dataclasses import dataclass
 
 # Run as a script, Python puts tools/ on the path and not the repository root,
 # so the package is not importable until the root is added. First, so a checkout
@@ -31,7 +30,7 @@ from benson.data import (
     read_metadata,
     read_pairs,
 )
-from benson.notation import COMPOSITION_RE
+from benson.notation import NOTATION_FILES, load_notation
 from benson.values import is_range, parse_value
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
@@ -202,77 +201,29 @@ def check_manifest(categories: list[Category], report: Report) -> None:
                                      "run: python tools/build_data.py")
 
 
-@dataclass(frozen=True)
-class NotationFile:
-    """One notation file and what is true of it, so no check has to guess."""
-
-    name: str
-    #: The key is a group name that must still exist in CSV_data_files/.
-    keys_are_groups: bool
-    #: The value is a composition rather than free text.
-    values_are_compositions: bool
-    #: A key may appear more than once, as a group may have several synonyms.
-    keys_may_repeat: bool = False
-    #: 'unknown' is an acceptable answer - true where a composition is still open.
-    allows_unknown: bool = False
-    #: What a value that must be definite is called, for the message.
-    subject: str = ""
-
-
-NOTATION_FILES = (
-    NotationFile("central_atoms.csv", keys_are_groups=False, values_are_compositions=True,
-                 subject="a central notation"),
-    NotationFile("ligand_atoms.csv", keys_are_groups=False, values_are_compositions=True,
-                 subject="a ligand"),
-    NotationFile("special_labels.csv", keys_are_groups=True, values_are_compositions=True,
-                 allows_unknown=True),
-    NotationFile("synonyms.csv", keys_are_groups=True, values_are_compositions=False,
-                 keys_may_repeat=True),
-)
-
-
 def check_notation(categories: list[Category], report: Report) -> None:
     """The notation files say what the group names are made of.
 
-    Only the mistakes that outlast a single edit are checked here: a composition
-    that is not element symbols, the same key answered twice, and - the one that
-    will actually fire - a file still pointing at a group that has since been
-    renamed. Whether a name can be read at all is a question about both the data
-    and the parser, so tools/notation.test.mjs asks it.
+    What each file may hold - a composition written as element symbols, a key
+    answered once, 'unknown' only where a composition is still open - is the
+    package's rule, applied as it loads them, and this reports every row it
+    refused. The one added here needs the data as well as the files, and is the
+    one that will actually fire: a file still pointing at a group that has since
+    been renamed. Whether a name can be read at all is a question about both the
+    data and the parser, so the notation tests ask it.
     """
-    known = {label for category in categories for label, _ in category.rows}
+    for problem in load_notation().problems:
+        report.add(problem.file, problem.line, problem.message)
 
+    known = {label for category in categories for label, _ in category.rows}
     for spec in NOTATION_FILES:
         path = os.path.join(NOTATION_DIR, spec.name)
-        if not os.path.exists(path):
-            report.add(spec.name, 0, f"missing - the calculator reads {NOTATION_DIR}/{spec.name}")
+        if not spec.keys_are_groups or not os.path.exists(path):
             continue
-
-        seen: dict[str, int] = {}
         for line, key, value in read_pairs(path):
-            if not value:
-                report.add(spec.name, line, f"{key!r} has no value")
-                continue
-
-            if spec.keys_are_groups and key not in known:
+            # A row with no key or no value has been reported by the loader already.
+            if key and value and key not in known:
                 report.add(spec.name, line, f"{key!r} is not a group in {CSV_DIR}/ - was it renamed?")
-
-            if not spec.keys_may_repeat:
-                if key in seen:
-                    report.add(spec.name, line, f"{key!r} is already answered on line {seen[key]}")
-                else:
-                    seen[key] = line
-
-            if not spec.values_are_compositions:
-                continue
-
-            if value == "unknown":
-                if not spec.allows_unknown:
-                    report.add(spec.name, line, f"{key!r} cannot be 'unknown' - "
-                                                f"{spec.subject} must say what it is")
-            elif value != "none" and not COMPOSITION_RE.match(value):
-                report.add(spec.name, line, f"{key!r}: {value!r} is not element symbols with optional "
-                                            "counts, like 'C', 'N O2' or 'C2'")
 
 
 def check_unique_names(categories: list[Category], report: Report) -> None:
