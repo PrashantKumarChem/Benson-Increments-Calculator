@@ -8,9 +8,10 @@ Python, and everything else consumes them. The website reads a generated
 artifact and stops parsing; the notebook imports this package directly, which is
 also what lets a student load their own file under identical rules.
 
-The value rule and the reading of the source data have moved in, and the
-repository's Python tools use them from here. The notation rules follow; each
-module says what it owns and what it does not own yet.
+The value rule, the reading of the source data and the notation rules have moved
+in, and the repository's Python tools use them from here. The website still runs
+its own copies of the same rules until it reads a generated artifact; emitting
+that artifact is what `build` will own.
 
 **Pure Python, zero runtime dependencies.** Not a preference: it is what makes
 `pip install` from a git URL instant in Colab, keeps the package able to run
