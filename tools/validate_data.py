@@ -14,8 +14,12 @@ import os
 import sys
 from dataclasses import dataclass
 
-from benson_data import (
-    COMPOSITION_RE,
+# Run as a script, Python puts tools/ on the path and not the repository root,
+# so the package is not importable until the root is added. First, so a checkout
+# is always checked by its own rules rather than by a copy installed elsewhere.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from benson.data import (
     CSV_DIR,
     MANIFEST_NAME,
     METADATA_FIELDS,
@@ -24,11 +28,11 @@ from benson_data import (
     Category,
     build_manifest_comparable,
     find_categories,
-    is_range,
-    parse_value,
     read_metadata,
     read_pairs,
 )
+from benson.notation import COMPOSITION_RE
+from benson.values import is_range, parse_value
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
 # cannot print one. Reporting a problem must not itself become one.

@@ -8,7 +8,12 @@ extraction, and the one where a rule is easiest to lose:
 - the search keys a student actually types, including synonyms
 - the notation data in `notation/` that says what cannot be derived from a name
 
-The composition rule is written twice today: `COMPOSITION_RE` in
-`tools/benson_data.py`, and the same rule again in `assets/notation.js`. Here it
-is written once.
+Only the composition syntax has moved in so far. It is still written twice:
+here, and again in `assets/notation.js`, which reads compositions by the same
+rule. Porting that file is what makes it once.
 """
+import re
+
+# "C", "N O2", "C2" - element symbols separated by spaces, each with an
+# optional count.
+COMPOSITION_RE = re.compile(r"^[A-Z][a-z]?\d*(?:\s+[A-Z][a-z]?\d*)*$")

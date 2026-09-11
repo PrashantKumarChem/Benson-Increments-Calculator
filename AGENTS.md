@@ -61,6 +61,7 @@ python tools/validate_data.py     # the increment CSVs and the manifest
 python tools/validate_assets.py   # every asset requested at one version
 node   tools/validate_css.mjs     # the stylesheet parses; every token exists
 node --test tools/*.test.mjs      # unit tests
+python -m unittest discover -s benson/tests -t .   # the benson package's tests
 node   tools/check_parity.mjs     # every increment: notebook vs. site
 node   tools/check_render.mjs     # the page, in a real browser
 ```
@@ -68,6 +69,8 @@ node   tools/check_render.mjs     # the page, in a real browser
 Notes:
 
 - **Never assert a specific test count.** It grows. Assert zero failures.
+  Read `unittest`'s count all the same: before Python 3.12 it reports `OK`
+  having found no tests at all.
 - `check_parity.mjs` needs a `PYTHON` environment variable pointing at an
   interpreter with `pandas`.
 - `check_render.mjs` is the only check needing a browser:
