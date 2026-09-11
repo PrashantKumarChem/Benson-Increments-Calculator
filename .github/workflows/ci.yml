@@ -19,6 +19,20 @@ jobs:
         with:
           python-version: '3.11'
 
+      # The rules every Python step in this job applies live in the benson
+      # package, and these are its tests. Standard library only, so nothing is
+      # installed. A step here rather than a job of its own, because this job is
+      # already a required check.
+      #
+      # The count is checked as well as the exit code: before Python 3.12 a
+      # discovery that finds no tests still exits 0, so a renamed test file would
+      # leave this green having run nothing.
+      - name: Test the rules package
+        run: |
+          out=$(python -m unittest discover -s benson/tests -t . 2>&1) || { echo "$out"; exit 1; }
+          echo "$out"
+          echo "$out" | grep -qE '^Ran [1-9][0-9]* tests? in' || { echo "No tests ran."; exit 1; }
+
       # Checks what a contributor can actually get wrong: two columns per file,
       # every value a number or a range, no duplicate or blank group names, the
       # filename convention, and manifest.json matching what is on disk.
