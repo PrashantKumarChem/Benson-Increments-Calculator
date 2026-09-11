@@ -1,6 +1,7 @@
 ---
 paths:
   - "tools/*.test.mjs"
+  - "tools/thermochemistry_data.mjs"
 ---
 
 # Citing a published value in a test
@@ -9,9 +10,10 @@ A test that compares the calculator against the literature is only as good as
 its citations. Nobody can check the chemistry by reading the code, so the
 citation is the only thing standing between a published value and a rumour.
 
-This rule covers tests. The increment data files are covered by
-[`data.md`](data.md), and a two-column data row has nowhere to keep the fields
-below — do not try to add them there.
+This rule covers tests, and `tools/thermochemistry_data.mjs`, where the
+thermochemistry test keeps its cited values. The increment data files are
+covered by [`data.md`](data.md), and a two-column data row has nowhere to keep
+the fields below — do not try to add them there.
 
 Two properties matter, and they are separate:
 
