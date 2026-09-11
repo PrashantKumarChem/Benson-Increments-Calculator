@@ -1,5 +1,5 @@
 /**
- * Does the increment data agree with reality?
+ * Does the increment data agree with experiment?
  *
  * Every other check in this repository proves the tool is internally
  * consistent. check_parity.mjs proves the notebook and the site read all 236
@@ -8,9 +8,15 @@
  * table, because a wrong number is copied faithfully into both consumers and
  * satisfies every one of those rules.
  *
- * This test closes that gap the only way it can be closed: by summing groups
- * for real molecules and comparing the total against an experimental
- * gas-phase enthalpy of formation looked up in the literature.
+ * This test does not close that gap either. It sums groups for real molecules
+ * and compares each total with an experimental gas-phase enthalpy of formation
+ * looked up in the literature. What it catches is an increment wrong enough
+ * that a molecule using it disagrees with experiment by more than the method's
+ * own scatter, as the tolerance below sets it, and only for the groups these
+ * molecules use. The less often these molecules use a group, the larger an
+ * error in it has to be before that happens, and a transcription error too
+ * small to get there passes. Nothing here checks a value against the source it
+ * was printed in.
  *
  * The molecules are decomposed by hand below. That is deliberate - structure
  * perception is an explicit non-goal for this project, so the decomposition is
@@ -59,8 +65,7 @@ const CORRECTIONS = "04_Corrections.csv";
  * set currently sits near 1.1 kJ/mol mean absolute error with a worst case of
  * 5.7, so both bounds have room above the data. This is a guard against an
  * increment that disagrees with the published thermochemistry, not a
- * change-detector for the CSV files - check_parity.mjs and validate_data.py
- * already cover unintended edits, and they do it to the last decimal.
+ * change-detector for the CSV files.
  */
 const PER_MOLECULE = 11.0;
 const MEAN_ABSOLUTE = 5.5;
