@@ -212,10 +212,8 @@ def check_notation(categories: list[Category], report: Report) -> None:
     been renamed. Whether a name can be read at all is a question about both the
     data and the parser, so the notation tests ask it.
     """
-    for problem in load_notation().problems:
-        report.add(problem.file, problem.line, problem.message)
-
     known = {label for category in categories for label, _ in category.rows}
+    problems = []
     for spec in NOTATION_FILES:
         path = os.path.join(NOTATION_DIR, spec.name)
         if not spec.keys_are_groups or not os.path.exists(path):
@@ -223,7 +221,16 @@ def check_notation(categories: list[Category], report: Report) -> None:
         for line, key, value in read_pairs(path):
             # A row with no key or no value has been reported by the loader already.
             if key and value and key not in known:
-                report.add(spec.name, line, f"{key!r} is not a group in {CSV_DIR}/ - was it renamed?")
+                problems.append((spec.name, line, f"{key!r} is not a group in {CSV_DIR}/ - was it renamed?"))
+    problems += load_notation().problems
+
+    # File by file and line by line, as a contributor reads them - not every
+    # refused row and then every renamed group. The sort is stable, so on one
+    # line a renamed group still comes before what else is wrong with the row.
+    order = {spec.name: index for index, spec in enumerate(NOTATION_FILES)}
+    for file, line, message in sorted(problems, key=lambda problem: (order.get(problem[0], len(order)),
+                                                                     problem[1])):
+        report.add(file, line, message)
 
 
 def check_unique_names(categories: list[Category], report: Report) -> None:
