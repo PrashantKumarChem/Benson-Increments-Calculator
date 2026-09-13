@@ -80,8 +80,10 @@ def check_category(category: Category, report: Report) -> None:
     readings: list[tuple[int, str, Value]] = []
     for line, row in category.records:
         # A line with no comma at all is missing one, not carrying a stray one;
-        # the site says so in the same words.
-        if len(row) == 1:
+        # the site says so in the same words. Only when there is no comma: a comma
+        # inside quotes still makes one cell here, and "no comma" would contradict
+        # a line the contributor can see holds one.
+        if len(row) == 1 and "," not in row[0]:
             report.add(name, line, "no comma - expected two columns")
             continue
         if len(row) != 2:
