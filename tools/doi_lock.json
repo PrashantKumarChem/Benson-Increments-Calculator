@@ -1,0 +1,276 @@
+{
+  "generatedBy": "node tools/build_doi_lock.mjs",
+  "records": {
+    "10.1007/978-94-009-4099-4": {
+      "type": "book",
+      "title": "Thermochemical Data of Organic Compounds",
+      "authors": [
+        "Pedley",
+        "Naylor",
+        "Kirby"
+      ],
+      "year": 1986,
+      "volume": null,
+      "page": null
+    },
+    "10.1016/0021-9614(69)90066-4": {
+      "type": "journal-article",
+      "title": "Thermochemistry of the gas phase equilibria i-C3H7I \uE5FB C3H6 + HI, n-C3H7I \uE5FB i-C3H7I, and C3H6 + 2HI \uE5FB C3H8 + I2",
+      "authors": [
+        "Furuyama",
+        "Golden",
+        "Benson"
+      ],
+      "year": 1969,
+      "volume": "1",
+      "page": "363-375"
+    },
+    "10.1016/0021-9614(70)90088-1": {
+      "type": "journal-article",
+      "title": "The enthalpies of combustion and formation of the isomeric pentanes",
+      "authors": [
+        "Good"
+      ],
+      "year": 1970,
+      "volume": "2",
+      "page": "237-244"
+    },
+    "10.1016/0021-9614(75)90035-x": {
+      "type": "journal-article",
+      "title": "Thermodynamic properties of organic oxygen compounds 42. Physical and thermodynamic properties of benzaldehyde",
+      "authors": [
+        "Ambrose",
+        "Connett",
+        "Green",
+        "Hales",
+        "Head",
+        "Martin"
+      ],
+      "year": 1975,
+      "volume": "7",
+      "page": "1143-1157"
+    },
+    "10.1021/ja00009a033": {
+      "type": "journal-article",
+      "title": "Thermochemical studies of carbonyl compounds. 5. Enthalpies of reduction of carbonyl groups",
+      "authors": [
+        "Wiberg",
+        "Crocker",
+        "Morgan"
+      ],
+      "year": 1991,
+      "volume": "113",
+      "page": "3447-3450"
+    },
+    "10.1021/ja00730a025": {
+      "type": "journal-article",
+      "title": "Thermochemistry of strained-ring bridgehead nitriles and esters",
+      "authors": [
+        "Baldt",
+        "Hall"
+      ],
+      "year": 1971,
+      "volume": "93",
+      "page": "140-145"
+    },
+    "10.1021/ja01531a009": {
+      "type": "journal-article",
+      "title": "Thermodynamics of Cyclopentane, Methylcyclopentane and 1,cis-3-Dimethylcyclopentane: Verification of the Concept of Pseudorotation",
+      "authors": [
+        "McCullough",
+        "Pennington",
+        "Smith",
+        "Hossenlopp",
+        "Waddington"
+      ],
+      "year": 1959,
+      "volume": "81",
+      "page": "5880-5883"
+    },
+    "10.1021/je60013a021": {
+      "type": "journal-article",
+      "title": "Chemical Thermodynamic Properties of Aniline.",
+      "authors": [
+        "Hatton",
+        "Hildenbrand",
+        "Sinke",
+        "Stull"
+      ],
+      "year": 1962,
+      "volume": "7",
+      "page": "229-231"
+    },
+    "10.1021/je960093t": {
+      "type": "journal-article",
+      "title": "Thermodynamic Properties and Ideal-Gas Enthalpies of Formation for Cyclohexene, Phthalan (2,5-Dihydrobenzo-3,4-furan), Isoxazole, Octylamine, Dioctylamine, Trioctylamine, Phenyl Isocyanate, and 1,4,5,6-Tetrahydropyrimidine",
+      "authors": [
+        "Steele",
+        "Chirico",
+        "Knipmeyer",
+        "Nguyen",
+        "Smith",
+        "Tasker"
+      ],
+      "year": 1996,
+      "volume": "41",
+      "page": "1269-1284"
+    },
+    "10.1039/f19726802224": {
+      "type": "journal-article",
+      "title": "Measurements of heats of combustion by flame calorimetry. Part 8.—Methane, ethane, propane, n-butane and 2-methylpropane",
+      "authors": [
+        "Pittam",
+        "Pilcher"
+      ],
+      "year": 1972,
+      "volume": "68",
+      "page": "2224"
+    },
+    "10.1039/tf9575301074": {
+      "type": "journal-article",
+      "title": "The second virial coefficients of pyridine and benzene, and certain of their methyl homologues",
+      "authors": [
+        "Andon",
+        "Cox",
+        "Herington",
+        "Martin"
+      ],
+      "year": 1957,
+      "volume": "53",
+      "page": "1074"
+    },
+    "10.1063/1.2955570": {
+      "type": "journal-article",
+      "title": "Critically Evaluated Thermochemical Properties of Polycyclic Aromatic Hydrocarbons",
+      "authors": [
+        "Roux",
+        "Temprado",
+        "Chickos",
+        "Nagano"
+      ],
+      "year": 2008,
+      "volume": "37",
+      "page": "1855-1996"
+    },
+    "10.1351/pac196102010125": {
+      "type": "journal-article",
+      "title": "The heats of combustion of phenol and the three cresols",
+      "authors": [
+        "Cox"
+      ],
+      "year": 1961,
+      "volume": "2",
+      "page": "125-128"
+    },
+    "10.18434/T4D303": {
+      "type": "dataset",
+      "title": "NIST Chemistry WebBook, NIST Standard Reference Database 69",
+      "publisher": "National Institute of Standards and Technology"
+    },
+    "10.3891/acta.chem.scand.22-2731": {
+      "type": "journal-article",
+      "title": "Heats of Combustion: Diethyl Ether and 1,1-Diethoxyethane.",
+      "authors": [
+        "Pihlaja",
+        "Heikkilä",
+        "Buchardt",
+        "Norin"
+      ],
+      "year": 1968,
+      "volume": "22",
+      "page": "2731-2732"
+    },
+    "10.6028/jres.033.011": {
+      "type": "journal-article",
+      "title": "Heats of combustion of eight normal paraffin hydrocarbons in the liquid state",
+      "authors": [
+        "Prosen",
+        "Rossini"
+      ],
+      "year": 1944,
+      "volume": "33",
+      "page": "255"
+    },
+    "10.6028/jres.034.013": {
+      "type": "journal-article",
+      "title": "Heats of combustion and formation of the paraffin hydrocarbons at 25 degrees C",
+      "authors": [
+        "Prosen",
+        "Rossini"
+      ],
+      "year": 1945,
+      "volume": "34",
+      "page": "263"
+    },
+    "10.6028/jres.034.031": {
+      "type": "journal-article",
+      "title": "Heats of formation and combustion of 1,3-butadiene and styrene",
+      "authors": [
+        "Prosen",
+        "Rossini"
+      ],
+      "year": 1945,
+      "volume": "34",
+      "page": "59"
+    },
+    "10.6028/jres.034.034": {
+      "type": "journal-article",
+      "title": "Heats of combustion of benzene, toluene, ethylbenzene, o-xylene, m-xylene, p-xylene, n-propylbenzene, and styrene",
+      "authors": [
+        "Prosen",
+        "Gilmont",
+        "Rossini"
+      ],
+      "year": 1945,
+      "volume": "34",
+      "page": "65"
+    },
+    "10.6028/jres.036.025": {
+      "type": "journal-article",
+      "title": "Heats of combustion and formation at 25 degrees C of the alkylbenzenes through C10H14, and of the higher normal monoalkylbenzenes",
+      "authors": [
+        "Prosen",
+        "Johnson",
+        "Rossini"
+      ],
+      "year": 1946,
+      "volume": "36",
+      "page": "455"
+    },
+    "10.6028/jres.037.031": {
+      "type": "journal-article",
+      "title": "Heats of formation and combustion of the normal alkylcyclopentanes and cyclohexanes and the increment per CH2 group for several homologous series of hydrocarbons",
+      "authors": [
+        "Prosen",
+        "Johnson",
+        "Rossini"
+      ],
+      "year": 1946,
+      "volume": "37",
+      "page": "51"
+    },
+    "10.6028/jres.043.013": {
+      "type": "journal-article",
+      "title": "Heats of combustion and formation of cyclopropane",
+      "authors": [
+        "Knowlton",
+        "Rossini"
+      ],
+      "year": 1949,
+      "volume": "43",
+      "page": "113"
+    },
+    "10.6028/jres.046.015": {
+      "type": "journal-article",
+      "title": "Heats of combustion, formation, and insomerization of ten C4 hydrocarbons",
+      "authors": [
+        "Prosen",
+        "Maron",
+        "Rossini"
+      ],
+      "year": 1951,
+      "volume": "46",
+      "page": "106"
+    }
+  }
+}
