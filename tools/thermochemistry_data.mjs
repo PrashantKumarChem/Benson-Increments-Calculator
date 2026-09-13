@@ -63,10 +63,10 @@ const CORRECTIONS = "04_Corrections.csv";
  *
  * Where NIST and a DOI record disagree, the entry keeps what NIST prints and the
  * disagreement is recorded, not smoothed over. Where a registry writes a title
- * in a form that normalizing does not forgive - Pittam and Pilcher, Furuyama et
- * al., Ambrose et al., the WebBook - `work.registryTitle` holds the registry's
- * title exactly. Where a record lists names NIST does not - Pihlaja and
- * Heikkila - `work.registryExtraAuthors` holds them. Both are compared exactly,
+ * in a form that normalizing does not forgive - Furuyama et al., Ambrose et al.,
+ * the WebBook - `work.registryTitle` holds the registry's title exactly. Where a
+ * record lists names NIST does not - Pihlaja and Heikkila -
+ * `work.registryExtraAuthors` holds them. Both are compared exactly,
  * so either fails the moment its record changes. Crossref also lists Baldt
  * before Hall, which is reported rather than failed, and names Springer
  * Netherlands rather than Chapman and Hall as the publisher of Pedley, Naylor
@@ -105,22 +105,20 @@ export const MOLECULES = [
     reference: "Pittam and Pilcher, 1972",
     citation:
       "Pittam, D.A.; Pilcher, G., 'Measurements of heats of combustion by flame calorimetry. " +
-      "Part 8. Methane, ethane, propane, n-butane and 2-methylpropane', J. Chem. Soc. Faraday " +
+      "Part 8.-Methane, ethane, propane, n-butane and 2-methylpropane', J. Chem. Soc. Faraday " +
       "Trans. 1, 1972, 68, 2224-2229",
     doi: "10.1039/f19726802224",
     work: {
       type: "journal-article",
       title:
-        "Measurements of heats of combustion by flame calorimetry. Part 8. Methane, ethane, " +
+        "Measurements of heats of combustion by flame calorimetry. Part 8.-Methane, ethane, " +
         "propane, n-butane and 2-methylpropane",
       authors: ["Pittam", "Pilcher"],
       year: 1972,
       volume: "68",
       firstPage: "2224",
-      // Crossref writes "Part 8.—Methane" where NIST prints "Part 8. Methane".
-      registryTitle:
-        "Measurements of heats of combustion by flame calorimetry. Part 8.—Methane, ethane, " +
-        "propane, n-butane and 2-methylpropane",
+      // NIST prints "Part 8.-Methane" and Crossref "Part 8.—Methane"; normalizing folds
+      // the dashes together, so there is no registry title to acknowledge.
     },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106978&Units=SI&Mask=1",
   },
@@ -133,22 +131,20 @@ export const MOLECULES = [
     reference: "Pittam and Pilcher, 1972",
     citation:
       "Pittam, D.A.; Pilcher, G., 'Measurements of heats of combustion by flame calorimetry. " +
-      "Part 8. Methane, ethane, propane, n-butane and 2-methylpropane', J. Chem. Soc. Faraday " +
+      "Part 8.-Methane, ethane, propane, n-butane and 2-methylpropane', J. Chem. Soc. Faraday " +
       "Trans. 1, 1972, 68, 2224-2229",
     doi: "10.1039/f19726802224",
     work: {
       type: "journal-article",
       title:
-        "Measurements of heats of combustion by flame calorimetry. Part 8. Methane, ethane, " +
+        "Measurements of heats of combustion by flame calorimetry. Part 8.-Methane, ethane, " +
         "propane, n-butane and 2-methylpropane",
       authors: ["Pittam", "Pilcher"],
       year: 1972,
       volume: "68",
       firstPage: "2224",
-      // Crossref writes "Part 8.—Methane" where NIST prints "Part 8. Methane".
-      registryTitle:
-        "Measurements of heats of combustion by flame calorimetry. Part 8.—Methane, ethane, " +
-        "propane, n-butane and 2-methylpropane",
+      // NIST prints "Part 8.-Methane" and Crossref "Part 8.—Methane"; normalizing folds
+      // the dashes together, so there is no registry title to acknowledge.
     },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75285&Units=SI&Mask=1",
   },

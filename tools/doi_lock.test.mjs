@@ -202,46 +202,49 @@ test("acknowledged extra names are reported, and fail once the record drops them
 
 test("an acknowledged registry title is compared exactly, and goes stale when the record changes", () => {
   const cited =
-    "Measurements of heats of combustion by flame calorimetry. Part 8. Methane, ethane, propane, " +
-    "n-butane and 2-methylpropane";
-  const registry = cited.replace("Part 8. Methane", "Part 8.—Methane");
-  const pittam = {
-    citedBy: "n-butane",
-    citation: `Pittam, D.A.; Pilcher, G., '${cited}', J. Chem. Soc. Faraday Trans. 1, 1972, 68, 2224-2229`,
-    doi: "10.1039/f19726802224",
+    "Thermodynamic properties of organic oxygen compounds. 42. Physical and thermodynamic " +
+    "properties of benzaldehyde";
+  const registry = cited.replace("compounds. 42.", "compounds 42.");
+  const authors = ["Ambrose", "Connett", "Green", "Hales", "Head", "Martin"];
+  const ambrose = {
+    citedBy: "benzaldehyde",
+    citation:
+      "Ambrose, D.; Connett, J.E.; Green, J.H.S.; Hales, J.L.; Head, A.J.; Martin, J.F., " +
+      `'${cited}', J. Chem. Thermodyn., 1975, 7, 1143-1157`,
+    doi: "10.1016/0021-9614(75)90035-x",
     work: {
       type: "journal-article",
       title: cited,
-      authors: ["Pittam", "Pilcher"],
-      year: 1972,
-      volume: "68",
-      firstPage: "2224",
+      authors,
+      year: 1975,
+      volume: "7",
+      firstPage: "1143",
       registryTitle: registry,
     },
   };
   const entry = {
     type: "journal-article",
     title: registry,
-    authors: ["Pittam", "Pilcher"],
-    year: 1972,
-    volume: "68",
-    page: "2224",
+    authors,
+    year: 1975,
+    volume: "7",
+    page: "1143-1157",
   };
 
-  const result = checkCitation(pittam, { [pittam.doi]: entry });
+  const result = checkCitation(ambrose, { [ambrose.doi]: entry });
   assert.deepEqual(result.problems, []);
   assert.match(result.notes.join("\n"), /writes the title differently, as acknowledged/);
 
   // Without the acknowledgement the difference fails: normalizing does not absorb it.
-  const { registryTitle, ...unacknowledged } = pittam.work;
-  assert.match(problemsOf({ ...pittam, work: unacknowledged }, { [pittam.doi]: entry }), /- title: cited/);
+  const { registryTitle, ...unacknowledged } = ambrose.work;
+  assert.match(problemsOf({ ...ambrose, work: unacknowledged }, { [ambrose.doi]: entry }), /- title: cited/);
 
   // The registry corrects its title to NIST's form: the acknowledgement is stale.
-  assert.match(problemsOf(pittam, { [pittam.doi]: { ...entry, title: cited } }), /title was acknowledged as/);
+  assert.match(problemsOf(ambrose, { [ambrose.doi]: { ...entry, title: cited } }), /title was acknowledged as/);
 
   // An acknowledgement of a difference normalizing already forgives is refused.
-  const needless = { ...pittam, work: { ...pittam.work, registryTitle: `${cited}.` } };
-  const recordWithStop = { [pittam.doi]: { ...entry, title: `${cited}.` } };
+  const needless = { ...ambrose, work: { ...ambrose.work, registryTitle: `${cited}.` } };
+  const recordWithStop = { [ambrose.doi]: { ...entry, title: `${cited}.` } };
   assert.match(problemsOf(needless, recordWithStop), /acknowledges no difference/);
 });
 
@@ -314,6 +317,8 @@ test("titles that differ only in form normalize to the same string", () => {
     ["pages 1\u20132", "pages 1-2"],
     ["the \u2018quoted\u2019 word", "the 'quoted' word"],
     ["two  spaces", "two spaces"],
+    // Pittam and Pilcher's title, as Crossref and as NIST print it.
+    ["Part 8.—Methane", "Part 8.-Methane"],
   ];
   for (const [a, b] of pairs) assert.equal(normalizeTitle(a), normalizeTitle(b), `'${a}' / '${b}'`);
 });
@@ -341,9 +346,10 @@ test("normalizing keeps apart titles that differ in anything but form", () => {
     ["Part 8", "Part 9"],
     ["Nature of the carbonium ion. VII", "Nature of the carbonium ion. VIII"],
     ["cm²", "cm2"],
-    // The four places a registry writes a cited title differently. Normalizing
-    // does not absorb any of them; each citation acknowledges its registry's title.
+    // A dash is not a space.
     ["Part 8.—Methane", "Part 8. Methane"],
+    // The three places a registry writes a cited title differently. Normalizing
+    // does not absorb any of them; each citation acknowledges its registry's title.
     ["i-C3H7I \uE5FB C3H6 + HI", "i-C3H7I = C3H6 + HI"],
     ["organic oxygen compounds 42.", "organic oxygen compounds. 42."],
     ["NIST Standard Reference Database 69", "NIST Standard Reference Database Number 69"],
