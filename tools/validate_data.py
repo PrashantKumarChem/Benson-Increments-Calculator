@@ -8,7 +8,6 @@ anyone's browser. Run it locally or let CI run it on every push:
 """
 from __future__ import annotations
 
-import csv
 import json
 import os
 import sys
@@ -27,6 +26,7 @@ from benson.data import (
     Category,
     build_manifest_comparable,
     find_categories,
+    read_category,
     read_metadata,
     read_pairs,
 )
@@ -79,6 +79,11 @@ def check_category(category: Category, report: Report) -> None:
     first_seen: dict[str, int] = {}
     readings: list[tuple[int, str, Value]] = []
     for line, row in category.records:
+        # A line with no comma at all is missing one, not carrying a stray one;
+        # the site says so in the same words.
+        if len(row) == 1:
+            report.add(name, line, "no comma - expected two columns")
+            continue
         if len(row) != 2:
             report.add(name, line, f"{len(row)} columns, expected 2 - a stray comma in the group name?")
             continue
@@ -149,14 +154,16 @@ def check_metadata(categories: list[Category], report: Report) -> None:
     known = {category.file for category in categories}
     seen: dict[str, int] = {}
 
-    with open(path, encoding="utf-8-sig", newline="") as handle:
-        rows = list(csv.reader(handle))
+    # Read as a category file is, so each row is numbered where it starts. A note
+    # quoted across a line break makes one row two lines, and counting rows
+    # instead put every later fault a line early.
+    metadata = read_category(path)
 
-    if not rows:
+    if not metadata.columns and not metadata.records:
         report.add(METADATA_NAME, 0, "file is empty - delete it, or give it a header row")
         return
 
-    header = [column.strip() for column in rows[0]]
+    header = metadata.columns
     if not header or header[0] != "File":
         report.add(METADATA_NAME, 1, "the first column must be headed 'File'")
         return
@@ -167,11 +174,10 @@ def check_metadata(categories: list[Category], report: Report) -> None:
                    f"header is missing {', '.join(missing)} - expected File, then "
                    + ", ".join(f.capitalize() for f in METADATA_FIELDS))
 
-    for offset, row in enumerate(rows[1:]):
-        line = offset + 2
-        if not row or not row[0].strip():
+    for line, row in metadata.records:
+        if not row[0]:
             continue
-        name = row[0].strip()
+        name = row[0]
 
         if name not in known:
             report.add(METADATA_NAME, line,
