@@ -54,9 +54,9 @@ const CORRECTIONS = "04_Corrections.csv";
  * an exact lookup of that DOI returned the same title, year, record type and
  * authors, and the same journal, volume and first page where the work has them -
  * so each is corroborated by two independent records rather than asserted from
- * one. A title alone proves nothing: the only records carrying the exact title
- * of Cox and Pilcher's 1970 monograph are reviews of it in two journals. No DOI
- * was composed by hand; a guessed suffix points at a real but different paper.
+ * one. A title alone proves nothing: the only records carrying the title of Cox
+ * and Pilcher's 1970 monograph are reviews of it in three journals. No DOI was
+ * composed by hand; a guessed suffix points at a real but different paper.
  * That lookup is now repeated rather than trusted: tools/build_doi_lock.mjs
  * records what each DOI resolves to in tools/doi_lock.json, and
  * tools/doi_lock.test.mjs compares every `work` with it.
@@ -801,7 +801,8 @@ export const MOLECULES = [
       doi: null,
       noDoiReason:
         "Crossref has no record of the book. The only records carrying its title are reviews of " +
-        "it in J. Organomet. Chem. and Ber. Bunsenges. Phys. Chem., which are not the book.",
+        "it in J. Organomet. Chem., Ber. Bunsenges. Phys. Chem. and Z. Phys. Chem., which are not " +
+        "the book.",
     },
     url: "https://webbook.nist.gov/cgi/cbook.cgi?ID=C75503&Units=SI&Mask=1",
   },
