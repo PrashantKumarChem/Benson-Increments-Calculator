@@ -61,6 +61,7 @@ last existing row. It fails loudly rather than silently, but it wastes a cycle.
 python tools/build_data.py        # regenerates manifest.json
 python tools/validate_data.py
 python tools/build_dist.py        # regenerates dist/increments.json, the built artifact
+python tools/build_version.py     # moves the asset version - the artifact's bytes are folded in
 node   tools/check_parity.mjs     # the site and the notebook must still agree
 ```
 
