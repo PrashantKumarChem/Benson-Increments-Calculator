@@ -49,6 +49,7 @@ from benson.data import (
     read_metadata,
     read_references,
     unresolved_sources,
+    work_of,
 )
 from benson.notation import build_index, load_notation
 from benson.notation import read as read_notation
@@ -178,6 +179,15 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
         problems = "\n".join(f"  {p.file}:{p.line}: {p.message}" for p in notation.problems)
         raise BuildError(f"{notation_dir}/ has {len(notation.problems)} problem(s):\n{problems}")
 
+    works = {}
+    for reference in references:
+        try:
+            works[reference.key] = work_of(reference)
+        except ValueError as exc:
+            # A work the lock cannot read would reach it as no work at all, and a
+            # DOI with no work is refused there under a message about something else.
+            raise BuildError(f"{references_path}:{reference.line}: {reference.key}: {exc}") from exc
+
     metadata = read_metadata(notation_dir)
     categories_out = [_category_entry(category, metadata.get(category.file, {})) for category in categories]
     unit_by_file = {entry["file"]: entry["unit"] for entry in categories_out}
@@ -194,7 +204,7 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
         # Numbered by their order in the file, here and nowhere else.
         "references": [
             {"number": number, "key": reference.key, "citation": reference.citation,
-             "doi": reference.doi or None}
+             "doi": reference.doi or None, "work": works[reference.key]}
             for number, reference in enumerate(references, start=1)
         ],
         "increments": increments_out,

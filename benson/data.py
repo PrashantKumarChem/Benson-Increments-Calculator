@@ -217,17 +217,36 @@ def find_categories(csv_dir: str = CSV_DIR) -> list[Category]:
 #: them - a reference's number is its place in this file, so inserting one
 #: renumbers the rest with nothing to edit by hand.
 REFERENCES_PATH = "data/references.csv"
-#: The columns of REFERENCES_PATH, found by title. A DOI may be blank.
-REFERENCE_COLUMNS = ("Key", "Citation", "DOI")
+#: The columns that say which work a reference is: what tools/doi_lock.mjs
+#: compares a DOI's record with, since a DOI is opaque and a near miss resolves
+#: to a real, different paper. Each is read off the citation beside it, and the
+#: lock checks that it was. Which of them a work is compared on depends on its
+#: Type - a journal article on its title, authors, year, volume and first page;
+#: a dataset on its title and publisher - and that table is the lock's alone.
+WORK_COLUMNS = ("Type", "Title", "Authors", "Year", "Volume", "FirstPage", "Publisher")
+#: The columns of REFERENCES_PATH, found by title. Only Key and Citation must be
+#: filled in; a reference with no DOI needs no work columns either.
+REFERENCE_COLUMNS = ("Key", "Citation", "DOI") + WORK_COLUMNS
 
 
 class Reference(NamedTuple):
-    """One published work a row may name as its Source."""
+    """One published work a row may name as its Source.
+
+    The fields after `doi` are WORK_COLUMNS, in order, as written: blank where
+    the file leaves them blank. work_of() says what they amount to.
+    """
 
     line: int
     key: str
     citation: str
     doi: str
+    type: str = ""
+    title: str = ""
+    authors: str = ""
+    year: str = ""
+    volume: str = ""
+    first_page: str = ""
+    publisher: str = ""
 
 
 def read_references(path: str = REFERENCES_PATH) -> list[Reference]:
@@ -247,8 +266,49 @@ def read_references(path: str = REFERENCES_PATH) -> list[Reference]:
         index = table.columns.index(column)
         return cells[index] if index < len(cells) else ""
 
-    return [Reference(line, cell(cells, "Key"), cell(cells, "Citation"), cell(cells, "DOI"))
+    return [Reference(line, *(cell(cells, column) for column in REFERENCE_COLUMNS))
             for line, cells in table.records if cell(cells, "Key")]
+
+
+YEAR_RE = re.compile(r"^\d{4}$")
+
+
+def work_of(reference: Reference) -> Optional[dict]:
+    """Which work a reference says it is, in the shape tools/doi_lock.mjs compares.
+
+    None when it names no Type. A field left blank is left out, not written
+    empty, so the lock reports it missing by name rather than comparing an
+    empty string. Authors are family names separated by semicolons, the
+    separator Verified already uses, because a family name can hold a comma's
+    worth of suffix ("Hall, Jr.") and a space.
+
+    Raises ValueError for work fields with no Type - they would otherwise be
+    dropped without a word - and for a Year that is not four digits, which the
+    lock compares as a number.
+    """
+    fields = dict(zip(WORK_COLUMNS[1:], (reference.title, reference.authors, reference.year,
+                                         reference.volume, reference.first_page, reference.publisher)))
+    if not reference.type:
+        given = [column for column, value in fields.items() if value]
+        if given:
+            raise ValueError(f"{', '.join(given)} given with no Type to say what kind of work they describe")
+        return None
+    if reference.year and not YEAR_RE.match(reference.year):
+        raise ValueError(f"Year {reference.year!r} is not a year - write the four digits alone, like '1996'")
+
+    work: dict = {"type": reference.type}
+    if reference.title:
+        work["title"] = reference.title
+    authors = [name.strip() for name in reference.authors.split(";") if name.strip()]
+    if authors:
+        work["authors"] = authors
+    if reference.year:
+        work["year"] = int(reference.year)
+    for key, value in (("volume", reference.volume), ("firstPage", reference.first_page),
+                       ("publisher", reference.publisher)):
+        if value:
+            work[key] = value
+    return work
 
 
 def unresolved_sources(categories: list[Category], references: list[Reference]) -> list[tuple[str, int, Row]]:

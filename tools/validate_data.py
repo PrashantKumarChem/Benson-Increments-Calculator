@@ -31,6 +31,7 @@ from benson.data import (
     read_pairs,
     read_references,
     unresolved_sources,
+    work_of,
 )
 from benson.notation import NOTATION_FILES, load_notation
 from benson.values import Value, read_uncertainty, read_value, to_kj
@@ -309,6 +310,13 @@ def check_references(categories: list[Category], report: Report) -> None:
                 first_seen[reference.key] = reference.line
             if not reference.citation:
                 report.add(name, reference.line, f"{reference.key!r} has no citation")
+            # Whether the work fields agree with the citation and with the DOI's
+            # record is the lock's to say (tools/doi_lock.mjs). What is checked
+            # here is only what would stop the build from reading them at all.
+            try:
+                work_of(reference)
+            except ValueError as exc:
+                report.add(name, reference.line, f"{reference.key!r}: {exc}")
 
     for file, line, row in unresolved_sources(categories, references):
         report.add(file, line, f"{row.group}: Source {row.source!r} is not a key in {REFERENCES_PATH}")

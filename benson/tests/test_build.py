@@ -239,9 +239,25 @@ class References(Fixture):
                               'ABE,"Abe, B. Another, 1999.",')
         self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
         self.assertEqual(self.build()["references"], [
-            {"number": 1, "key": "ZED", "citation": "Zed, A. A work, 2000.", "doi": "10.0000/zed"},
-            {"number": 2, "key": "ABE", "citation": "Abe, B. Another, 1999.", "doi": None},
+            {"number": 1, "key": "ZED", "citation": "Zed, A. A work, 2000.", "doi": "10.0000/zed", "work": None},
+            {"number": 2, "key": "ABE", "citation": "Abe, B. Another, 1999.", "doi": None, "work": None},
         ])
+
+    def test_a_reference_carries_the_work_its_columns_describe(self):
+        self.write_references("Key,Citation,DOI,Type,Title,Authors,Year,Volume,FirstPage,Publisher\n"
+                              "REF1,A citation,10.0000/ref1,journal-article,A title,Hall; Baldt,1971,93,140,")
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        [reference] = self.build()["references"]
+        self.assertEqual(reference["work"], {"type": "journal-article", "title": "A title",
+                                             "authors": ["Hall", "Baldt"], "year": 1971,
+                                             "volume": "93", "firstPage": "140"})
+
+    def test_a_work_the_lock_could_not_read_refuses_to_build(self):
+        self.write_references("Key,Citation,DOI,Type,Year\nREF1,A citation,10.0000/ref1,journal-article,1971a")
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        with self.assertRaises(BuildError) as caught:
+            self.build()
+        self.assertIn(":2: REF1: Year '1971a' is not a year", str(caught.exception))
 
     def test_a_row_carries_the_key_its_source_names(self):
         self.write_references("Key,Citation,DOI\nREF1,A citation,")

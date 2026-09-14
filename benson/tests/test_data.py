@@ -29,6 +29,7 @@ from benson.data import (
     read_references,
     title_for,
     unresolved_sources,
+    work_of,
 )
 from benson.values import read_value
 
@@ -291,6 +292,55 @@ class ReadingReferences(Fixture):
 
     def test_no_references_file_is_no_references(self):
         self.assertEqual(self.references(), [])
+
+    def test_the_work_columns_are_read_by_title_into_their_own_fields(self):
+        # Written out of order, so a reader that took them by position could not pass.
+        self.write("references.csv",
+                   "Year,Key,Title,Citation,Type,DOI,FirstPage,Authors,Volume,Publisher\n"
+                   "1971,REF1,A title,A citation,journal-article,10.0000/ref1,140,Hall; Baldt,93,")
+        self.assertEqual(self.references(), [
+            Reference(2, "REF1", "A citation", "10.0000/ref1", type="journal-article", title="A title",
+                      authors="Hall; Baldt", year="1971", volume="93", first_page="140"),
+        ])
+
+
+class TheWorkOfAReference(unittest.TestCase):
+    """What tools/doi_lock.mjs is handed to compare a DOI's record with."""
+
+    ARTICLE = Reference(2, "REF1", "A citation", "10.0000/ref1", type="journal-article",
+                        title="A title", authors="Hall, Jr.; Baldt", year="1971", volume="93",
+                        first_page="140")
+
+    def test_a_journal_article_in_the_shape_the_lock_compares(self):
+        self.assertEqual(work_of(self.ARTICLE), {
+            "type": "journal-article", "title": "A title", "authors": ["Hall, Jr.", "Baldt"],
+            "year": 1971, "volume": "93", "firstPage": "140",
+        })
+
+    def test_a_year_is_a_number_because_the_lock_compares_it_with_one(self):
+        self.assertIs(type(work_of(self.ARTICLE)["year"]), int)
+
+    def test_a_blank_field_is_left_out_so_the_lock_names_it_missing(self):
+        work = work_of(self.ARTICLE._replace(volume="", publisher=""))
+        self.assertNotIn("volume", work)
+        self.assertNotIn("publisher", work)
+
+    def test_a_dataset_carries_its_publisher(self):
+        dataset = Reference(2, "WEBBOOK", "A citation", "10.0000/set", type="dataset",
+                            title="A database", publisher="NIST")
+        self.assertEqual(work_of(dataset), {"type": "dataset", "title": "A database", "publisher": "NIST"})
+
+    def test_no_type_and_no_work_fields_is_no_work(self):
+        self.assertIsNone(work_of(Reference(2, "REF1", "A citation", "")))
+
+    def test_work_fields_with_no_type_are_refused_rather_than_dropped(self):
+        with self.assertRaisesRegex(ValueError, "Title, Year given with no Type"):
+            work_of(Reference(2, "REF1", "A citation", "", title="A title", year="1971"))
+
+    def test_a_year_that_is_not_four_digits_is_refused(self):
+        for year in ("71", "1971a", "c. 1971", "1971.0"):
+            with self.subTest(year=year), self.assertRaisesRegex(ValueError, f"Year '{year}' is not a year"):
+                work_of(self.ARTICLE._replace(year=year))
 
 
 class ResolvingSources(Fixture):
