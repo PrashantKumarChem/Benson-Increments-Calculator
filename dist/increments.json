@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generated_by": "benson/build.py - do not edit by hand",
-  "content_hash": "ce34eb93e4c84367",
+  "content_hash": "10e3e31f7afe9ecc",
   "display": {
     "kj_to_kcal": 0.239006
   },
@@ -57,7 +57,41 @@
       "count": 29
     }
   ],
-  "references": [],
+  "references": [
+    {
+      "number": 1,
+      "key": "Cohen1996",
+      "citation": "Cohen, N., 'Revised Group Additivity Values for Enthalpies of Formation (at 298 K) of Carbon\u2013Hydrogen and Carbon\u2013Hydrogen\u2013Oxygen Compounds', J. Phys. Chem. Ref. Data, 1996, 25, 1411-1481",
+      "doi": "10.1063/1.555988",
+      "work": {
+        "type": "journal-article",
+        "title": "Revised Group Additivity Values for Enthalpies of Formation (at 298 K) of Carbon\u2013Hydrogen and Carbon\u2013Hydrogen\u2013Oxygen Compounds",
+        "authors": [
+          "Cohen"
+        ],
+        "year": 1996,
+        "volume": "25",
+        "firstPage": "1411"
+      }
+    }
+  ],
+  "uncertainty": [
+    {
+      "symbol": "\u0394Hf\u00b0",
+      "value": 5.5,
+      "decimals": 1,
+      "unit": "kJ/mol",
+      "storedValue": 5.5,
+      "phase": "gas",
+      "elements": [
+        "C",
+        "H",
+        "O"
+      ],
+      "ref": "Cohen1996",
+      "note": "It is Cohen's average error for gas-phase compounds of carbon, hydrogen and oxygen, calculated with his own revised group values (\u00a72.8, p. 1417). It measures how well those values fit the compounds they were derived from, so a new molecule can miss by more. It is borrowed: this calculator's values come from other tables, include nitrogen, and have no error figure of their own. Rings are the weak point \u2014 many ring corrections rest on a single compound, and building a complex ring from simpler ones is good only to 10\u201315 kJ/mol (\u00a72.3, p. 1413). It is not each group's uncertainty added up, which would overstate it."
+    }
+  ],
   "increments": [
     {
       "label": "C-(C)(H)3",

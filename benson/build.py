@@ -12,13 +12,15 @@ is not implementing notation decomposition. CI regenerates the artifact and
 fails on any difference, which is the bargain the asset version already keeps
 here.
 
-**What this does not emit yet, and why.** `02-data-schema.md`'s sketch also
-shows an `uncertainty` block: the method's own error, one figure for any total.
-Choosing that figure is a chemistry judgement between candidate values (D11,
-H4) that is not this package's to make, so emitting it now would be inventing
-an answer ahead of the work that earns it.
+`uncertainty` lists data/uncertainty.csv: for each quantity symbol, the
+published figure for the method's own error on a whole total - in kJ/mol, with
+the phase and the elements it was measured on, the key of the reference it is
+from, and the note a reader needs to read it honestly. Which figure, and what
+to say beside it, are chemistry and wording decisions (D11, H4), so they are
+data with a citation rather than a constant here or in the page; the build only
+carries them, and refuses a figure with anything missing.
 
-A row's own `uncertainty` is not that figure. It is the ± the row's source
+A row's own `uncertainty` is not that figure, and is never summed into it (D11). It is the ± the row's source
 prints, from the optional Uncertainty column, converted to kJ/mol as its value
 is; like `verified`, `note` and `ref`, it is null wherever its column is blank.
 `references` lists data/references.csv in file order, numbered by that order,
@@ -45,8 +47,11 @@ from benson.data import (
     METADATA_FIELDS,
     NOTATION_DIR,
     REFERENCES_PATH,
+    UNCERTAINTY_PATH,
     find_categories,
+    method_figure_problems,
     read_metadata,
+    read_method_figures,
     read_references,
     unresolved_sources,
     work_of,
@@ -68,7 +73,7 @@ class BuildError(Exception):
     """
 
 
-def _content_hash(csv_dir: str, notation_dir: str, references_path: str) -> str:
+def _content_hash(csv_dir: str, notation_dir: str, references_path: str, uncertainty_path: str) -> str:
     """A hash of every source file the build reads - name and bytes both.
 
     Not a date and not a git SHA (see the module docstring's neighbour, D2):
@@ -86,7 +91,7 @@ def _content_hash(csv_dir: str, notation_dir: str, references_path: str) -> str:
     """
     paths = sorted(glob.glob(os.path.join(csv_dir, "*.csv"))) + \
         sorted(glob.glob(os.path.join(notation_dir, "*.csv"))) + \
-        [path for path in [references_path] if os.path.exists(path)]
+        [path for path in [references_path, uncertainty_path] if os.path.exists(path)]
     digest = hashlib.sha256()
     for path in paths:
         digest.update(os.path.basename(path).encode("utf-8"))
@@ -153,8 +158,25 @@ def _increment_entry(entry, notation, category_unit: str) -> dict:
     }
 
 
+def _uncertainty_entry(figure) -> dict:
+    """One method figure, converted as an increment's value is (D18), with what the page says beside it."""
+    unit = figure.unit or "kJ/mol"
+    reading = read_value(figure.value)
+    return {
+        "symbol": figure.symbol,
+        "value": to_kj(read_uncertainty(figure.value), unit),
+        "decimals": reading.decimals,
+        "unit": unit,
+        "storedValue": reading.value,
+        "phase": figure.phase,
+        "elements": figure.elements.split(),
+        "ref": figure.source,
+        "note": figure.note,
+    }
+
+
 def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
-                   references_path: str = REFERENCES_PATH) -> dict:
+                   references_path: str = REFERENCES_PATH, uncertainty_path: str = UNCERTAINTY_PATH) -> dict:
     """Everything the consumers need, read from the source and derived once."""
     categories = find_categories(csv_dir)
     if not categories:
@@ -192,13 +214,23 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
     categories_out = [_category_entry(category, metadata.get(category.file, {})) for category in categories]
     unit_by_file = {entry["file"]: entry["unit"] for entry in categories_out}
 
+    figures = read_method_figures(uncertainty_path)
+    symbols = {entry["symbol"] for entry in categories_out if entry["symbol"]}
+    figure_problems = method_figure_problems(figures, references, symbols)
+    if figure_problems:
+        # A figure is printed under a student's total as a claim about it. One
+        # missing its source, its caveats or what it applies to is refused
+        # rather than shown with a hole in it.
+        problems = "\n".join(f"  {uncertainty_path}:{line}: {message}" for line, message in figure_problems)
+        raise BuildError(f"{uncertainty_path} has {len(figure_problems)} problem(s):\n{problems}")
+
     index = build_index(categories, notation)
     increments_out = [_increment_entry(entry, notation, unit_by_file[entry.category.file]) for entry in index]
 
     return {
         "schema": SCHEMA,
         "generated_by": "benson/build.py - do not edit by hand",
-        "content_hash": _content_hash(csv_dir, notation_dir, references_path),
+        "content_hash": _content_hash(csv_dir, notation_dir, references_path, uncertainty_path),
         "display": {"kj_to_kcal": KJ_TO_KCAL_DISPLAY},
         "categories": categories_out,
         # Numbered by their order in the file, here and nowhere else.
@@ -207,13 +239,14 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
              "doi": reference.doi or None, "work": works[reference.key]}
             for number, reference in enumerate(references, start=1)
         ],
+        "uncertainty": [_uncertainty_entry(figure) for figure in figures],
         "increments": increments_out,
     }
 
 
 def write_artifact(path: str = ARTIFACT_PATH, csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
-                   references_path: str = REFERENCES_PATH) -> dict:
-    artifact = build_artifact(csv_dir, notation_dir, references_path)
+                   references_path: str = REFERENCES_PATH, uncertainty_path: str = UNCERTAINTY_PATH) -> dict:
+    artifact = build_artifact(csv_dir, notation_dir, references_path, uncertainty_path)
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(artifact, handle, indent=2)

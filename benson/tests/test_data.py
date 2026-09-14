@@ -27,6 +27,10 @@ from benson.data import (
     read_metadata,
     read_pairs,
     read_references,
+    MethodFigure,
+    UNCERTAINTY_PATH,
+    method_figure_problems,
+    read_method_figures,
     title_for,
     unresolved_sources,
     work_of,
@@ -341,6 +345,82 @@ class TheWorkOfAReference(unittest.TestCase):
         for year in ("71", "1971a", "c. 1971", "1971.0"):
             with self.subTest(year=year), self.assertRaisesRegex(ValueError, f"Year '{year}' is not a year"):
                 work_of(self.ARTICLE._replace(year=year))
+
+
+class ReadingMethodFigures(Fixture):
+    def figures(self):
+        return read_method_figures(os.path.join(self.folder, "uncertainty.csv"))
+
+    def test_columns_are_found_by_title_and_lines_kept_in_file_order(self):
+        self.write("uncertainty.csv", 'Note,Source,Elements,Phase,Unit,Value,Symbol\n'
+                                      '"A note, with a comma",REF1,C H O,gas,kJ/mol,5.5,ΔHf°\n'
+                                      ',,,,,,')
+        self.assertEqual(self.figures(), [
+            MethodFigure(2, "ΔHf°", "5.5", "kJ/mol", "gas", "C H O", "REF1", "A note, with a comma"),
+        ])
+
+    def test_an_incomplete_line_is_kept_so_it_can_be_reported(self):
+        self.write("uncertainty.csv", "Symbol,Value,Unit,Phase,Elements,Source,Note\nΔHf°,5.5")
+        self.assertEqual(self.figures(), [MethodFigure(2, "ΔHf°", "5.5", "", "", "", "", "")])
+
+    def test_no_file_is_no_figures(self):
+        self.assertEqual(self.figures(), [])
+
+
+class MethodFigureProblems(unittest.TestCase):
+    """What stops a figure being shown truthfully under a student's total."""
+
+    FIGURE = MethodFigure(2, "ΔHf°", "5.5", "kJ/mol", "gas", "C H O", "REF1", "A note")
+    REFERENCES = [Reference(2, "REF1", "A citation", "")]
+    SYMBOLS = {"ΔHf°", "ΔG°"}
+
+    def problems(self, *figures):
+        return method_figure_problems(list(figures), self.REFERENCES, self.SYMBOLS)
+
+    def test_a_complete_figure_has_none(self):
+        self.assertEqual(self.problems(self.FIGURE), [])
+
+    def test_every_column_but_unit_must_be_filled_in(self):
+        for field, column in (("symbol", "Symbol"), ("value", "Value"), ("phase", "Phase"),
+                              ("elements", "Elements"), ("source", "Source"), ("note", "Note")):
+            with self.subTest(column=column):
+                self.assertIn((2, f"no {column}"), self.problems(self.FIGURE._replace(**{field: ""})))
+
+    def test_a_blank_unit_is_kj_mol_rather_than_a_problem(self):
+        self.assertEqual(self.problems(self.FIGURE._replace(unit="")), [])
+
+    def test_a_symbol_no_category_declares_is_refused(self):
+        self.assertEqual(self.problems(self.FIGURE._replace(symbol="S°")),
+                         [(2, "'S°' is not the Symbol of any category, so this figure would describe no total")])
+
+    def test_a_second_figure_for_one_symbol_is_refused(self):
+        second = self.FIGURE._replace(line=3)
+        self.assertEqual(self.problems(self.FIGURE, second), [(3, "'ΔHf°' already has a figure on line 2")])
+
+    def test_a_value_that_is_not_one_unsigned_number_is_refused(self):
+        for value in ("-5.5", "5 to 6", "about 6"):
+            with self.subTest(value=value):
+                [(line, message)] = self.problems(self.FIGURE._replace(value=value))
+                self.assertIn("is not an unsigned number", message)
+
+    def test_a_unit_that_cannot_be_converted_is_refused(self):
+        [(line, message)] = self.problems(self.FIGURE._replace(unit="cal/mol"))
+        self.assertIn("'cal/mol' is not a unit this package can convert", message)
+
+    def test_an_element_that_is_not_a_symbol_is_refused(self):
+        for elements, bad in (("C,H,O", "C,H,O"), ("carbon", "carbon"), ("C h O", "h")):
+            with self.subTest(elements=elements):
+                self.assertEqual(self.problems(self.FIGURE._replace(elements=elements)),
+                                 [(2, f"Elements: {bad!r} is not an element symbol")])
+
+    def test_a_source_that_names_no_reference_is_refused(self):
+        self.assertEqual(self.problems(self.FIGURE._replace(source="REF2")),
+                         [(2, "Source 'REF2' is not a key in data/references.csv")])
+
+    def test_the_repository_s_figures_have_none(self):
+        symbols = {fields["symbol"] for fields in read_metadata(str(ROOT / NOTATION_DIR)).values() if fields["symbol"]}
+        self.assertEqual(method_figure_problems(read_method_figures(str(ROOT / UNCERTAINTY_PATH)),
+                                                read_references(str(ROOT / REFERENCES_PATH)), symbols), [])
 
 
 class ResolvingSources(Fixture):

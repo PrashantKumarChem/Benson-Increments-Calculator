@@ -24,10 +24,14 @@ from benson.data import (
     OPTIONAL_COLUMNS,
     REFERENCES_PATH,
     REFERENCE_COLUMNS,
+    UNCERTAINTY_COLUMNS,
+    UNCERTAINTY_PATH,
     Category,
     find_categories,
+    method_figure_problems,
     read_category,
     read_metadata,
+    read_method_figures,
     read_pairs,
     read_references,
     unresolved_sources,
@@ -322,6 +326,32 @@ def check_references(categories: list[Category], report: Report) -> None:
         report.add(file, line, f"{row.group}: Source {row.source!r} is not a key in {REFERENCES_PATH}")
 
 
+def check_uncertainty(categories: list[Category], report: Report) -> None:
+    """data/uncertainty.csv, the method's own error on a total.
+
+    What makes a figure usable is benson.data.method_figure_problems(), which
+    the build refuses on too, so the two cannot disagree. Only the file's shape
+    is checked here as well.
+    """
+    if not os.path.exists(UNCERTAINTY_PATH):
+        return
+    name = os.path.basename(UNCERTAINTY_PATH)
+    table = read_category(UNCERTAINTY_PATH)
+    missing = [column for column in UNCERTAINTY_COLUMNS if column not in table.columns]
+    if missing:
+        report.add(name, 1, f"header is missing {', '.join(missing)} - expected {','.join(UNCERTAINTY_COLUMNS)}")
+    for line, cells in table.records:
+        if len(cells) > len(table.columns):
+            report.add(name, line, f"{len(cells)} columns, expected {len(table.columns)} - "
+                                   "an unquoted comma in the note?")
+
+    # The symbols the build sees: those declared for a category that exists.
+    metadata = read_metadata()
+    symbols = {metadata.get(category.file, {}).get("symbol") for category in categories} - {"", None}
+    for line, message in method_figure_problems(read_method_figures(), read_references(), symbols):
+        report.add(name, line, message)
+
+
 def main() -> int:
     categories = find_categories()
     if not categories:
@@ -335,6 +365,7 @@ def main() -> int:
     check_metadata(categories, report)
     check_notation(categories, report)
     check_references(categories, report)
+    check_uncertainty(categories, report)
 
     if report:
         print(f"{len(report.problems)} problem(s) found:\n", file=sys.stderr)
@@ -346,7 +377,8 @@ def main() -> int:
     described = sum(1 for c in categories if read_metadata().get(c.file, {}).get("quantity"))
     cited = sum(1 for c in categories for row in c.rows if row.source)
     print(f"OK - {len(categories)} category files ({described} described), {total} increments "
-          f"({cited} with a Source), {len(read_references())} references, notation files consistent.")
+          f"({cited} with a Source), {len(read_references())} references, "
+          f"{len(read_method_figures())} method uncertainty figure(s), notation files consistent.")
     return 0
 
 

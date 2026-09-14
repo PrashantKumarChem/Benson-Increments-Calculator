@@ -17,7 +17,7 @@ import re
 from dataclasses import dataclass, field
 from typing import NamedTuple, Optional
 
-from benson.values import cell_text
+from benson.values import cell_text, read_uncertainty, to_kj
 
 CSV_DIR = "CSV_data_files"
 # Hand-edited, and optional: what a category's numbers are, and where they came
@@ -259,15 +259,16 @@ def read_references(path: str = REFERENCES_PATH) -> list[Reference]:
     if not os.path.exists(path):
         return []
     table = read_category(path)
+    return [Reference(line, *(_titled_cell(table, cells, column) for column in REFERENCE_COLUMNS))
+            for line, cells in table.records if _titled_cell(table, cells, "Key")]
 
-    def cell(cells, column):
-        if column not in table.columns:
-            return ""
-        index = table.columns.index(column)
-        return cells[index] if index < len(cells) else ""
 
-    return [Reference(line, *(cell(cells, column) for column in REFERENCE_COLUMNS))
-            for line, cells in table.records if cell(cells, "Key")]
+def _titled_cell(table: Category, cells, column: str) -> str:
+    """A line's cell under a column found by its title anywhere in the header; blank where there is none."""
+    if column not in table.columns:
+        return ""
+    index = table.columns.index(column)
+    return cells[index] if index < len(cells) else ""
 
 
 YEAR_RE = re.compile(r"^\d{4}$")
@@ -309,6 +310,96 @@ def work_of(reference: Reference) -> Optional[dict]:
         if value:
             work[key] = value
     return work
+
+
+#: The method's own error on a total, as a published figure: one row per quantity
+#: it is published for. It is not any group's uncertainty, and not a sum of them
+#: (D11) - the group values were fitted to whole molecules together, so their
+#: errors are not independent and adding them up overstates the whole. Cited as
+#: a row is, by a Source key into REFERENCES_PATH.
+UNCERTAINTY_PATH = "data/uncertainty.csv"
+#: The columns of UNCERTAINTY_PATH, found by title.
+#:   Symbol    the quantity symbol of the totals it describes, as notation/categories.csv writes it
+#:   Value     the figure as its source prints it, one unsigned number
+#:   Unit      the unit it is printed in; blank is kJ/mol, as for a category
+#:   Phase     the phase it was measured in, which the page's sentence names
+#:   Elements  the element symbols of the compounds it was measured on, separated by spaces
+#:   Source    a Key in REFERENCES_PATH
+#:   Note      what a reader has to know to read the figure honestly
+UNCERTAINTY_COLUMNS = ("Symbol", "Value", "Unit", "Phase", "Elements", "Source", "Note")
+
+ELEMENT_RE = re.compile(r"^[A-Z][a-z]?$")
+
+
+class MethodFigure(NamedTuple):
+    """One row of UNCERTAINTY_PATH, as written. method_figure_problems() says whether it is usable."""
+
+    line: int
+    symbol: str
+    value: str
+    unit: str
+    phase: str
+    elements: str
+    source: str
+    note: str
+
+
+def read_method_figures(path: str = UNCERTAINTY_PATH) -> list[MethodFigure]:
+    """Every figure in file order, kept whether or not it is complete. An absent file means none.
+
+    A line with nothing in any cell - a spreadsheet's trailing ",,,,,," - is not a figure.
+    """
+    if not os.path.exists(path):
+        return []
+    table = read_category(path)
+    return [MethodFigure(line, *(_titled_cell(table, cells, column) for column in UNCERTAINTY_COLUMNS))
+            for line, cells in table.records if any(cells)]
+
+
+def method_figure_problems(figures: list[MethodFigure], references: list[Reference],
+                           symbols: set[str]) -> list[tuple[int, str]]:
+    """Everything that stops a figure being shown truthfully, as (line, message).
+
+    `symbols` are the quantity symbols the categories declare. The build refuses
+    on any of these and the validator reports them, from this one list, so the
+    two cannot disagree about what a usable figure is.
+
+    Every column is required. A figure with no Source is an uncited number in
+    front of a student; one with no Note has lost the caveats that stop a fit
+    statistic being read as a prediction interval; and the page's sentence names
+    the phase, the quantity and the elements, so a blank there would print a
+    claim with a hole in it.
+    """
+    known = {reference.key for reference in references}
+    problems: list[tuple[int, str]] = []
+    first_seen: dict[str, int] = {}
+    for figure in figures:
+        line = figure.line
+        for column, value in zip(UNCERTAINTY_COLUMNS, figure[1:]):
+            if not value and column != "Unit":
+                problems.append((line, f"no {column}"))
+        if figure.symbol:
+            if figure.symbol not in symbols:
+                problems.append((line, f"{figure.symbol!r} is not the Symbol of any category, "
+                                       "so this figure would describe no total"))
+            if figure.symbol in first_seen:
+                problems.append((line, f"{figure.symbol!r} already has a figure on line {first_seen[figure.symbol]}"))
+            else:
+                first_seen[figure.symbol] = line
+        try:
+            read_uncertainty(figure.value)
+        except ValueError as exc:
+            problems.append((line, str(exc)))
+        try:
+            to_kj(0.0, figure.unit)
+        except ValueError as exc:
+            problems.append((line, str(exc)))
+        for element in figure.elements.split():
+            if not ELEMENT_RE.match(element):
+                problems.append((line, f"Elements: {element!r} is not an element symbol"))
+        if figure.source and figure.source not in known:
+            problems.append((line, f"Source {figure.source!r} is not a key in {REFERENCES_PATH}"))
+    return problems
 
 
 def unresolved_sources(categories: list[Category], references: list[Reference]) -> list[tuple[str, int, Row]]:
