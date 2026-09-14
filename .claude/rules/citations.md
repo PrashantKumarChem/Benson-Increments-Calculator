@@ -14,10 +14,11 @@ between a published value and a rumour.
 
 This rule covers every citation the repository keeps: the tests' — including
 `tools/thermochemistry_data.mjs`, where the thermochemistry test keeps its
-cited values — and `data/references.csv`, whose keys the increment rows name as
-their `Source`. An increment row carries its value as the source prints it, the
-source's own uncertainty where it gives one, and that key; the citation and its
-link belong in the reference, never on the row. The format of the data files,
+cited values — and `data/references.csv`, whose keys the increment rows, and
+the method's uncertainty figure in `data/uncertainty.csv`, name as their
+`Source`. Such a row carries its value as the source prints it, the source's
+own uncertainty where it gives one, and that key; the citation and its link
+belong in the reference, never on the row. The format of the data files,
 and what the validator checks in them, is [`data.md`](data.md)'s.
 
 Two properties matter, and they are separate:

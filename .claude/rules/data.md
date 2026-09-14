@@ -71,18 +71,56 @@ last existing row. It fails loudly rather than silently, but it wastes a cycle.
 
 ## `data/references.csv`
 
-One row per published work, with the columns `Key,Citation,DOI`. A row's
-`Source` names a `Key`, so a citation is written once, here, however many rows
-cite it. `DOI` may be blank. Nobody writes a reference number down: a
-reference's number is its place in this file, assigned when the artifact is
-built, so inserting one renumbers the rest.
+One row per published work. A row's `Source` names a `Key`, so a citation is
+written once, here, however many rows cite it. Nobody writes a reference number
+down: a reference's number is its place in this file, assigned when the
+artifact is built, so inserting one renumbers the rest. The page lists them in
+that order at its foot.
 
-A reference with a DOI also has to pass the DOI lock
+| Column | What it holds |
+|---|---|
+| `Key` | The short name a `Source` uses. Required. |
+| `Citation` | The full citation, as the page prints it. Required. |
+| `DOI` | The work's DOI, or blank. |
+| `Type` | What kind of work it is, as the DOI lock compares it: `journal-article`, for instance. |
+| `Title` | The title, exactly as it stands inside the citation's quotes. |
+| `Authors` | Family names, separated by `;`, since a name can hold a comma. |
+| `Year` | Four digits. |
+| `Volume`, `FirstPage` | As the citation ends: `…, year, volume, first page`. |
+| `Publisher` | For a work compared on its publisher, such as a dataset. |
+
+The columns from `Type` on say which work the citation is, and a reference with
+no DOI can leave them blank. A DOI is opaque - a near miss resolves to a real,
+different paper - so a reference with one has to pass the DOI lock
 (`node tools/build_doi_lock.mjs`, then `node --test tools/doi_lock.test.mjs`).
-Today the lock refuses one outright, because it compares a DOI's record with
-fields — the work's type, title, authors, year, volume and first page — that no
-column holds yet. Giving them one is part of adding the first reference with a
-DOI.
+The lock compares the DOI's record with these fields and checks that each was
+read off the citation beside it; which fields a type is compared on is
+`tools/doi_lock.mjs`'s to say.
+
+## `data/uncertainty.csv`
+
+The method's own error on a whole total, as a published figure: one row per
+quantity it is published for. The line under the running total is written
+from it, and its `Note` is printed at the foot of the page. It is not any
+group's uncertainty, and nothing adds those up into it - the group values were
+fitted to whole molecules together, so their errors are not independent, and a
+sum of them overstates the whole.
+
+| Column | What it holds |
+|---|---|
+| `Symbol` | The quantity symbol of the totals it describes, as `notation/categories.csv` writes it. |
+| `Value` | The figure as its source prints it: one unsigned number. |
+| `Unit` | The unit it is printed in. Blank is kJ/mol. |
+| `Phase` | The phase it was measured in, which the line names. |
+| `Elements` | The element symbols of the compounds it was measured on, separated by spaces. A total holding another element is told the figure does not cover it. |
+| `Source` | A `Key` in `data/references.csv`. |
+| `Note` | What a reader needs in order to read the figure honestly: what kind of statistic it is, whose values it was measured with, where it is weakest. |
+
+Every column but `Unit` has to be filled in. A figure with no source is
+uncited, one with no note has lost its caveats, and the line names the phase,
+the quantity and the elements. Which figure is shown, and what is said beside
+it, are chemistry and wording decisions: raise a change, with the page it comes
+from, rather than making one.
 
 ## Rules the validator enforces, and why
 
@@ -92,6 +130,14 @@ DOI.
 - **Every `Source` must be a key in `data/references.csv`.** A key naming
   nothing claims a citation nobody can find, and the build refuses one as well.
   A blank `Source` is not a fault.
+- **A reference's work fields must be readable.** No work field without a
+  `Type` to say what it describes, and a `Year` of four digits. Otherwise the
+  build would drop them, and the lock would refuse the DOI for a reason that
+  names something else.
+- **A figure in `data/uncertainty.csv` must be complete, and describe a total
+  that exists.** Every column but `Unit` filled in; a `Symbol` that a category
+  declares, and only once; one unsigned number; element symbols; a `Source`
+  that is a key. The build refuses the same faults, asking the same function.
 - **No file may contain both a published range and a negative value.** This was
   once unreadable: pandas types a whole column as strings as soon as one cell is
   a range, and the notebook split those strings on the range separator, so while

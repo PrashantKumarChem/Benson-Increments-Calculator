@@ -2,7 +2,8 @@
 
 What counts as a category file and the order its filename declares, reading
 one into rows, the notation-style two-column files, the metadata saying what a
-category's numbers are, and the references a row's Source names.
+category's numbers are, the references a row's Source names, and the published
+figures for the method's own error.
 
 Reading does not judge: tools/validate_data.py asks whether what was read is
 valid, once the rows are in hand. A folder that is not this repository's is
