@@ -378,7 +378,7 @@ def build_index(categories: list[Category], notation: Notation) -> list[Entry]:
     return [
         Entry(
             label=row[0],
-            row=tuple(row),
+            row=row,
             category=category,
             category_index=category_index,
             row_index=row_index,

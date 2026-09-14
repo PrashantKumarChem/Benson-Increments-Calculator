@@ -101,7 +101,7 @@ def _increment_entry(entry, notation, unit: str) -> dict:
     `entry` is a benson.notation.Entry - one row of build_index(), which
     already carries the precomputed, normalised search aliases (D7 layer B).
     """
-    reading = read_value(entry.row[1])
+    reading = read_value(entry.row.value)
     decomposed = read_notation(entry.label, notation)
     return {
         "label": entry.label,

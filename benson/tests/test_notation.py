@@ -19,7 +19,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from benson.data import CSV_DIR, NOTATION_DIR, find_categories
+from benson.data import CSV_DIR, NOTATION_DIR, Row, find_categories
 from benson.notation import (
     ENERGY,
     GROUP,
@@ -45,7 +45,7 @@ categories = find_categories(str(ROOT / CSV_DIR))
 notation = load_notation(str(ROOT / NOTATION_DIR))
 index = build_index(categories, notation)
 
-every_label = [(category.file, label) for category in categories for label, _ in category.rows]
+every_label = [(category.file, row.group) for category in categories for row in category.rows]
 
 
 def molecule(parts):
@@ -390,7 +390,7 @@ class Searching(unittest.TestCase):
         # The index is what a page renders a card from. Narrowing an entry to its
         # label would lose how the source wrote the value, so the row comes along.
         methylene = next(entry for entry in index if entry.label == "C-(C)2(H)2")
-        self.assertEqual(methylene.row, ("C-(C)2(H)2", "-20.9"))
+        self.assertEqual(methylene.row, Row("C-(C)2(H)2", "-20.9"))
         self.assertEqual(methylene.category.file, "01_CH_Groups.csv")
 
 

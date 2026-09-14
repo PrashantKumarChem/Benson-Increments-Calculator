@@ -21,6 +21,7 @@ from benson.data import (
     METADATA_FIELDS,
     METADATA_NAME,
     NOTATION_DIR,
+    OPTIONAL_COLUMNS,
     Category,
     find_categories,
     read_category,
@@ -61,13 +62,23 @@ def check_category(category: Category, report: Report) -> None:
         report.add(name, 0, "file is empty")
         return
 
-    if len(category.columns) != 2:
-        report.add(name, 1, f"header has {len(category.columns)} columns, expected exactly 2 "
-                            "(group name, then value in kJ/mol)")
+    if len(category.columns) < 2:
+        report.add(name, 1, "header has one column, expected at least two (group name, then value)")
         return
 
     if not all(category.columns):
         report.add(name, 1, "header has an empty column title")
+
+    # The reader finds an optional column by its exact title and ignores any
+    # other, so a misspelt one would drop what it holds without a word. That is
+    # the silent kind of fault, and the one worth refusing by name.
+    optional = category.columns[2:]
+    for column in dict.fromkeys(optional):
+        if column and column not in OPTIONAL_COLUMNS:
+            report.add(name, 1, f"header column {column!r} is not one a category file can carry - after "
+                                f"the group name and value, a column is one of {', '.join(OPTIONAL_COLUMNS)}")
+        elif column and optional.count(column) > 1:
+            report.add(name, 1, f"header names {column!r} more than once")
 
     if not category.records:
         report.add(name, 0, "file has a header but no data rows")
@@ -83,11 +94,12 @@ def check_category(category: Category, report: Report) -> None:
         if len(row) == 1 and "," not in row[0]:
             report.add(name, line, "no comma - expected two columns")
             continue
-        if len(row) != 2:
-            report.add(name, line, f"{len(row)} columns, expected 2 - a stray comma in the group name?")
+        if not 2 <= len(row) <= category.width:
+            expected = "2" if category.width == 2 else f"2 to {category.width}"
+            report.add(name, line, f"{len(row)} columns, expected {expected} - a stray comma in the group name?")
             continue
 
-        label, raw_value = row
+        label, raw_value = row[0], row[1]
         if not label:
             report.add(name, line, "missing group name")
         elif label in first_seen:
@@ -202,7 +214,7 @@ def check_notation(categories: list[Category], report: Report) -> None:
     been renamed. Whether a name can be read at all is a question about both the
     data and the parser, so the notation tests ask it.
     """
-    known = {label for category in categories for label, _ in category.rows}
+    known = {row.group for category in categories for row in category.rows}
     problems = []
     for spec in NOTATION_FILES:
         path = os.path.join(NOTATION_DIR, spec.name)
@@ -234,13 +246,11 @@ def check_unique_names(categories: list[Category], report: Report) -> None:
     """
     seen: dict[str, str] = {}
     for category in categories:
-        for line, row in category.records:
-            if len(row) != 2 or not row[0]:
-                continue
-            owner = seen.setdefault(row[0], category.file)
+        for line, row in category.numbered_rows:
+            owner = seen.setdefault(row.group, category.file)
             if owner != category.file:
                 report.add(category.file, line,
-                           f"{row[0]!r} is already defined in {owner} - a group name has to be "
+                           f"{row.group!r} is already defined in {owner} - a group name has to be "
                            "unique across categories, not just within one file")
 
 
