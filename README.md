@@ -131,12 +131,13 @@ python -m unittest discover -s benson/tests -t .   # the benson package's rules
 node tools/validate_css.mjs     # the stylesheet parses, and every token it names exists
 ```
 
-Those need nothing installed. Two more do. `check_parity.mjs` runs the
-notebook's own code, so it needs pandas, in `python` or in whichever interpreter
-a `PYTHON` variable names. `check_render.mjs` needs a browser:
+Both of the first two also run `tests/conformance.json` — the fixture pinning
+the tally arithmetic, total formatting, query matching and the method
+uncertainty rule against one agreed answer, rather than against each other.
+Those need nothing installed. One more does — `check_render.mjs` needs a
+browser:
 
 ```bash
-node tools/check_parity.mjs     # every increment, notebook vs. site
 npm install --no-save playwright && npx playwright install chromium
 node tools/check_render.mjs     # open the page and ask where its furniture ended up
 ```
@@ -156,11 +157,6 @@ the increments on a wide screen, that adding one does not move the sheet, and
 that nothing spills sideways. Each of those has been run against a deliberately
 broken copy to confirm it fails. CI installs a browser for it; nothing else
 here needs one, which is why it is a separate script rather than a test.
-
-`check_parity.mjs` loads all 236 increments twice — once through the notebook's
-own code, once from `dist/increments.json`, the artifact the site itself reads
-— and fails on any difference. Because a molecule's total is a sum of these
-values, agreement on every increment means agreement on every total.
 
 ## Layout
 

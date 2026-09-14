@@ -2,11 +2,12 @@
  * Does the increment data agree with experiment?
  *
  * Every other check in this repository proves the tool is internally
- * consistent. check_parity.mjs proves the notebook and the site read all 236
- * increments identically; validate_data.py proves the files are well formed.
- * None of them can notice a value that was mistranscribed from the published
- * table, because a wrong number is copied faithfully into both consumers and
- * satisfies every one of those rules.
+ * consistent: validate_data.py proves the files are well formed, and
+ * tests/conformance.json proves the tally, formatting and search rules that
+ * still exist in two places agree on an agreed answer. None of them can
+ * notice a value that was mistranscribed from the published table, because a
+ * wrong number is copied faithfully into every consumer and satisfies every
+ * one of those rules.
  *
  * This test does not close that gap either. It sums groups for real molecules
  * and compares each total with an experimental gas-phase enthalpy of formation

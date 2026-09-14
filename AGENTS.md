@@ -61,9 +61,8 @@ python tools/validate_data.py     # the increment CSVs
 python tools/validate_assets.py   # every asset requested at one version
 python tools/build_dist.py        # regenerates dist/increments.json; CI fails on a diff
 node   tools/validate_css.mjs     # the stylesheet parses; every token exists
-node --test tools/*.test.mjs      # unit tests
-python -m unittest discover -s benson/tests -t .   # the benson package's tests
-node   tools/check_parity.mjs     # every increment: notebook vs. site
+node --test tools/*.test.mjs      # unit tests, including tests/conformance.json (tally, total, query, uncertainty)
+python -m unittest discover -s benson/tests -t .   # the benson package's tests, including the same fixture
 node   tools/check_render.mjs     # the page, in a real browser
 node   tools/build_doi_lock.mjs   # what each cited DOI resolves to; CI fails on a diff
 ```
@@ -73,8 +72,6 @@ Notes:
 - **Never assert a specific test count.** It grows. Assert zero failures.
   Read `unittest`'s count all the same: before Python 3.12 it reports `OK`
   having found no tests at all.
-- `check_parity.mjs` needs a `PYTHON` environment variable pointing at an
-  interpreter with `pandas`.
 - `check_render.mjs` is the only check needing a browser:
   `npm install --no-save playwright && npx playwright install chromium`.
   Install it outside the repository so nothing here is polluted.
