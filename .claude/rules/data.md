@@ -18,8 +18,11 @@ as a fact.
   four `[COd]` ketene rows, for instance, are a chemist's call that was
   explicitly left alone — and changing one silently can make several documents
   false at once.
-- Values currently follow Cohen & Benson, *Chem. Rev.* **1993**, *93*, 2419.
-  Later revisions exist but cover fewer elements; the choice is deliberate.
+- Group values compiled from published Benson group-additivity tables, including
+  Benson (1976) and Cohen & Benson (1993). Each value is being checked against its
+  printed source. Which table a given row came from is not yet recorded, so do not
+  credit a row or a category to one paper. Later revisions exist but cover fewer
+  elements.
 
 ## File format
 

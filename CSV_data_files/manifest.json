@@ -12,7 +12,7 @@
       "quantity": "standard enthalpy of formation",
       "symbol": "\u0394Hf\u00b0",
       "unit": "kJ/mol",
-      "source": "Cohen & Benson 1993",
+      "source": "Published Benson tables (pending final review)",
       "note": ""
     },
     {
@@ -26,7 +26,7 @@
       "quantity": "standard enthalpy of formation",
       "symbol": "\u0394Hf\u00b0",
       "unit": "kJ/mol",
-      "source": "Cohen & Benson 1993",
+      "source": "Published Benson tables (pending final review)",
       "note": ""
     },
     {
@@ -40,7 +40,7 @@
       "quantity": "standard enthalpy of formation",
       "symbol": "\u0394Hf\u00b0",
       "unit": "kJ/mol",
-      "source": "Cohen & Benson 1993",
+      "source": "Published Benson tables (pending final review)",
       "note": ""
     },
     {
@@ -54,7 +54,7 @@
       "quantity": "ring and steric correction",
       "symbol": "\u0394Hf\u00b0",
       "unit": "kJ/mol",
-      "source": "Cohen & Benson 1993",
+      "source": "Published Benson tables (pending final review)",
       "note": "Added once per ring or interaction rather than per atom"
     },
     {

@@ -10,8 +10,9 @@ increments. Nothing to install — the calculator runs in a browser, on a laptop
 a phone.
 
 Designed for Chemistry C450/C540 at Indiana University Bloomington by Prashant
-Kumar and Dr. Nicola L. B. Pohl. Values follow Cohen &amp; Benson, *Chem. Rev.*
-**1993**, *93*, 2419.
+Kumar and Dr. Nicola L. B. Pohl. Group values compiled from published Benson
+group-additivity tables, including Benson (1976) and Cohen &amp; Benson (1993). Each
+value is being checked against its printed source.
 
 ## What it does
 
