@@ -83,8 +83,8 @@ export function rangeSpread(entries) {
  * it is built from.
  *
  * `individualUncertainties` is accepted and deliberately not summed. Ten
- * groups at ±3 kJ/mol would give ±9.5 in quadrature, nearly double Cohen's
- * observed 5.5 kJ/mol mean absolute error - the group values were fitted to
+ * groups at ±3 kJ/mol would give ±9.5 in quadrature, nearly double the 5.5
+ * kJ/mol average error Cohen reports - the group values were fitted to
  * minimise whole-molecule residuals, so their errors are anticorrelated by
  * construction, and naive propagation overestimates (D11). The empirical
  * figure is what is displayed, supplied as `methodFigure` rather than
@@ -133,6 +133,128 @@ export function describeTotal(entries, categoriesByFile = new Map()) {
   // More than one quantity in the sum. Name the total plainly and let the page
   // list what is in it, rather than claiming it is any one of them.
   return { label: "Total", quantities, mixed: true };
+}
+
+/**
+ * Element symbols as words, for the one sentence that names an element.
+ *
+ * Which elements a figure was measured on is data (data/uncertainty.csv), and
+ * so is every group's composition; only the word for a symbol lives here. A
+ * symbol with no word is printed as the symbol rather than guessed at, and
+ * tools/format.test.mjs fails if the artifact holds an element this leaves
+ * unnamed.
+ */
+export const ELEMENT_NAMES = { C: "carbon", H: "hydrogen", N: "nitrogen", O: "oxygen" };
+
+/** "nitrogen", "nitrogen or oxygen", "carbon, nitrogen or oxygen". */
+const orList = (words) =>
+  words.length > 1 ? `${words.slice(0, -1).join(", ")} or ${words[words.length - 1]}` : words.join("");
+
+/**
+ * What to say about the method's own uncertainty, under a total.
+ *
+ * `figures` is the artifact's `uncertainty` list - for each quantity symbol, a
+ * published figure for the method's error on a whole total, with the phase and
+ * the elements it was measured on - and `references` is the artifact's own
+ * list, so a sentence can carry its citation's number.
+ *
+ * The figure is shown as published and never built up from the chosen groups'
+ * own uncertainties. combinedUncertainty() is what says so (D11), and it is
+ * asked here rather than restated. What this decides is where the figure
+ * applies, because a method error printed under a total it was never measured
+ * on is a confident wrong statement:
+ *
+ *   - nothing chosen, no figure at all, or a category that has not said what
+ *     it holds: nothing is claimed, as describeTotal() declines to label it;
+ *   - no quantity in the total has a figure: say so, and what the figure is for;
+ *   - a total that mixes quantities: the figure, and that it is for its own
+ *     quantity's terms only;
+ *   - a chosen group holding an element the figure was not measured on: the
+ *     figure, and that it does not cover that element.
+ *
+ * This is apart from rangeSpread() on purpose (D12): that is how far the
+ * published ranges move this total, and this is how far the method typically
+ * misses. Two questions, two lines.
+ *
+ * Returns null, or `{ sentences }` where each is `{ text, ref, figure }`: plain
+ * text, the number of the reference it cites or null, and the index in
+ * `figures` of the figure whose note explains it or null. app.js escapes the
+ * text and sets the number as a superscript.
+ */
+export function describeMethodUncertainty(entries, categoriesByFile, figures, references) {
+  if (!figures.length) return null;
+  // describeTotal() names no quantity for an empty selection either.
+  const described = describeTotal(entries, categoriesByFile);
+  if (!described.quantities.length) return null;
+
+  const withFigure = described.quantities
+    .map((quantity) => ({ quantity, index: figures.findIndex((figure) => figure.symbol === quantity.symbol) }))
+    .filter(({ index }) => index >= 0);
+  if (!withFigure.length) {
+    return {
+      sentences: [{
+        text: `No method error is given for a ${orList(described.quantities.map((q) => q.symbol))} total; ` +
+          `the figure is for ${orList(figures.map((figure) => figure.symbol))}.`,
+        ref: null,
+        figure: null,
+      }],
+    };
+  }
+
+  const sentences = [];
+  for (const { quantity, index } of withFigure) {
+    const figure = figures[index];
+    const reference = references.find((candidate) => candidate.key === figure.ref);
+    if (!reference) {
+      // benson/build.py refuses to write this, so reaching it means the page
+      // is reading an artifact it was not built with.
+      throw new Error(`the ${figure.symbol} uncertainty figure cites '${figure.ref}', ` +
+        "which is not in the artifact's references");
+    }
+    const terms = entries.filter((entry) => categoriesByFile.get(entry.categoryFile)?.symbol === quantity.symbol);
+    // Each group's own published uncertainty, once for every time it was
+    // chosen: handed over, and not summed.
+    const own = terms.flatMap((entry) => Array(entry.count).fill(entry.uncertainty))
+      .filter((uncertainty) => uncertainty != null);
+    const value = combinedUncertainty(own, figure.value);
+    sentences.push({
+      text: `Benson estimates of ${figure.phase}-phase ${figure.symbol} are typically off by about ` +
+        `${value.toFixed(figure.decimals)} kJ/mol.`,
+      ref: reference.number,
+      figure: index,
+    });
+    if (described.mixed) {
+      sentences.push({ text: `The figure is for the ${figure.symbol} terms only.`, ref: null, figure: null });
+    }
+    const outside = [...new Set(terms.flatMap((entry) => Object.keys(entry.composition ?? {})))]
+      .filter((element) => !figure.elements.includes(element))
+      .sort();
+    if (outside.length) {
+      sentences.push({
+        text: `The figure does not cover ${orList(outside.map((element) => ELEMENT_NAMES[element] ?? element))}.`,
+        ref: null,
+        figure: null,
+      });
+    }
+  }
+  return { sentences };
+}
+
+/**
+ * What a table row shows under Source.
+ *
+ * A row whose Source names a reference shows that reference's number, which
+ * the page links to the list at its foot. A row with none keeps its category's
+ * own description word for word: until each row records its source, that is
+ * what says where the category's values come from.
+ */
+export function sourceOf(increment, references) {
+  if (!increment.ref) return { number: null, label: increment.category?.source ?? "" };
+  const reference = references.find((candidate) => candidate.key === increment.ref);
+  if (!reference) {
+    throw new Error(`'${increment.label}' cites '${increment.ref}', which is not in the artifact's references`);
+  }
+  return { number: reference.number, label: null };
 }
 
 /**

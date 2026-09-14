@@ -764,6 +764,19 @@ ul.picks .sum {
 }
 .band b { font-family: var(--font-mono); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
+/* How far the method itself typically misses, under the figures it qualifies.
+   Not part of the band above, and not styled as it is: the band bounds this
+   total's published ranges, and this is a statistic about the method. */
+.method {
+  color: var(--ink-soft); font-size: .78rem; line-height: 1.45;
+  margin: var(--space-2) 0 0;
+}
+/* A citation mark. line-height: 0 keeps the raised figure from opening up the
+   line it sits in, as it does for the subscripts in a group name. */
+sup.cite-mark { font-size: .75em; line-height: 0; }
+.cite-mark a { color: var(--accent); text-decoration: none; padding: 0 1px; }
+.cite-mark a:hover { text-decoration: underline; }
+
 /* On a phone the panel sits at the foot of the page rather than beside the
    grid, and there it has to earn every pixel of its height.
 
@@ -1008,6 +1021,21 @@ ul.picks .sum {
    going for Copy. */
 .actions .destructive { margin-left: auto; }
 
+/* The foot of the page: what a figure means, then the works cited, numbered. */
+.notes {
+  margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--line);
+  color: var(--ink-soft); font-size: .85rem;
+}
+.notes-head {
+  margin: var(--space-5) 0 var(--space-2); color: var(--ink-soft);
+  font-size: .6875rem; font-weight: 600; letter-spacing: .4px; text-transform: uppercase;
+}
+.notes-head:first-child { margin-top: 0; }
+.notes p, .notes ol { margin: 0; max-width: 72ch; }
+.notes ol { padding-left: var(--space-5); }
+/* A DOI has no spaces to break at, and would otherwise push a phone's page sideways. */
+.notes li { overflow-wrap: anywhere; }
+.notes a { color: var(--accent); }
 footer { color: var(--ink-helper); font-size: .8rem; margin-top: var(--space-7); padding-top: var(--space-5); border-top: 1px solid var(--line); }
 footer a { color: var(--ink-soft); }
 
