@@ -1,11 +1,19 @@
 """Export every increment value exactly as the notebook computes it.
 
-This is the reference implementation the web version is being ported from. The
-loading and the parsing are both the notebook's own code - load_increment_data,
-get_value_dicts and parse_value - read out of the notebook file each time this
-runs. tools/check_parity.mjs compares this output against what the browser code
-produces, so the port is proven value by value instead of by spot-checking a
-few molecules.
+The loading and the parsing are both the notebook's own code -
+load_increment_data, get_value_dicts and parse_value - read out of the
+notebook file each time this runs, so a change to any of the three is
+reflected here without being copied by hand.
+
+Until WP4, tools/check_parity.mjs ran this and compared its output against
+dist/increments.json automatically, on every push. WP4 retired that check
+once the fixture in tests/conformance.json covered what was left to check
+that a generated artifact could not (see benson/tests/test_conformance.py's
+docstring) - the 236 increments checked here are not part of that fixture.
+This script still runs; only its automated caller is gone. Anyone editing
+parse_value, load_increment_data or get_value_dicts should run it by hand
+and diff the result against dist/increments.json before relying on the
+notebook agreeing with the site again.
 
 Retire this together with the notebook.
 
@@ -71,8 +79,8 @@ def notebook_functions(notebook_path: str = NOTEBOOK) -> dict:
         if len(definitions) != 1:
             raise SystemExit(
                 f"{notebook_path}: expected exactly one top-level {name}, found {len(definitions)}. "
-                "The parity check compares the site against the notebook's own reading of the data, "
-                "so it cannot run without it.")
+                "This script exports the notebook's own reading of the data for comparison "
+                "against dist/increments.json, so it cannot run without it.")
 
     namespace: dict = {"pd": pd, "glob": glob, "os": os}
     module = ast.Module(body=[definitions[0] for definitions in found.values()], type_ignores=[])
