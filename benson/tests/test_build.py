@@ -238,8 +238,8 @@ class TheRepositoryData(unittest.TestCase):
                 self.assertEqual(increment["value"], increment["storedValue"])
 
     def test_the_committed_artifact_is_what_the_build_produces(self):
-        # The same bargain manifest.json and the asset version already keep:
-        # CI regenerates and diffs, so a stale committed copy is a real fault.
+        # The same bargain the asset version already keeps: CI regenerates and
+        # diffs, so a stale committed copy is a real fault.
         path = ROOT / ARTIFACT_PATH
         self.assertTrue(path.exists(), f"{ARTIFACT_PATH} is missing - run: python tools/build_dist.py")
         with open(path, encoding="utf-8") as handle:

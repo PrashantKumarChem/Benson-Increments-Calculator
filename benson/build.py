@@ -9,8 +9,8 @@ The point of emitting the derived parts rather than the raw parts is that a
 consumer then has no rule of its own to get wrong. A website that reads
 `decimals` is not implementing a precision rule, and one that reads `aliases`
 is not implementing notation decomposition. CI regenerates the artifact and
-fails on any difference, which is the bargain `CSV_data_files/manifest.json`
-and the asset version already keep here.
+fails on any difference, which is the bargain the asset version already keeps
+here.
 
 **What this does not emit yet, and why.** `02-data-schema.md`'s sketch also
 shows `uncertainty` and `references` blocks. Neither has a consumer before WP5

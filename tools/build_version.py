@@ -18,7 +18,7 @@ longer be forgotten, mis-typed, or picked twice by two branches that never saw
 each other. There is nothing to remember and nothing to look up.
 
 It stays a generated file checked by `git diff --exit-code`, which is how
-CSV_data_files/manifest.json is already kept honest - not a build step the site
+`dist/increments.json` is already kept honest - not a build step the site
 needs, but a file a human could edit wrongly and a machine can confirm.
 
     python tools/build_version.py           # rewrite index.html

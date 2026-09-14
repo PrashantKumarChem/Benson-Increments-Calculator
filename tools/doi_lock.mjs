@@ -9,8 +9,8 @@
  * journal, volume and year. Only resolving the DOI shows the difference.
  *
  * Resolving needs the network, and the unit tests must not, so the work is in
- * three parts - the bargain CI already strikes for the manifest and the asset
- * version:
+ * three parts - the bargain CI already strikes for the increments artifact and
+ * the asset version:
  *
  *   tools/build_doi_lock.mjs   asks doi.org about every cited DOI and writes the
  *                              fields compared here to tools/doi_lock.json

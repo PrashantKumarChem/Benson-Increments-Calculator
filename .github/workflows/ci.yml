@@ -34,23 +34,15 @@ jobs:
           echo "$out" | grep -qE '^Ran [1-9][0-9]* tests? in' || { echo "No tests ran."; exit 1; }
 
       # Checks what a contributor can actually get wrong: two columns per file,
-      # every value a number or a range, no duplicate or blank group names, the
-      # filename convention, and manifest.json matching what is on disk.
+      # every value a number or a range, no duplicate or blank group names, and
+      # the filename convention.
       - name: Validate CSV files
         run: python tools/validate_data.py
 
-      # The manifest is generated, so a stale committed copy is a real fault:
-      # the site would show categories that no longer match the data.
-      - name: Confirm the manifest is current
-        run: |
-          python tools/build_data.py
-          git diff --exit-code CSV_data_files/manifest.json
-
       # dist/increments.json is the artifact benson/build.py emits from
       # CSV_data_files/ and notation/ - everything a consumer needs, derived
-      # once. Regenerated and diffed the same way the manifest above is: a
-      # stale committed copy would ship a value or a notation reading the
-      # source no longer says.
+      # once. Regenerated and diffed: a stale committed copy would ship a value
+      # or a notation reading the source no longer says.
       - name: Confirm the increments artifact is current
         run: |
           python tools/build_dist.py
@@ -70,9 +62,9 @@ jobs:
       # a string saying it is current.
       #
       # The version is generated from the assets now, so that is one diff rather
-      # than an argument about letters. This is the same bargain the manifest
-      # above strikes: regenerate the file, and fail if the committed copy is
-      # not what the sources produce.
+      # than an argument about letters. This is the same bargain the increments
+      # artifact above strikes: regenerate the file, and fail if the committed
+      # copy is not what the sources produce.
       #
       # It replaces a step that walked the whole history of index.html to prove
       # a hand-picked letter had never been used before - which was needed
@@ -167,8 +159,8 @@ jobs:
       # tools/doi_lock.json. That comparison is only as honest as the file, and a
       # file edited to agree with a wrong DOI passes it. This asks doi.org again,
       # and fails if the committed file is not what the DOIs resolve to - the same
-      # bargain as the manifest and the asset version, with the registries in
-      # place of the source files.
+      # bargain as the increments artifact and the asset version, with the
+      # registries in place of the source files.
       #
       # It is a job of its own because it is the only one that needs the network.
       # When the resolver is down this job goes red and says the resolver could

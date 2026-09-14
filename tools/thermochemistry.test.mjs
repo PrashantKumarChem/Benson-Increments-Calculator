@@ -189,9 +189,9 @@ test("no enthalpy sum draws on the cyclohexane A-values", () => {
   // arithmetic cannot see, and the interface deliberately puts those rows one
   // click away from the increments, so the mistake is easy to make.
   //
-  // The two quantities allowed here are read from the manifest rather than
-  // named as file numbers, so a sixth category of some third quantity is
-  // refused on arrival instead of being silently summable.
+  // The two quantities allowed here are read from the artifact's category
+  // metadata rather than named as file numbers, so a sixth category of some
+  // third quantity is refused on arrival instead of being silently summable.
   const ENTHALPY_QUANTITIES = new Set(["standard enthalpy of formation", "ring and steric correction"]);
   const quantities = new Map(categories.map((category) => [category.file, category.quantity]));
 
