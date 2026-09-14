@@ -102,6 +102,21 @@ def parse_value(raw) -> float:
     return read_value(raw).value
 
 
+def read_uncertainty(raw) -> Optional[float]:
+    """A row's Uncertainty cell: the ± its source prints, or None where it prints none.
+
+    One number, unsigned. A ± is a magnitude, so a sign is a mistake rather
+    than information; and the range form a value may take would read
+    "0.1 to 0.3" as its average, an uncertainty nobody printed.
+    """
+    text = cell_text(raw)
+    if not text:
+        return None
+    if NUMBER_RE.match(text) and not text.startswith("-"):
+        return float(text)
+    raise InvalidValueError(f"uncertainty {text!r} is not an unsigned number - write the figure alone, like '0.5'")
+
+
 #: 1 thermochemical calorie = 4.184 J, exactly (D18). Converts a value as its
 #: source prints it into the kJ/mol the site sums. Every category declares
 #: kJ/mol today, so nothing actually converts yet - the rule lives here so the

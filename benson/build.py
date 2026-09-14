@@ -18,8 +18,12 @@ and WP6, and both need something this data does not have yet: `uncertainty`'s
 figure is a chemistry judgement between candidate values (D11, H4) that is not
 this package's to make, and `references` needs `data/references.csv`, which
 does not exist until WP5. Emitting either now would be inventing an answer
-ahead of the work that earns it. Per-increment `ref` and `uncertainty` are
-skipped for the same reason.
+ahead of the work that earns it. Per-increment `ref` is skipped for the same
+reason.
+
+A row's own `uncertainty` is not that figure. It is the ± the row's source
+prints, from the optional Uncertainty column, converted to kJ/mol as its value
+is; like `verified` and `note`, it is null wherever its column is blank.
 
 The schema doc's `search` block is a map keyed by exact query text, which
 cannot hold arbitrary typing. What is actually precomputed - each increment's
@@ -40,7 +44,7 @@ import sys
 from benson.data import CSV_DIR, METADATA_FIELDS, NOTATION_DIR, find_categories, read_metadata
 from benson.notation import build_index, load_notation
 from benson.notation import read as read_notation
-from benson.values import KJ_TO_KCAL_DISPLAY, read_value, to_kj
+from benson.values import KJ_TO_KCAL_DISPLAY, read_uncertainty, read_value, to_kj
 
 SCHEMA = 1
 ARTIFACT_PATH = os.path.join("dist", "increments.json")
@@ -95,13 +99,17 @@ def _ligands_of(ligands) -> list[dict]:
     return [{"token": token, "count": count} for token, count in ligands]
 
 
-def _increment_entry(entry, notation, unit: str) -> dict:
+def _increment_entry(entry, notation, category_unit: str) -> dict:
     """One row: its value in the unit the site sums, and its notation reading.
 
     `entry` is a benson.notation.Entry - one row of build_index(), which
     already carries the precomputed, normalised search aliases (D7 layer B).
     """
-    reading = read_value(entry.row.value)
+    row = entry.row
+    # D18: a row's own Unit overrides its category's, for a file whose sources
+    # print different units. One conversion either way; only its argument differs.
+    unit = row.unit or category_unit
+    reading = read_value(row.value)
     decomposed = read_notation(entry.label, notation)
     return {
         "label": entry.label,
@@ -111,11 +119,17 @@ def _increment_entry(entry, notation, unit: str) -> dict:
         "isRange": reading.is_range,
         "low": to_kj(reading.low, unit),
         "high": to_kj(reading.high, unit),
-        # As printed, in the category's own unit - the provenance record a
+        # As printed, in the row's own unit - the provenance record a
         # converted "value" alone would lose.
         "source": reading.source,
         "unit": unit,
         "storedValue": reading.value,
+        # The ± the row's source prints, converted as its value is. A blank
+        # optional cell is null rather than absent, as low and high are, so
+        # every increment carries the same keys.
+        "uncertainty": to_kj(read_uncertainty(row.uncertainty), unit),
+        "verified": row.verified or None,
+        "note": row.note or None,
         "kind": decomposed.kind,
         "composition": decomposed.atoms,
         "central": decomposed.central,

@@ -29,7 +29,7 @@ from benson.data import (
     read_pairs,
 )
 from benson.notation import NOTATION_FILES, load_notation
-from benson.values import Value, read_value
+from benson.values import Value, read_uncertainty, read_value, to_kj
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
 # cannot print one. Reporting a problem must not itself become one.
@@ -106,6 +106,21 @@ def check_category(category: Category, report: Report) -> None:
             report.add(name, line, f"{label!r} already appears on line {first_seen[label]}")
         else:
             first_seen[label] = line
+
+        # The build converts with both of these, so a Unit it cannot convert or
+        # an Uncertainty that is not a number would stop it with a traceback
+        # rather than a line a contributor can act on. Each asks the package's
+        # own rule rather than restating it.
+        unit = category.cell(row, "Unit")
+        if unit:
+            try:
+                to_kj(0.0, unit)
+            except ValueError as exc:
+                report.add(name, line, f"{label or 'row'}: {exc}")
+        try:
+            read_uncertainty(category.cell(row, "Uncertainty"))
+        except ValueError as exc:
+            report.add(name, line, f"{label or 'row'}: {exc}")
 
         try:
             reading = read_value(raw_value)

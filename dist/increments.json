@@ -69,6 +69,9 @@
       "source": "-42",
       "unit": "kJ/mol",
       "storedValue": -42.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -106,6 +109,9 @@
       "source": "-20.9",
       "unit": "kJ/mol",
       "storedValue": -20.9,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -143,6 +149,9 @@
       "source": "-7",
       "unit": "kJ/mol",
       "storedValue": -7.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -180,6 +189,9 @@
       "source": "2",
       "unit": "kJ/mol",
       "storedValue": 2.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -212,6 +224,9 @@
       "source": "26.2",
       "unit": "kJ/mol",
       "storedValue": 26.2,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -245,6 +260,9 @@
       "source": "35.8",
       "unit": "kJ/mol",
       "storedValue": 35.8,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -280,6 +298,9 @@
       "source": "42.6",
       "unit": "kJ/mol",
       "storedValue": 42.6,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -310,6 +331,9 @@
       "source": "28.4",
       "unit": "kJ/mol",
       "storedValue": 28.4,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -345,6 +369,9 @@
       "source": "36.7",
       "unit": "kJ/mol",
       "storedValue": 36.7,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -379,6 +406,9 @@
       "source": "53",
       "unit": "kJ/mol",
       "storedValue": 53.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -409,6 +439,9 @@
       "source": "36",
       "unit": "kJ/mol",
       "storedValue": 36.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -444,6 +477,9 @@
       "source": "40",
       "unit": "kJ/mol",
       "storedValue": 40.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -478,6 +514,9 @@
       "source": "28",
       "unit": "kJ/mol",
       "storedValue": 28.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -513,6 +552,9 @@
       "source": "36",
       "unit": "kJ/mol",
       "storedValue": 36.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -547,6 +589,9 @@
       "source": "50",
       "unit": "kJ/mol",
       "storedValue": 50.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -577,6 +622,9 @@
       "source": "113",
       "unit": "kJ/mol",
       "storedValue": 113.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -610,6 +658,9 @@
       "source": "115",
       "unit": "kJ/mol",
       "storedValue": 115.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -640,6 +691,9 @@
       "source": "126",
       "unit": "kJ/mol",
       "storedValue": 126.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -670,6 +724,9 @@
       "source": "118",
       "unit": "kJ/mol",
       "storedValue": 118.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -700,6 +757,9 @@
       "source": "125",
       "unit": "kJ/mol",
       "storedValue": 125.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "named",
       "composition": {
         "C": 2
@@ -723,6 +783,9 @@
       "source": "13.8",
       "unit": "kJ/mol",
       "storedValue": 13.8,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -756,6 +819,9 @@
       "source": "23",
       "unit": "kJ/mol",
       "storedValue": 23.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -789,6 +855,9 @@
       "source": "27",
       "unit": "kJ/mol",
       "storedValue": 27.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -819,6 +888,9 @@
       "source": "21",
       "unit": "kJ/mol",
       "storedValue": 21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -849,6 +921,9 @@
       "source": "141",
       "unit": "kJ/mol",
       "storedValue": 141.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "named",
       "composition": {
         "C": 1
@@ -872,6 +947,9 @@
       "source": "4",
       "unit": "kJ/mol",
       "storedValue": 4.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "named",
       "composition": {},
       "central": null,
@@ -893,6 +971,9 @@
       "source": "17",
       "unit": "kJ/mol",
       "storedValue": 17.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "named",
       "composition": {},
       "central": null,
@@ -914,6 +995,9 @@
       "source": "-42",
       "unit": "kJ/mol",
       "storedValue": -42.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -948,6 +1032,9 @@
       "source": "-20.1",
       "unit": "kJ/mol",
       "storedValue": -20.1,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -986,6 +1073,9 @@
       "source": "-18",
       "unit": "kJ/mol",
       "storedValue": -18.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1020,6 +1110,9 @@
       "source": "-7",
       "unit": "kJ/mol",
       "storedValue": -7.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1058,6 +1151,9 @@
       "source": "-7",
       "unit": "kJ/mol",
       "storedValue": -7.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1096,6 +1192,9 @@
       "source": "6",
       "unit": "kJ/mol",
       "storedValue": 6.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1129,6 +1228,9 @@
       "source": "-20",
       "unit": "kJ/mol",
       "storedValue": -20.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1167,6 +1269,9 @@
       "source": "-6.5",
       "unit": "kJ/mol",
       "storedValue": -6.5,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1205,6 +1310,9 @@
       "source": "5.5",
       "unit": "kJ/mol",
       "storedValue": 5.5,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1238,6 +1346,9 @@
       "source": "-42",
       "unit": "kJ/mol",
       "storedValue": -42.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1272,6 +1383,9 @@
       "source": "-20",
       "unit": "kJ/mol",
       "storedValue": -20.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1310,6 +1424,9 @@
       "source": "-4",
       "unit": "kJ/mol",
       "storedValue": -4.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1348,6 +1465,9 @@
       "source": "11",
       "unit": "kJ/mol",
       "storedValue": 11.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1381,6 +1501,9 @@
       "source": "-20",
       "unit": "kJ/mol",
       "storedValue": -20.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1415,6 +1538,9 @@
       "source": "-4",
       "unit": "kJ/mol",
       "storedValue": -4.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1449,6 +1575,9 @@
       "source": "31",
       "unit": "kJ/mol",
       "storedValue": 31.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1478,6 +1607,9 @@
       "source": "-18",
       "unit": "kJ/mol",
       "storedValue": -18.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1516,6 +1648,9 @@
       "source": "-42",
       "unit": "kJ/mol",
       "storedValue": -42.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1550,6 +1685,9 @@
       "source": "-33",
       "unit": "kJ/mol",
       "storedValue": -33.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1588,6 +1726,9 @@
       "source": "-29",
       "unit": "kJ/mol",
       "storedValue": -29.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1626,6 +1767,9 @@
       "source": "-26",
       "unit": "kJ/mol",
       "storedValue": -26.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1664,6 +1808,9 @@
       "source": "-23",
       "unit": "kJ/mol",
       "storedValue": -23.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1702,6 +1849,9 @@
       "source": "-26",
       "unit": "kJ/mol",
       "storedValue": -26.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1740,6 +1890,9 @@
       "source": "-21",
       "unit": "kJ/mol",
       "storedValue": -21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1778,6 +1931,9 @@
       "source": "-21",
       "unit": "kJ/mol",
       "storedValue": -21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1811,6 +1967,9 @@
       "source": "-67",
       "unit": "kJ/mol",
       "storedValue": -67.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1845,6 +2004,9 @@
       "source": "-65",
       "unit": "kJ/mol",
       "storedValue": -65.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1883,6 +2045,9 @@
       "source": "-48",
       "unit": "kJ/mol",
       "storedValue": -48.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1916,6 +2081,9 @@
       "source": "-108",
       "unit": "kJ/mol",
       "storedValue": -108.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -1950,6 +2118,9 @@
       "source": "-105",
       "unit": "kJ/mol",
       "storedValue": -105.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -1983,6 +2154,9 @@
       "source": "-162",
       "unit": "kJ/mol",
       "storedValue": -162.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2012,6 +2186,9 @@
       "source": "36",
       "unit": "kJ/mol",
       "storedValue": 36.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2047,6 +2224,9 @@
       "source": "43",
       "unit": "kJ/mol",
       "storedValue": 43.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2081,6 +2261,9 @@
       "source": "37",
       "unit": "kJ/mol",
       "storedValue": 37.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2115,6 +2298,9 @@
       "source": "37",
       "unit": "kJ/mol",
       "storedValue": 37.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2149,6 +2335,9 @@
       "source": "25",
       "unit": "kJ/mol",
       "storedValue": 25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2179,6 +2368,9 @@
       "source": "180",
       "unit": "kJ/mol",
       "storedValue": 180.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2209,6 +2401,9 @@
       "source": "49",
       "unit": "kJ/mol",
       "storedValue": 49.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -2243,6 +2438,9 @@
       "source": "-242",
       "unit": "kJ/mol",
       "storedValue": -242.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -2272,6 +2470,9 @@
       "source": "-159",
       "unit": "kJ/mol",
       "storedValue": -159.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -2311,6 +2512,9 @@
       "source": "-190",
       "unit": "kJ/mol",
       "storedValue": -190.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -2345,6 +2549,9 @@
       "source": "-190",
       "unit": "kJ/mol",
       "storedValue": -190.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -2379,6 +2586,9 @@
       "source": "-201",
       "unit": "kJ/mol",
       "storedValue": -201.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -2413,6 +2623,9 @@
       "source": "-99",
       "unit": "kJ/mol",
       "storedValue": -99.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2445,6 +2658,9 @@
       "source": "-124",
       "unit": "kJ/mol",
       "storedValue": -124.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2478,6 +2694,9 @@
       "source": "-124",
       "unit": "kJ/mol",
       "storedValue": -124.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2511,6 +2730,9 @@
       "source": "-141",
       "unit": "kJ/mol",
       "storedValue": -141.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2544,6 +2766,9 @@
       "source": "-150",
       "unit": "kJ/mol",
       "storedValue": -150.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2577,6 +2802,9 @@
       "source": "-137",
       "unit": "kJ/mol",
       "storedValue": -137.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2606,6 +2834,9 @@
       "source": "-136",
       "unit": "kJ/mol",
       "storedValue": -136.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -2635,6 +2866,9 @@
       "source": "-109",
       "unit": "kJ/mol",
       "storedValue": -109.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2665,6 +2899,9 @@
       "source": "-123",
       "unit": "kJ/mol",
       "storedValue": -123.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2705,6 +2942,9 @@
       "source": "-113",
       "unit": "kJ/mol",
       "storedValue": -113.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2740,6 +2980,9 @@
       "source": "-107",
       "unit": "kJ/mol",
       "storedValue": -107.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2775,6 +3018,9 @@
       "source": "-122",
       "unit": "kJ/mol",
       "storedValue": -122.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2810,6 +3056,9 @@
       "source": "-133",
       "unit": "kJ/mol",
       "storedValue": -133.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2843,6 +3092,9 @@
       "source": "-123",
       "unit": "kJ/mol",
       "storedValue": -123.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2877,6 +3129,9 @@
       "source": "-130",
       "unit": "kJ/mol",
       "storedValue": -130.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2911,6 +3166,9 @@
       "source": "-113",
       "unit": "kJ/mol",
       "storedValue": -113.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2945,6 +3203,9 @@
       "source": "-113",
       "unit": "kJ/mol",
       "storedValue": -113.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -2975,6 +3236,9 @@
       "source": "-118",
       "unit": "kJ/mol",
       "storedValue": -118.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3005,6 +3269,9 @@
       "source": "-40",
       "unit": "kJ/mol",
       "storedValue": -40.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3035,6 +3302,9 @@
       "source": "-42",
       "unit": "kJ/mol",
       "storedValue": -42.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3069,6 +3339,9 @@
       "source": "-22",
       "unit": "kJ/mol",
       "storedValue": -22.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3107,6 +3380,9 @@
       "source": "-16",
       "unit": "kJ/mol",
       "storedValue": -16.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3145,6 +3421,9 @@
       "source": "-11",
       "unit": "kJ/mol",
       "storedValue": -11.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3183,6 +3462,9 @@
       "source": "-9",
       "unit": "kJ/mol",
       "storedValue": -9.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3221,6 +3503,9 @@
       "source": "-4",
       "unit": "kJ/mol",
       "storedValue": -4.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3259,6 +3544,9 @@
       "source": "-12",
       "unit": "kJ/mol",
       "storedValue": -12.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3297,6 +3585,9 @@
       "source": "9",
       "unit": "kJ/mol",
       "storedValue": 9.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -3330,6 +3621,9 @@
       "source": "-10",
       "unit": "kJ/mol",
       "storedValue": -10.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3364,6 +3658,9 @@
       "source": "-29",
       "unit": "kJ/mol",
       "storedValue": -29.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3402,6 +3699,9 @@
       "source": "21",
       "unit": "kJ/mol",
       "storedValue": 21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3437,6 +3737,9 @@
       "source": "31",
       "unit": "kJ/mol",
       "storedValue": 31.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -3471,6 +3774,9 @@
       "source": "38",
       "unit": "kJ/mol",
       "storedValue": 38.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -3505,6 +3811,9 @@
       "source": "18",
       "unit": "kJ/mol",
       "storedValue": 18.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -3535,6 +3844,9 @@
       "source": "120",
       "unit": "kJ/mol",
       "storedValue": 120.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -3565,6 +3877,9 @@
       "source": "-69",
       "unit": "kJ/mol",
       "storedValue": -69.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -3599,6 +3914,9 @@
       "source": "-24",
       "unit": "kJ/mol",
       "storedValue": -24.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -3632,6 +3950,9 @@
       "source": "-243",
       "unit": "kJ/mol",
       "storedValue": -243.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1,
@@ -3666,6 +3987,9 @@
       "source": "-180",
       "unit": "kJ/mol",
       "storedValue": -180.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -3702,6 +4026,9 @@
       "source": "-80",
       "unit": "kJ/mol",
       "storedValue": -80.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -3735,6 +4062,9 @@
       "source": "-187",
       "unit": "kJ/mol",
       "storedValue": -187.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -3768,6 +4098,9 @@
       "source": "-182",
       "unit": "kJ/mol",
       "storedValue": -182.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -3801,6 +4134,9 @@
       "source": "-202",
       "unit": "kJ/mol",
       "storedValue": -202.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -3830,6 +4166,9 @@
       "source": "-134",
       "unit": "kJ/mol",
       "storedValue": -134.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3870,6 +4209,9 @@
       "source": "-147",
       "unit": "kJ/mol",
       "storedValue": -147.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3907,6 +4249,9 @@
       "source": "-134",
       "unit": "kJ/mol",
       "storedValue": -134.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3941,6 +4286,9 @@
       "source": "-115",
       "unit": "kJ/mol",
       "storedValue": -115.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -3975,6 +4323,9 @@
       "source": "-143",
       "unit": "kJ/mol",
       "storedValue": -143.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4009,6 +4360,9 @@
       "source": "-106",
       "unit": "kJ/mol",
       "storedValue": -106.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4044,6 +4398,9 @@
       "source": "-121",
       "unit": "kJ/mol",
       "storedValue": -121.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4078,6 +4435,9 @@
       "source": "-110",
       "unit": "kJ/mol",
       "storedValue": -110.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4112,6 +4472,9 @@
       "source": "-129",
       "unit": "kJ/mol",
       "storedValue": -129.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4142,6 +4505,9 @@
       "source": "-123",
       "unit": "kJ/mol",
       "storedValue": -123.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4176,6 +4542,9 @@
       "source": "-78",
       "unit": "kJ/mol",
       "storedValue": -78.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "unreadable",
       "composition": null,
       "central": null,
@@ -4197,6 +4566,9 @@
       "source": "-58",
       "unit": "kJ/mol",
       "storedValue": -58.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "unreadable",
       "composition": null,
       "central": null,
@@ -4218,6 +4590,9 @@
       "source": "-47",
       "unit": "kJ/mol",
       "storedValue": -47.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "unreadable",
       "composition": null,
       "central": null,
@@ -4239,6 +4614,9 @@
       "source": "-50",
       "unit": "kJ/mol",
       "storedValue": -50.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "unreadable",
       "composition": null,
       "central": null,
@@ -4260,6 +4638,9 @@
       "source": "-42",
       "unit": "kJ/mol",
       "storedValue": -42.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4294,6 +4675,9 @@
       "source": "-23",
       "unit": "kJ/mol",
       "storedValue": -23.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4332,6 +4716,9 @@
       "source": "-18",
       "unit": "kJ/mol",
       "storedValue": -18.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4370,6 +4757,9 @@
       "source": "-13",
       "unit": "kJ/mol",
       "storedValue": -13.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4403,6 +4793,9 @@
       "source": "-26",
       "unit": "kJ/mol",
       "storedValue": -26.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4441,6 +4834,9 @@
       "source": "-15",
       "unit": "kJ/mol",
       "storedValue": -15.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4483,6 +4879,9 @@
       "source": "-6",
       "unit": "kJ/mol",
       "storedValue": -6.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4520,6 +4919,9 @@
       "source": "36",
       "unit": "kJ/mol",
       "storedValue": 36.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4555,6 +4957,9 @@
       "source": "41",
       "unit": "kJ/mol",
       "storedValue": 41.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4589,6 +4994,9 @@
       "source": "25",
       "unit": "kJ/mol",
       "storedValue": 25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4619,6 +5027,9 @@
       "source": "10",
       "unit": "kJ/mol",
       "storedValue": 10.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4654,6 +5065,9 @@
       "source": "15",
       "unit": "kJ/mol",
       "storedValue": 15.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4688,6 +5102,9 @@
       "source": "12",
       "unit": "kJ/mol",
       "storedValue": 12.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4722,6 +5139,9 @@
       "source": "-18",
       "unit": "kJ/mol",
       "storedValue": -18.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4756,6 +5176,9 @@
       "source": "1",
       "unit": "kJ/mol",
       "storedValue": 1.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4790,6 +5213,9 @@
       "source": "7",
       "unit": "kJ/mol",
       "storedValue": 7.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4824,6 +5250,9 @@
       "source": "28",
       "unit": "kJ/mol",
       "storedValue": 28.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4854,6 +5283,9 @@
       "source": "22",
       "unit": "kJ/mol",
       "storedValue": 22.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -4884,6 +5316,9 @@
       "source": "23",
       "unit": "kJ/mol",
       "storedValue": 23.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4919,6 +5354,9 @@
       "source": "20",
       "unit": "kJ/mol",
       "storedValue": 20.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4954,6 +5392,9 @@
       "source": "-21",
       "unit": "kJ/mol",
       "storedValue": -21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -4992,6 +5433,9 @@
       "source": "-12",
       "unit": "kJ/mol",
       "storedValue": -12.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5034,6 +5478,9 @@
       "source": "105",
       "unit": "kJ/mol",
       "storedValue": 105.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5072,6 +5519,9 @@
       "source": "-21",
       "unit": "kJ/mol",
       "storedValue": -21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5110,6 +5560,9 @@
       "source": "-23",
       "unit": "kJ/mol",
       "storedValue": -23.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5148,6 +5601,9 @@
       "source": "35",
       "unit": "kJ/mol",
       "storedValue": 35.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -5178,6 +5634,9 @@
       "source": "123",
       "unit": "kJ/mol",
       "storedValue": 123.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -5208,6 +5667,9 @@
       "source": "115",
       "unit": "kJ/mol",
       "storedValue": 115.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5241,6 +5703,9 @@
       "source": "115",
       "unit": "kJ/mol",
       "storedValue": 115.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5271,6 +5736,9 @@
       "source": "115",
       "unit": "kJ/mol",
       "storedValue": 115.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5301,6 +5769,9 @@
       "source": "115",
       "unit": "kJ/mol",
       "storedValue": 115.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5331,6 +5802,9 @@
       "source": "166",
       "unit": "kJ/mol",
       "storedValue": 166.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1
@@ -5365,6 +5839,9 @@
       "source": "-25",
       "unit": "kJ/mol",
       "storedValue": -25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5403,6 +5880,9 @@
       "source": "-25",
       "unit": "kJ/mol",
       "storedValue": -25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -5441,6 +5921,9 @@
       "source": "20",
       "unit": "kJ/mol",
       "storedValue": 20.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "named",
       "composition": {
         "C": 1,
@@ -5466,6 +5949,9 @@
       "source": "18",
       "unit": "kJ/mol",
       "storedValue": 18.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5503,6 +5989,9 @@
       "source": "65",
       "unit": "kJ/mol",
       "storedValue": 65.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5540,6 +6029,9 @@
       "source": "102",
       "unit": "kJ/mol",
       "storedValue": 102.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1
@@ -5572,6 +6064,9 @@
       "source": "-11",
       "unit": "kJ/mol",
       "storedValue": -11.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5606,6 +6101,9 @@
       "source": "0",
       "unit": "kJ/mol",
       "storedValue": 0.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5640,6 +6138,9 @@
       "source": "19",
       "unit": "kJ/mol",
       "storedValue": 19.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5674,6 +6175,9 @@
       "source": "41",
       "unit": "kJ/mol",
       "storedValue": 41.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5712,6 +6216,9 @@
       "source": "-60",
       "unit": "kJ/mol",
       "storedValue": -60.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5749,6 +6256,9 @@
       "source": "-20",
       "unit": "kJ/mol",
       "storedValue": -20.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5787,6 +6297,9 @@
       "source": "17",
       "unit": "kJ/mol",
       "storedValue": 17.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1
@@ -5820,6 +6333,9 @@
       "source": "64",
       "unit": "kJ/mol",
       "storedValue": 64.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -5850,6 +6366,9 @@
       "source": "79",
       "unit": "kJ/mol",
       "storedValue": 79.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1
@@ -5880,6 +6399,9 @@
       "source": "96",
       "unit": "kJ/mol",
       "storedValue": 96.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1
@@ -5910,6 +6432,9 @@
       "source": "98",
       "unit": "kJ/mol",
       "storedValue": 98.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1
@@ -5940,6 +6465,9 @@
       "source": "-12",
       "unit": "kJ/mol",
       "storedValue": -12.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "O": 1
@@ -5969,6 +6497,9 @@
       "source": "-128",
       "unit": "kJ/mol",
       "storedValue": -128.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -6004,6 +6535,9 @@
       "source": "-136",
       "unit": "kJ/mol",
       "storedValue": -136.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -6038,6 +6572,9 @@
       "source": "-128",
       "unit": "kJ/mol",
       "storedValue": -128.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "C": 1,
@@ -6072,6 +6609,9 @@
       "source": "210",
       "unit": "kJ/mol",
       "storedValue": 210.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -6102,6 +6642,9 @@
       "source": "-25",
       "unit": "kJ/mol",
       "storedValue": -25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -6132,6 +6675,9 @@
       "source": "-35",
       "unit": "kJ/mol",
       "storedValue": -35.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -6165,6 +6711,9 @@
       "source": "-25",
       "unit": "kJ/mol",
       "storedValue": -25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "group",
       "composition": {
         "N": 1,
@@ -6195,6 +6744,9 @@
       "source": "3.4",
       "unit": "kJ/mol",
       "storedValue": 3.4,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6216,6 +6768,9 @@
       "source": "2.5",
       "unit": "kJ/mol",
       "storedValue": 2.5,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6237,6 +6792,9 @@
       "source": "4",
       "unit": "kJ/mol",
       "storedValue": 4.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6258,6 +6816,9 @@
       "source": "17",
       "unit": "kJ/mol",
       "storedValue": 17.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6279,6 +6840,9 @@
       "source": "44",
       "unit": "kJ/mol",
       "storedValue": 44.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6300,6 +6864,9 @@
       "source": "118",
       "unit": "kJ/mol",
       "storedValue": 118.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6321,6 +6888,9 @@
       "source": "111",
       "unit": "kJ/mol",
       "storedValue": 111.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6342,6 +6912,9 @@
       "source": "28",
       "unit": "kJ/mol",
       "storedValue": 28.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6363,6 +6936,9 @@
       "source": "2",
       "unit": "kJ/mol",
       "storedValue": 2.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6384,6 +6960,9 @@
       "source": "28",
       "unit": "kJ/mol",
       "storedValue": 28.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6405,6 +6984,9 @@
       "source": "43",
       "unit": "kJ/mol",
       "storedValue": 43.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6426,6 +7008,9 @@
       "source": "56",
       "unit": "kJ/mol",
       "storedValue": 56.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6447,6 +7032,9 @@
       "source": "55",
       "unit": "kJ/mol",
       "storedValue": 55.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6468,6 +7056,9 @@
       "source": "51",
       "unit": "kJ/mol",
       "storedValue": 51.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6489,6 +7080,9 @@
       "source": "21",
       "unit": "kJ/mol",
       "storedValue": 21.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6510,6 +7104,9 @@
       "source": "225",
       "unit": "kJ/mol",
       "storedValue": 225.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6531,6 +7128,9 @@
       "source": "125",
       "unit": "kJ/mol",
       "storedValue": 125.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6552,6 +7152,9 @@
       "source": "25",
       "unit": "kJ/mol",
       "storedValue": 25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6573,6 +7176,9 @@
       "source": "5",
       "unit": "kJ/mol",
       "storedValue": 5.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6594,6 +7200,9 @@
       "source": "22",
       "unit": "kJ/mol",
       "storedValue": 22.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6615,6 +7224,9 @@
       "source": "25",
       "unit": "kJ/mol",
       "storedValue": 25.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6636,6 +7248,9 @@
       "source": "64",
       "unit": "kJ/mol",
       "storedValue": 64.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6657,6 +7272,9 @@
       "source": "41",
       "unit": "kJ/mol",
       "storedValue": 41.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6678,6 +7296,9 @@
       "source": "54",
       "unit": "kJ/mol",
       "storedValue": 54.0,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6699,6 +7320,9 @@
       "source": "0.03",
       "unit": "kJ/mol",
       "storedValue": 0.03,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6720,6 +7344,9 @@
       "source": "1.05 to 1.76",
       "unit": "kJ/mol",
       "storedValue": 1.405,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6741,6 +7368,9 @@
       "source": "2.22 to 2.68",
       "unit": "kJ/mol",
       "storedValue": 2.45,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6762,6 +7392,9 @@
       "source": "2.01 to 2.80",
       "unit": "kJ/mol",
       "storedValue": 2.405,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6783,6 +7416,9 @@
       "source": "1.97 to 2.55",
       "unit": "kJ/mol",
       "storedValue": 2.26,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6804,6 +7440,9 @@
       "source": "2.51 to 4.35",
       "unit": "kJ/mol",
       "storedValue": 3.4299999999999997,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6825,6 +7464,9 @@
       "source": "2.30 to 3.14",
       "unit": "kJ/mol",
       "storedValue": 2.7199999999999998,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6846,6 +7488,9 @@
       "source": "2.72",
       "unit": "kJ/mol",
       "storedValue": 2.72,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6867,6 +7512,9 @@
       "source": "2.85 to 3.64",
       "unit": "kJ/mol",
       "storedValue": 3.245,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6888,6 +7536,9 @@
       "source": "3.1",
       "unit": "kJ/mol",
       "storedValue": 3.1,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6909,6 +7560,9 @@
       "source": "5.15 to 7.11",
       "unit": "kJ/mol",
       "storedValue": 6.130000000000001,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6930,6 +7584,9 @@
       "source": "6.28 to 8.79",
       "unit": "kJ/mol",
       "storedValue": 7.535,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6951,6 +7608,9 @@
       "source": "4.6",
       "unit": "kJ/mol",
       "storedValue": 4.6,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6972,6 +7632,9 @@
       "source": "5.06",
       "unit": "kJ/mol",
       "storedValue": 5.06,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -6993,6 +7656,9 @@
       "source": "10.46",
       "unit": "kJ/mol",
       "storedValue": 10.46,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7014,6 +7680,9 @@
       "source": "7.28",
       "unit": "kJ/mol",
       "storedValue": 7.28,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7035,6 +7704,9 @@
       "source": "7.49",
       "unit": "kJ/mol",
       "storedValue": 7.49,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7056,6 +7728,9 @@
       "source": "9.25",
       "unit": "kJ/mol",
       "storedValue": 9.25,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7077,6 +7752,9 @@
       "source": "19.66 to 20.50",
       "unit": "kJ/mol",
       "storedValue": 20.08,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7098,6 +7776,9 @@
       "source": "10.04 to 10.46",
       "unit": "kJ/mol",
       "storedValue": 10.25,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7119,6 +7800,9 @@
       "source": "11.72",
       "unit": "kJ/mol",
       "storedValue": 11.72,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7140,6 +7824,9 @@
       "source": "7.49",
       "unit": "kJ/mol",
       "storedValue": 7.49,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7161,6 +7848,9 @@
       "source": "10.46",
       "unit": "kJ/mol",
       "storedValue": 10.46,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7182,6 +7872,9 @@
       "source": "6.28 to 7.11",
       "unit": "kJ/mol",
       "storedValue": 6.695,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7203,6 +7896,9 @@
       "source": "2.34 to 3.35",
       "unit": "kJ/mol",
       "storedValue": 2.8449999999999998,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7224,6 +7920,9 @@
       "source": "4.18 to 6.28",
       "unit": "kJ/mol",
       "storedValue": 5.23,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7245,6 +7944,9 @@
       "source": "8.37",
       "unit": "kJ/mol",
       "storedValue": 8.37,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7266,6 +7968,9 @@
       "source": "5.86",
       "unit": "kJ/mol",
       "storedValue": 5.86,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,
@@ -7287,6 +7992,9 @@
       "source": "5.02 to 5.44",
       "unit": "kJ/mol",
       "storedValue": 5.23,
+      "uncertainty": null,
+      "verified": null,
+      "note": null,
       "kind": "energy",
       "composition": {},
       "central": null,

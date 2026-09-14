@@ -181,6 +181,45 @@ class UnitConversion(Fixture):
         [increment] = self.build()["increments"]
         self.assertEqual(increment["value"], increment["storedValue"])
 
+    def test_a_row_s_own_unit_overrides_its_category_s(self):
+        # One file may hold sources printed in different units; only the row
+        # that says so converts.
+        self.declare_unit("01_A.csv", "kJ/mol")
+        self.write_csv("01_A.csv", "Group,Value,Unit\nC-(C)(H)3,-42,\nC-(C)2(H)2,-5.00,kcal/mol")
+        methyl, methylene = self.build()["increments"]
+        self.assertEqual((methyl["unit"], methyl["value"]), ("kJ/mol", -42))
+        self.assertEqual((methylene["unit"], methylene["storedValue"]), ("kcal/mol", -5.00))
+        self.assertAlmostEqual(methylene["value"], -5.00 * 4.184)
+
+    def test_a_kj_mol_row_in_a_kcal_mol_category_is_not_converted(self):
+        self.declare_unit("01_A.csv", "kcal/mol")
+        self.write_csv("01_A.csv", "Group,Value,Unit\nC-(C)(H)3,-42,kJ/mol")
+        [increment] = self.build()["increments"]
+        self.assertEqual((increment["unit"], increment["value"], increment["storedValue"]), ("kJ/mol", -42, -42))
+
+
+class OptionalFields(Fixture):
+    """What a row's optional columns say, carried to every consumer. Blank is null."""
+
+    def test_a_two_column_row_carries_null_for_every_optional_field(self):
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        [increment] = self.build()["increments"]
+        for key in ("uncertainty", "verified", "note"):
+            with self.subTest(key=key):
+                self.assertIn(key, increment)
+                self.assertIsNone(increment[key])
+
+    def test_verified_and_note_are_carried_as_written(self):
+        self.write_csv("01_A.csv", 'Group,Value,Verified,Note\nC-(C)(H)3,-42,2000-01-01;AB;p1,"a note, with a comma"')
+        [increment] = self.build()["increments"]
+        self.assertEqual((increment["verified"], increment["note"]), ("2000-01-01;AB;p1", "a note, with a comma"))
+
+    def test_an_uncertainty_is_converted_as_its_value_is(self):
+        self.write_notation("categories.csv", "File,Quantity,Symbol,Unit,Source,Note\n01_A.csv,,,kcal/mol,,\n")
+        self.write_csv("01_A.csv", "Group,Value,Uncertainty\nC-(C)(H)3,-10.00,0.5")
+        [increment] = self.build()["increments"]
+        self.assertAlmostEqual(increment["uncertainty"], 0.5 * 4.184)
+
 
 class Reproducibility(Fixture):
     def test_building_twice_from_the_same_source_is_byte_identical(self):
