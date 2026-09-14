@@ -8,7 +8,6 @@ anyone's browser. Run it locally or let CI run it on every push:
 """
 from __future__ import annotations
 
-import json
 import os
 import sys
 
@@ -19,12 +18,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from benson.data import (
     CSV_DIR,
-    MANIFEST_NAME,
     METADATA_FIELDS,
     METADATA_NAME,
     NOTATION_DIR,
     Category,
-    build_manifest_comparable,
     find_categories,
     read_category,
     read_metadata,
@@ -194,25 +191,6 @@ def check_metadata(categories: list[Category], report: Report) -> None:
                        f"{len(row)} columns, expected {len(header)} - an unquoted comma in the note?")
 
 
-def check_manifest(categories: list[Category], report: Report) -> None:
-    """The site reads the manifest instead of scanning the folder, so it must match."""
-    path = os.path.join(CSV_DIR, MANIFEST_NAME)
-    if not os.path.exists(path):
-        report.add(MANIFEST_NAME, 0, "missing - run: python tools/build_data.py")
-        return
-
-    with open(path, encoding="utf-8") as handle:
-        try:
-            committed = json.load(handle)
-        except json.JSONDecodeError as exc:
-            report.add(MANIFEST_NAME, 0, f"is not valid JSON ({exc.msg})")
-            return
-
-    if build_manifest_comparable(categories, read_metadata()) != build_manifest_comparable(committed):
-        report.add(MANIFEST_NAME, 0, "does not match the CSV files on disk - "
-                                     "run: python tools/build_data.py")
-
-
 def check_notation(categories: list[Category], report: Report) -> None:
     """The notation files say what the group names are made of.
 
@@ -277,7 +255,6 @@ def main() -> int:
         check_category(category, report)
     check_unique_names(categories, report)
     check_metadata(categories, report)
-    check_manifest(categories, report)
     check_notation(categories, report)
 
     if report:
@@ -289,7 +266,7 @@ def main() -> int:
     total = sum(len(c.rows) for c in categories)
     described = sum(1 for c in categories if read_metadata().get(c.file, {}).get("quantity"))
     print(f"OK - {len(categories)} category files ({described} described), {total} increments, "
-          "manifest up to date, notation files consistent.")
+          "notation files consistent.")
     return 0
 
 

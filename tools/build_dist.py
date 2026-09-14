@@ -2,8 +2,7 @@
 
 Run this after changing anything under CSV_data_files/ or notation/; CI
 regenerates it independently and fails if the committed copy is out of date -
-the same bargain CSV_data_files/manifest.json and the asset version already
-keep in this repository.
+the same bargain the asset version already keeps in this repository.
 
     python tools/build_dist.py
 """

@@ -1,8 +1,10 @@
 # Keep line endings identical on every platform.
 #
-# tools/build_data.py writes manifest.json with LF endings, and CI checks the
-# committed copy is current with `git diff --exit-code`. Without this, a
-# contributor on Windows would see that check fail on line endings alone.
+# tools/build_dist.py writes dist/increments.json with LF endings, and CI
+# checks the committed copy is current with `git diff --exit-code` - the same
+# bargain tools/build_version.py and tools/build_doi_lock.mjs strike for
+# index.html and tools/doi_lock.json. Without this, a contributor on Windows
+# would see any of those checks fail on line endings alone.
 
 * text=auto
 

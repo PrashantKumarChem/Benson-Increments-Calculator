@@ -53,12 +53,11 @@ Adding a category needs no code changes:
 2. Give it exactly two columns: the group name, and its value in kJ/mol.
    A published range is written `1.05 to 1.76` and is averaged. The separator is
    the word, not a hyphen, because a hyphen also starts a negative number.
-3. Regenerate the category index, check the file, rebuild the artifact, and
-   move the asset version (the artifact's own bytes are folded into it, so a
-   data-only change bumps it too):
+3. Check the file, rebuild the artifact, and move the asset version (the
+   artifact's own bytes are folded into it, so a data-only change bumps it
+   too):
 
    ```bash
-   python tools/build_data.py
    python tools/validate_data.py
    python tools/build_dist.py
    python tools/build_version.py
@@ -68,16 +67,16 @@ Adding a category needs no code changes:
    are — the quantity, its symbol, the unit and a source. This is what lets the
    running total head itself `ΔHf°` rather than just `Total`. It is optional,
    and a category without a row works exactly as before.
-5. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`,
-   `dist/increments.json` and `index.html`.
+5. Commit the CSV together with the regenerated `dist/increments.json` and
+   `index.html`.
 
-The index exists because a browser cannot list a folder the way the notebook's
-`glob` could. `validate_data.py` catches the mistakes that actually happen —
-a missing value, a duplicate group name, a stray comma, a stale index — and CI
-runs it on every push, so a broken contribution cannot reach the site.
-`dist/increments.json` is the artifact `benson/build.py` derives from the CSVs
-for every consumer; CI regenerates it too and fails on a diff, and so does the
-asset version.
+`validate_data.py` catches the mistakes that actually happen — a missing
+value, a duplicate group name, a stray comma — and CI runs it on every push,
+so a broken contribution cannot reach the site. `dist/increments.json` is the
+artifact `benson/build.py` derives from the CSVs for every consumer — a
+browser cannot list a folder the way the notebook's `glob` could, so this is
+also how the site discovers which categories exist; CI regenerates it too and
+fails on a diff, and so does the asset version.
 
 ## Running it locally
 
@@ -103,7 +102,7 @@ that a value already in use is not a bump. That could only be checked by
 reading every version the page had ever carried, and the letters ran out faster
 than anyone expected; two branches once picked the same one. A hash cannot be
 forgotten or picked twice. CI regenerates it and fails if the committed copy
-differs, the same way it checks `manifest.json`.
+differs, the same way it checks `dist/increments.json`.
 
 GitHub Pages caches every file for ten minutes, and each file's ten minutes
 start when that file was last fetched, so they expire at different times. A
@@ -177,7 +176,7 @@ assets/theme.js         light, dark, and having chosen neither (no DOM)
 assets/app.js           rendering and events
 assets/styles.css       visual styles
 assets/fonts/           IBM Plex Mono, shipped with the site (see License)
-CSV_data_files/         the increment data, plus the generated manifest
+CSV_data_files/         the increment data
 notation/               what the group names mean, the words students use, and
                         what each category of numbers is (categories.csv)
 benson/                 the data rules, in Python - the only place one is written

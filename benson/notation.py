@@ -157,8 +157,8 @@ class NotationFile:
     subject: str = ""
 
 
-# The filenames are fixed here the way manifest.json's is: these are where the
-# data lives, not chemistry. Every statement about chemistry is inside the files.
+# The filenames are fixed here: these are where the data lives, not chemistry.
+# Every statement about chemistry is inside the files.
 NOTATION_FILES = (
     NotationFile("central_atoms.csv", "centrals", keys_are_groups=False, values_are_compositions=True,
                  subject="a central notation"),

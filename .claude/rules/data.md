@@ -58,18 +58,16 @@ last existing row. It fails loudly rather than silently, but it wastes a cycle.
 ## After changing anything here
 
 ```bash
-python tools/build_data.py        # regenerates manifest.json
 python tools/validate_data.py
 python tools/build_dist.py        # regenerates dist/increments.json, the built artifact
 python tools/build_version.py     # moves the asset version - the artifact's bytes are folded in
 node   tools/check_parity.mjs     # the site and the notebook must still agree
 ```
 
-`manifest.json` and `dist/increments.json` are both generated. Never hand-edit
-either — a browser cannot list a directory, so the site reads the manifest
-instead of scanning the folder; `dist/increments.json` is what `benson/build.py`
-derives from these files for every consumer. CI regenerates both and fails on a
-diff.
+`dist/increments.json` is generated. Never hand-edit it — a browser cannot
+list a directory, so `benson/build.py` derives the artifact from these files
+once, at build time, and that is what the site fetches instead of scanning the
+folder. CI regenerates it and fails on a diff.
 
 ## Do not touch
 
