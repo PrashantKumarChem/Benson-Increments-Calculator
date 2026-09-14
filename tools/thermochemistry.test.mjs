@@ -30,14 +30,14 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { loadCategories } from "../assets/benson.js";
+import { loadArtifact } from "../assets/benson.js";
 import { createSelection } from "../assets/selection.js";
 import { MOLECULES } from "./thermochemistry_data.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readText = (relative) => readFile(path.join(ROOT, relative), "utf8");
 
-const categories = await loadCategories({ readText });
+const { categories } = await loadArtifact({ readText, path: "dist/increments.json" });
 
 /**
  * Tolerance, in kJ/mol.

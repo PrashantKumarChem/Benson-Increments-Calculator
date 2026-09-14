@@ -16,7 +16,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { loadCategories, readValue } from "../assets/benson.js";
+import { loadArtifact } from "../assets/benson.js";
 import {
   MINUS,
   describeTotal,
@@ -29,36 +29,45 @@ import {
 } from "../assets/format.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const categories = await loadCategories({
+const { categories, index: rows } = await loadArtifact({
   readText: (relative) => readFile(path.join(ROOT, relative), "utf8"),
+  path: "dist/increments.json",
 });
-const rows = categories.flatMap((category) => category.rows);
 const find = (label) => rows.find((row) => row.label === label);
+
+/**
+ * A reading with just enough shape for formatIncrement()/formatRange(): the
+ * value-parsing this used to exercise (readValue from assets/benson.js) moved
+ * to benson/values.py at WP3, and benson/tests/test_values.py tests it now.
+ * What is left to test here is formatting, which only needs the shape.
+ */
+const reading = (value, decimals, isRange = false, low = null, high = null) =>
+  ({ value, decimals, isRange, low, high });
 
 /* -------------------------------------------------------------------------- */
 /* Precision                                                                    */
 /* -------------------------------------------------------------------------- */
 
 test("a whole number is shown as one, not padded to two decimals", () => {
-  assert.equal(formatIncrement(readValue("-42")), `${MINUS}42`);
-  assert.equal(formatIncrement(readValue("118")), "+118");
+  assert.equal(formatIncrement(reading(-42, 0)), `${MINUS}42`);
+  assert.equal(formatIncrement(reading(118, 0)), "+118");
 });
 
 test("a source with one decimal keeps exactly one", () => {
-  assert.equal(formatIncrement(readValue("-20.9")), `${MINUS}20.9`);
-  assert.equal(formatIncrement(readValue("13.8")), "+13.8");
+  assert.equal(formatIncrement(reading(-20.9, 1)), `${MINUS}20.9`);
+  assert.equal(formatIncrement(reading(13.8, 1)), "+13.8");
 });
 
 test("a source with two decimals keeps exactly two", () => {
-  assert.equal(formatIncrement(readValue("0.03")), "+0.03");
+  assert.equal(formatIncrement(reading(0.03, 2)), "+0.03");
 });
 
 test("zero carries no sign", () => {
-  assert.equal(formatIncrement(readValue("0")), "0");
+  assert.equal(formatIncrement(reading(0, 0)), "0");
 });
 
 test("the minus shown is a real minus sign, not a hyphen", () => {
-  assert.ok(formatIncrement(readValue("-7")).startsWith(MINUS));
+  assert.ok(formatIncrement(reading(-7, 0)).startsWith(MINUS));
   assert.notEqual(MINUS, "-");
 });
 
@@ -98,7 +107,7 @@ test("a midpoint that lands cleanly is not padded", () => {
 });
 
 test("a plain number has no range to show", () => {
-  assert.equal(formatRange(readValue("-42")), null);
+  assert.equal(formatRange(reading(-42, 0)), null);
 });
 
 test("the range dash is not a minus sign", () => {

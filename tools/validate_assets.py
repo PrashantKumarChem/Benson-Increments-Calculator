@@ -33,11 +33,17 @@ sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 PAGE = "index.html"
 ASSET_DIR = "assets"
+ARTIFACT_PATH = "dist/increments.json"
 
 #: An href= or src= pointing into assets/, with its version if it has one.
 ASSET_REF_RE = re.compile(
     r'["\'](?:\./)?' + ASSET_DIR + r'/([A-Za-z0-9_.-]+)(?:\?v=([^"\']*))?["\']')
 IMPORT_MAP_RE = re.compile(r'<script\s+type="importmap"\s*>(.*?)</script>', re.S)
+#: The increments artifact is fetched at runtime, not imported as a module, so
+#: it is not in the import map above - but it is requested with the same
+#: version discipline, from index.html's data-artifact attribute.
+ARTIFACT_REF_RE = re.compile(
+    r'["\'](?:\./)?' + re.escape(ARTIFACT_PATH) + r'(?:\?v=([^"\']*))?["\']')
 
 
 def modules(asset_dir: str = ASSET_DIR) -> set[str]:
@@ -63,6 +69,19 @@ def main() -> int:
             versions.add(version)
         else:
             problems.append(f"{PAGE}: 'assets/{name}' is requested without a ?v= version")
+
+    # Not a module the import map remaps, so it is checked on its own: a
+    # data-artifact reference must exist and must carry the same version as
+    # everything else, or a returning visitor can be served fresh JavaScript
+    # against a stale artifact.
+    artifact_refs = ARTIFACT_REF_RE.findall(page)
+    if not artifact_refs:
+        problems.append(f"{PAGE}: '{ARTIFACT_PATH}' is not referenced, so its version cannot be checked")
+    for version in artifact_refs:
+        if version:
+            versions.add(version)
+        else:
+            problems.append(f"{PAGE}: '{ARTIFACT_PATH}' is requested without a ?v= version")
 
     if not import_map:
         problems.append(f"{PAGE}: no import map, so a module's own imports go unversioned")
@@ -103,7 +122,7 @@ def main() -> int:
         print("\nThe version lives in index.html and nowhere else.", file=sys.stderr)
         return 1
 
-    print(f"OK - {len(modules())} modules and the stylesheet all requested at "
+    print(f"OK - {len(modules())} modules, the stylesheet and the artifact all requested at "
           f"version {versions.pop() if versions else '?'}.")
     return 0
 

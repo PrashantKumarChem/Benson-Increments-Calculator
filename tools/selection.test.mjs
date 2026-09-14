@@ -1,10 +1,13 @@
 /**
- * Tests for the selection arithmetic and the value parser.
+ * Tests for the selection arithmetic.
  *
- * Worked molecules are built from the real CSV files rather than from numbers
+ * Worked molecules are built from the real artifact rather than from numbers
  * typed in here, so the expected totals stay correct if a published value is
  * ever revised: the test asserts the calculator adds up what the data says,
  * which is the property that must hold.
+ *
+ * Value parsing moved to benson/values.py at WP3 and is tested there
+ * (benson/tests/test_values.py); nothing under assets/ parses a cell any more.
  *
  *     node --test tools/
  */
@@ -14,13 +17,14 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { InvalidValueError, KJ_TO_KCAL, loadCategories, parseValue } from "../assets/benson.js";
+import { loadArtifact } from "../assets/benson.js";
 import { createSelection, keyOf } from "../assets/selection.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readText = (relative) => readFile(path.join(ROOT, relative), "utf8");
 
-const categories = await loadCategories({ readText });
+const { display, categories } = await loadArtifact({ readText, path: "dist/increments.json" });
+const KJ_TO_KCAL = display.kj_to_kcal;
 
 /** Look an increment up in the loaded data; fail loudly if the name is gone. */
 function increment(file, label) {
@@ -41,47 +45,6 @@ function build(selection, parts) {
 const CH = "01_CH_Groups.csv";
 const CORRECTIONS = "04_Corrections.csv";
 const A_VALUES = "05_Cyclohexane_A_Values.csv";
-
-test("parseValue reads plain numbers, including negatives", () => {
-  assert.equal(parseValue("-42"), -42);
-  assert.equal(parseValue("-20.9"), -20.9);
-  assert.equal(parseValue("2"), 2);
-  assert.equal(parseValue(" 3.4 "), 3.4);
-});
-
-test("parseValue averages a published range", () => {
-  assert.equal(parseValue("1.05 to 1.76"), (1.05 + 1.76) / 2);
-  assert.equal(parseValue("19.66 to 20.50"), (19.66 + 20.5) / 2);
-});
-
-test("a range written with a hyphen is refused, and says what to write instead", () => {
-  // The form this data used to be written in. It is refused rather than read,
-  // because the alternative is a rule that has to decide whether the dash in
-  // '-42' is a sign - and that is the decision two implementations get to make
-  // differently. The message has to name the old form specifically: falling
-  // through to 'neither a number nor a range' would leave a contributor with a
-  // row that is unreadable for no stated reason.
-  assert.throws(() => parseValue("1.05-1.76"), (error) => {
-    assert.ok(error instanceof InvalidValueError);
-    assert.match(error.message, /hyphen/, "the message has to name what is wrong with the row");
-    assert.match(error.message, /'1\.05 to 1\.76'/, "and quote the row rewritten correctly");
-    return true;
-  });
-});
-
-test("refusing the hyphen form does not refuse a negative number", () => {
-  // The rule above and the minus sign are the same character. If the refusal
-  // ever widened to cover a leading minus, 195 of the 236 increments would stop
-  // loading - so the two are pinned together rather than in separate tests.
-  assert.equal(parseValue("-42"), -42);
-  assert.equal(parseValue("-20.9"), -20.9);
-});
-
-test("parseValue rejects anything that is not a number or a range", () => {
-  for (const bad of ["", "   ", "abc", "1.2.3", "--4"]) {
-    assert.throws(() => parseValue(bad), InvalidValueError, `expected '${bad}' to be rejected`);
-  }
-});
 
 test("decane totals two methyls plus eight methylenes", () => {
   const methyl = increment(CH, "C-(C)(H)3");

@@ -4,13 +4,12 @@
  * All chemistry data handling lives in benson.js; this file only turns that
  * data into a page and keeps the selection in sync with what is displayed.
  */
-import { KJ_TO_KCAL, fetchText, loadCategories } from "./benson.js";
+import { fetchText, loadArtifact } from "./benson.js";
 import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "./browse.js";
 import {
   describeTotal, formatIncrement, formatKcal, formatRange, formatSelectionAsText,
   formatTotal, rangeSpread,
 } from "./format.js";
-import { buildIndex, emptyNotation, loadNotation } from "./notation.js";
 import { createSelection, keyOf } from "./selection.js";
 import { sheetMetrics, swipeIntent } from "./sheet.js";
 import { THEME_KEY, isDark, nextTheme, themeLabel } from "./theme.js";
@@ -43,12 +42,14 @@ function valueHtml(reading) {
  * than building one up. See browse.js for the rules themselves.
  */
 const view = {
-  categories: [], notation: emptyNotation(), index: [],
+  categories: [], index: [],
   /** Categories by filename, for looking up what a chosen increment is a measure of. */
   byFile: new Map(),
   files: new Set(), query: "",
   /** "cards" to scan by shape, "table" to compare values and read provenance. */
   mode: "cards",
+  /** kJ/mol -> kcal/mol, from the artifact's display block (assets/benson.js). */
+  kjToKcal: 1,
 };
 
 /** One increment, as a card. */
@@ -176,7 +177,7 @@ function renderTally() {
   // The unit is written as its own element, as it is on the kJ line above:
   // set as one string it inherited the figure's monospace and read as code.
   el("kcal").innerHTML =
-    `${escapeHtml(formatKcal(totalKj * KJ_TO_KCAL))}<span>kcal/mol</span>`;
+    `${escapeHtml(formatKcal(totalKj * view.kjToKcal))}<span>kcal/mol</span>`;
 
   // What the total is a total of. The categories do not all hold the same
   // quantity - a group increment is an enthalpy of formation, a cyclohexane
@@ -714,7 +715,7 @@ el("copy").addEventListener("click", async (event) => {
   const totalKj = selection.totalKj;
   const text = formatSelectionAsText(selection.entries, {
     totalKj,
-    kcal: totalKj * KJ_TO_KCAL,
+    kcal: totalKj * view.kjToKcal,
     described: describeTotal(selection.entries, view.byFile),
   });
 
@@ -834,41 +835,29 @@ el("reset").addEventListener("click", () => {
 
 const REPO_URL = "https://github.com/PrashantKumarChem/Benson-Increments-Calculator";
 
+// The versioned URL lives on the module's own <script> tag in index.html,
+// alongside the version every other asset is requested with - not written
+// here a second time, which is exactly the duplication that let a returning
+// visitor be served a stale module under a string claiming to be current. See
+// assets.md and tools/build_version.py.
+const ARTIFACT_URL = document.getElementById("app-module").dataset.artifact;
+
 try {
-  view.categories = await loadCategories({ readText: fetchText });
-
-  // The increments are the calculator; the notation files only let a group be
-  // found by the shorthand a student writes. If they cannot be read the sums
-  // must still work, so this is reported and stepped over rather than thrown -
-  // searching then falls back to the names as printed, by the same code path.
-  let notationProblem = "";
-  try {
-    view.notation = await loadNotation({ readText: fetchText });
-  } catch (error) {
-    view.notation = emptyNotation();
-    notationProblem = error.message;
-    console.warn(`notation/ could not be read, so a group is only findable by its printed name: ${error.message}`);
-  }
-  view.index = buildIndex(view.categories, view.notation);
-  view.byFile = new Map(view.categories.map((category) => [category.file, category]));
-
-  const total = view.categories.reduce((sum, category) => sum + category.rows.length, 0);
-  const unreadable = view.categories.flatMap((category) =>
-    category.problems.map((problem) => `${category.file}:${problem.line} (${problem.reason})`));
+  // One fetch, one failure mode. The site used to load CSV_data_files/ and
+  // notation/ separately and step over a broken notation/ so the sums could
+  // still work - but the artifact is guaranteed clean by the build (L16:
+  // benson/build.py refuses to write one when a notation row cannot be read),
+  // so there is nothing left for that fallback to catch, and one clear error
+  // path is a truer picture of the one thing that can now go wrong: the fetch.
+  const { display, categories, index } = await loadArtifact({ readText: fetchText, path: ARTIFACT_URL });
+  view.categories = categories;
+  view.index = index;
+  view.byFile = new Map(categories.map((category) => [category.file, category]));
+  view.kjToKcal = display.kj_to_kcal;
 
   el("footer").innerHTML =
-    `${total} increments across ${view.categories.length} categories, read from the ` +
-    `project&rsquo;s CSV files. <a href="${REPO_URL}">Source and data on GitHub</a> &middot; GPL-3.0.` +
-    (unreadable.length
-      ? `<br><strong>${unreadable.length} row(s) could not be read:</strong> ${escapeHtml(unreadable.join(", "))}`
-      : "") +
-    // Stepping over an unreadable notation/ is deliberate - the sums do not
-    // need it - but the reader was never told, and a search for CH3 that
-    // quietly stops finding anything reads as the data being wrong.
-    (notationProblem
-      ? `<br><strong>Shorthand search is unavailable:</strong> the notation files could not be read ` +
-        `(${escapeHtml(notationProblem)}). Groups can still be found by their printed names.`
-      : "");
+    `${index.length} increments across ${categories.length} categories, built from the ` +
+    `project&rsquo;s data. <a href="${REPO_URL}">Source and data on GitHub</a> &middot; GPL-3.0.`;
 
   render();
 } catch (error) {
@@ -880,5 +869,5 @@ try {
   el("library").innerHTML =
     `<p class="status">Could not load the increment data: ${escapeHtml(error.message)}.<br>
      If you opened this file straight from disk, serve the folder instead — for example
-     <code>python -m http.server</code> — so the browser is allowed to read the CSV files.</p>`;
+     <code>python -m http.server</code> — so the browser is allowed to fetch the data.</p>`;
 }

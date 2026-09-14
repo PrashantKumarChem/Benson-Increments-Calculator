@@ -1,11 +1,15 @@
 /**
- * Tests for reading Benson notation.
+ * Tests for searching the increments and adding up a molecular formula.
  *
- * The load-bearing one is "every name in the data is understood": it fails the
- * moment somebody adds a group built on a central the notation files have never
- * heard of, which is the way a formula would otherwise end up quietly short of
- * an atom. The worked molecules are built from the real CSV rows rather than
- * from numbers typed in here, in keeping with the rest of the suite.
+ * Decomposing a group name - what its central and ligands are, what atoms it
+ * contributes, whether it is a group, a correction, a spelled-out name, or
+ * unreadable - moved to benson/notation.py at WP3 and is tested there
+ * (benson/tests/test_notation.py), against the real notation/ files. What is
+ * left here is what still runs in the browser: turning a keystroke into a
+ * score against an increment's precomputed aliases, and adding a chosen set of
+ * increments' precomputed compositions into a formula. Both are exercised
+ * against the real artifact, so a change to the data that would break search
+ * or a formula is caught here rather than in a browser.
  *
  *     node --test tools/
  */
@@ -15,20 +19,14 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { loadCategories } from "../assets/benson.js";
+import { loadArtifact } from "../assets/benson.js";
 import {
   ENERGY,
   GROUP,
   MATCH,
   NAMED,
   UNREADABLE,
-  aliasesFor,
-  buildIndex,
-  emptyNotation,
   formulaOf,
-  loadNotation,
-  parseComposition,
-  read,
   scoreOf,
   search,
   summarise,
@@ -37,138 +35,47 @@ import {
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readText = (relative) => readFile(path.join(ROOT, relative), "utf8");
 
-const categories = await loadCategories({ readText });
-const notation = await loadNotation({ readText });
-const index = buildIndex(categories, notation);
-
-const everyLabel = categories.flatMap((category) =>
-  category.rows.map((row) => ({ file: category.file, label: row.label })));
+const { index } = await loadArtifact({ readText, path: "dist/increments.json" });
+const byLabel = new Map(index.map((entry) => [entry.label, entry]));
 
 /** Describe a molecule as [group name, how many] and add up its formula. */
 function molecule(parts) {
-  return summarise(parts.map(([label, count]) => ({ label, count })), notation);
+  return summarise(parts.map(([label, count]) => ({ label, count })), byLabel);
 }
 
-/* -------------------------------------------------------------------------- */
-/* The notation files themselves                                               */
-/* -------------------------------------------------------------------------- */
-
-test("the notation files load without a single unreadable row", () => {
-  assert.deepEqual(notation.problems, []);
-  assert.ok(notation.centrals.size > 0, "central_atoms.csv is empty");
-  assert.ok(notation.ligands.size > 0, "ligand_atoms.csv is empty");
-  assert.ok(notation.synonyms.size > 0, "synonyms.csv is empty");
-});
-
-test("what a ligand contributes is read from the data, not assumed", () => {
-  // Hydrogen is counted inside a group because it never has a group of its own.
-  // That is a statement about the method, so it lives in ligand_atoms.csv - and
-  // taking it away must change what a group is made of.
-  assert.deepEqual(notation.ligands.get("H"), { H: 1 });
-
-  const withoutLigands = { ...notation, ligands: new Map() };
-  assert.deepEqual(read("C-(C)(H)3", withoutLigands).atoms, { C: 1 });
-  assert.deepEqual(read("C-(C)(H)3", notation).atoms, { C: 1, H: 3 });
-});
-
-test("every synonym names a group that really exists", () => {
-  const known = new Set(everyLabel.map((entry) => entry.label));
-  const orphans = [...notation.synonyms.keys()].filter((label) => !known.has(label));
-  assert.deepEqual(orphans, [], "synonyms.csv names groups that are no longer in the data");
-});
-
-test("every spelled-out name still exists in the data", () => {
-  const known = new Set(everyLabel.map((entry) => entry.label));
-  const orphans = [...notation.named.keys()].filter((label) => !known.has(label));
-  assert.deepEqual(orphans, [], "special_labels.csv names groups that are no longer in the data");
-});
+const find = (label) => byLabel.get(label);
 
 /* -------------------------------------------------------------------------- */
-/* Reading a name                                                              */
+/* What the artifact carries for each increment                               */
 /* -------------------------------------------------------------------------- */
 
-test("every name in the data is understood", () => {
-  const unreadable = everyLabel
-    .map((entry) => ({ ...entry, reading: read(entry.label, notation) }))
-    .filter((entry) => entry.reading.kind === UNREADABLE && !notation.named.has(entry.label))
-    .map((entry) => `${entry.file}: ${entry.label} - ${entry.reading.reason}`);
-
-  assert.deepEqual(unreadable, [],
-    "add the missing central notation to notation/central_atoms.csv, or the whole "
-    + "name to notation/special_labels.csv");
+test("every increment carries a kind, and every kind actually occurs", () => {
+  const kinds = new Set(index.map((entry) => entry.kind));
+  assert.deepEqual(kinds, new Set([GROUP, NAMED, ENERGY, UNREADABLE]));
 });
 
-test("a group's atoms are its central plus its hydrogen ligands", () => {
-  assert.deepEqual(read("C-(C)(H)3", notation).atoms, { C: 1, H: 3 });
-  assert.deepEqual(read("C-(C)2(H)2", notation).atoms, { C: 1, H: 2 });
-  assert.deepEqual(read("O-(H)(C)", notation).atoms, { O: 1, H: 1 });
-  assert.deepEqual(read("CO-(C)2", notation).atoms, { C: 1, O: 1 });
-  assert.deepEqual(read("ONO-(C)", notation).atoms, { N: 1, O: 2 });
-});
-
-test("a ligand that is not hydrogen contributes nothing", () => {
-  // The carbons in (C)3 belong to their own groups; counting them here would
-  // count every carbon in the molecule as many times as it has neighbours.
-  assert.deepEqual(read("C-(C)3(H)", notation).atoms, { C: 1, H: 1 });
-  assert.deepEqual(read("N-(C)3", notation).atoms, { N: 1 });
+test("a group's composition is its central plus its hydrogen ligands", () => {
+  assert.deepEqual(find("C-(C)(H)3").composition, { C: 1, H: 3 });
+  assert.deepEqual(find("C-(C)2(H)2").composition, { C: 1, H: 2 });
+  assert.deepEqual(find("O-(H)(C)").composition, { O: 1, H: 1 });
+  assert.deepEqual(find("CO-(C)2").composition, { C: 1, O: 1 });
 });
 
 test("corrections and A-values are energy terms, not groups", () => {
-  for (const label of ["cyclohexane", "Gauche alkane", "cis correction", "cyclooctene (cis)"]) {
-    assert.equal(read(label, notation).kind, ENERGY, label);
-  }
-  for (const label of ["CH3", "OCH3", "C(CH3)3", "CO2-", "F"]) {
-    assert.equal(read(label, notation).kind, ENERGY, label);
+  for (const label of ["cyclohexane", "F"]) {
+    assert.equal(find(label).kind, ENERGY, label);
+    assert.deepEqual(find(label).composition, {}, label);
   }
 });
 
-test("a row that only looks like a group adds no atoms", () => {
-  // 'Cis- (one t-butyl)' sits in 01_CH_Groups.csv and starts like a group name.
-  const reading = read("Cis- (one t-butyl)", notation);
-  assert.equal(reading.kind, NAMED);
-  assert.deepEqual(reading.atoms, {});
-});
-
-test("one value covering two groups counts both carbons", () => {
-  // 'Ct-(CB) + CB-(Ct)' is a single row holding two groups; reading it as one
-  // central atom would lose a carbon without anything saying so.
-  const reading = read("Ct-(CB) + CB-(Ct)", notation);
-  assert.equal(reading.kind, NAMED);
-  assert.deepEqual(reading.atoms, { C: 2 });
-});
-
-test("a name whose composition is unsettled is reported, not treated as empty", () => {
-  const reading = read("[COd]-Cd(H)2", notation);
+test("a name whose composition is unsettled is unreadable, with a reason", () => {
+  // The [COd] rows are a chemist's call, left alone on purpose
+  // (.claude/rules/data.md) - not a build fault (benson/build.py refuses to
+  // ship a genuinely broken notation/ row rather than emit this).
+  const reading = find("[COd]-Cd(H)2");
   assert.equal(reading.kind, UNREADABLE);
+  assert.equal(reading.composition, null);
   assert.match(reading.reason, /settled/);
-});
-
-test("a group built on an unknown central is reported", () => {
-  const reading = read("S-(C)2", notation);
-  assert.equal(reading.kind, UNREADABLE);
-  assert.match(reading.reason, /central_atoms\.csv/);
-});
-
-/* -------------------------------------------------------------------------- */
-/* Compositions and formulae                                                   */
-/* -------------------------------------------------------------------------- */
-
-test("a composition is element symbols with optional counts", () => {
-  assert.deepEqual(parseComposition("C"), { C: 1 });
-  assert.deepEqual(parseComposition("N O2"), { N: 1, O: 2 });
-  assert.deepEqual(parseComposition("C2"), { C: 2 });
-  assert.deepEqual(parseComposition("none"), {});
-  assert.equal(parseComposition("unknown"), null);
-  assert.throws(() => parseComposition("carbon"));
-  assert.throws(() => parseComposition(""));
-});
-
-test("a formula is written carbon, hydrogen, then the rest alphabetically", () => {
-  assert.equal(formulaOf({ H: 22, C: 10 }), "C10H22");
-  assert.equal(formulaOf({ O: 1, C: 2, H: 6 }), "C2H6O");
-  assert.equal(formulaOf({ N: 1, C: 2, H: 3 }), "C2H3N");
-  assert.equal(formulaOf({ C: 1, H: 1 }), "CH");
-  assert.equal(formulaOf({ C: 0, H: 2, O: 1 }), "H2O");
 });
 
 /* -------------------------------------------------------------------------- */
@@ -194,19 +101,11 @@ test("a molecule's formula is the sum of the groups chosen for it", () => {
 // the nitrogen an `NI`. Each end must contribute only its own atom, exactly as
 // the two carbons of a C=C do. central_atoms.csv once gave `CdN` a nitrogen as
 // well, so every imine came out with one nitrogen too many - methanimine, which
-// has one, summarised to CH3N2. Nothing displayed it, because the formula is
-// not shown yet, so only a test can keep this from coming back.
+// has one, summarised to CH3N2. This is the regression test for that, ported to
+// the artifact; benson/tests/test_notation.py pins the underlying rule.
 test("the nitrogen of a C=N is counted once, by NI and not also by CdN", () => {
-  assert.deepEqual(read("CdN-(H)2", notation).atoms, { C: 1, H: 2 });
-  assert.deepEqual(read("NI-(H)", notation).atoms, { N: 1, H: 1 });
-
-  // `CdN` is a `Cd` whose partner happens to be nitrogen, so the two central
-  // notations stand for the same atoms.
-  assert.deepEqual(
-    read("CdN-(H)2", notation).atoms,
-    read("Cd-(H)2", notation).atoms,
-    "CdN should contribute what Cd contributes",
-  );
+  assert.deepEqual(find("CdN-(H)2").composition, find("Cd-(H)2").composition,
+    "CdN should contribute what Cd contributes");
 
   assert.equal(molecule([["CdN-(H)2", 1], ["NI-(H)", 1]]).formula, "CH3N");   // methanimine
   assert.equal(
@@ -234,6 +133,20 @@ test("corrections on their own produce no formula", () => {
   assert.equal(summary.formula, null);
   assert.equal(summary.groups, 0);
   assert.equal(summary.energy, 1);
+});
+
+test("a label the artifact does not know is unreadable, not silently dropped", () => {
+  const summary = molecule([["C-(C)(H)3", 1], ["NoSuchGroup", 1]]);
+  assert.equal(summary.formula, null);
+  assert.equal(summary.unreadable[0].label, "NoSuchGroup");
+});
+
+test("a formula is written carbon, hydrogen, then the rest alphabetically", () => {
+  assert.equal(formulaOf({ H: 22, C: 10 }), "C10H22");
+  assert.equal(formulaOf({ O: 1, C: 2, H: 6 }), "C2H6O");
+  assert.equal(formulaOf({ N: 1, C: 2, H: 3 }), "C2H3N");
+  assert.equal(formulaOf({ C: 1, H: 1 }), "CH");
+  assert.equal(formulaOf({ C: 0, H: 2, O: 1 }), "H2O");
 });
 
 /* -------------------------------------------------------------------------- */
@@ -283,9 +196,9 @@ test("a group does not answer to another group's name", () => {
   assert.equal(search("NO2", index)[0].label, "NO2-(C)");
   assert.equal(search("CN", index)[0].label, "CN-(C)");
 
-  assert.ok(!aliasesFor("ONO-(C)", notation).includes("no2"));
-  assert.ok(!aliasesFor("NC-(C)", notation).includes("cn"));
-  assert.ok(!aliasesFor("CdN-(C)2", notation).includes("cn"));
+  assert.ok(!find("ONO-(C)").aliases.includes("no2"));
+  assert.ok(!find("NC-(C)").aliases.includes("cn"));
+  assert.ok(!find("CdN-(C)2").aliases.includes("cn"));
 
   // Each is still findable by the notation it is actually written in.
   assert.equal(search("ONO", index)[0].label, "ONO-(C)");
@@ -294,8 +207,8 @@ test("a group does not answer to another group's name", () => {
 });
 
 test("the bonding is searchable when a student wants it", () => {
-  assert.ok(aliasesFor("Cd-(H)2", notation).includes("cdh2"));
-  assert.ok(aliasesFor("Cd-(H)2", notation).includes("ch2"), "a double bond is still a CH2 to type");
+  assert.ok(find("Cd-(H)2").aliases.includes("cdh2"));
+  assert.ok(find("Cd-(H)2").aliases.includes("ch2"), "a double bond is still a CH2 to type");
   assert.equal(search("CdH2", index)[0].label, "Cd-(H)2");
 });
 
@@ -312,18 +225,20 @@ test("an exact match outranks a partial one", () => {
     > results.findIndex((entry) => entry.label === "C-(C)(H)3"), "but below the exact one");
 });
 
-test("ties are settled by the order the data is written in", () => {
-  // Seven groups match 'CH3' exactly. The CSV files run simplest first, so the
-  // plain methyl comes out on top without this code ranking chemistry itself.
+test("ties are settled by the order the artifact is written in", () => {
+  // Seven groups match 'CH3' exactly. The artifact carries every increment in
+  // the CSV files' own order, which runs simplest first, so the plain methyl
+  // comes out on top without this code ranking chemistry itself - and without
+  // needing a categoryIndex/rowIndex pair of its own (search()'s sort is
+  // stable, so ties keep the artifact's array order for free).
   const exact = search("CH3", index).filter((entry) => entry.score === MATCH.EXACT);
   assert.ok(exact.length > 1, "expected several exact matches to tie");
   assert.equal(exact[0].label, "C-(C)(H)3");
+
+  const positionOf = new Map(index.map((entry, i) => [entry.label, i]));
   for (let i = 1; i < exact.length; i += 1) {
-    const previous = exact[i - 1];
-    const current = exact[i];
-    assert.ok(previous.categoryIndex < current.categoryIndex
-      || (previous.categoryIndex === current.categoryIndex && previous.rowIndex < current.rowIndex),
-      "exact matches should stay in data order");
+    assert.ok(positionOf.get(exact[i - 1].label) < positionOf.get(exact[i].label),
+      "exact matches should stay in the artifact's own order");
   }
 });
 
@@ -334,24 +249,8 @@ test("searching for nothing matches nothing", () => {
 });
 
 test("the index covers every increment exactly once", () => {
-  assert.equal(index.length, everyLabel.length);
-});
-
-test("searching still works when the notation files are missing", () => {
-  // The page falls back to empty tables rather than to a second search of its
-  // own, so this path is the same code as every other search - a group is just
-  // findable by its printed name alone.
-  const bare = buildIndex(categories, emptyNotation());
-
-  assert.equal(search("C-(C)(H)3", bare)[0].label, "C-(C)(H)3");
-  assert.equal(search("cyclohexane", bare)[0].label, "cyclohexane");
-
-  // What is lost is exactly what the files provide: the shorthand a group
-  // stands for, and the words people call it by.
-  assert.deepEqual(search("methyl", bare), []);
-  assert.ok(!search("CH2", bare).some((entry) => entry.label === "C-(C)2(H)2"),
-    "without the files a methylene is not findable as CH2");
-  assert.equal(search("CH2", index)[0].label, "C-(C)2(H)2", "with them it is the first hit");
+  assert.equal(new Set(index.map((entry) => entry.label)).size, index.length);
+  assert.equal(index.length, 236);
 });
 
 test("a result says which synonym found it", () => {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=771003771b">
+<link rel="stylesheet" href="assets/styles.css?v=ac254f7048">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -39,10 +39,10 @@
      saying "Loading increment data" forever.
 
      Versioning only the entry point would be worse than doing nothing. The
-     browser would fetch a new app.js and still import a cached notation.js,
-     and an older notation.js drops the source precision from each value - so
-     -20.9 renders as -21. A loud failure would become a wrong number, which on
-     a calculator is the one outcome worth avoiding.
+     browser would fetch a new app.js and still import a cached benson.js, or
+     fetch a stale dist/increments.json under a version string claiming it is
+     current. A loud failure would become a wrong number, which on a
+     calculator is the one outcome worth avoiding.
 
      The import map below is what prevents that. A module's own imports are
      written relative - app.js asks for "./benson.js" - and the browser
@@ -66,18 +66,20 @@
      has to remember to do.
 
      tools/validate_assets.py still checks the other half - that every module
-     is listed here, and that all ten slots agree with each other. -->
+     is listed here, and that all eleven slots agree with each other: the
+     stylesheet link, eight import-map entries, the module tag's own src, and
+     the data-artifact attribute that same tag carries below. -->
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=771003771b",
-    "./assets/benson.js": "./assets/benson.js?v=771003771b",
-    "./assets/browse.js": "./assets/browse.js?v=771003771b",
-    "./assets/format.js": "./assets/format.js?v=771003771b",
-    "./assets/notation.js": "./assets/notation.js?v=771003771b",
-    "./assets/selection.js": "./assets/selection.js?v=771003771b",
-    "./assets/sheet.js": "./assets/sheet.js?v=771003771b",
-    "./assets/theme.js": "./assets/theme.js?v=771003771b"
+    "./assets/app.js": "./assets/app.js?v=ac254f7048",
+    "./assets/benson.js": "./assets/benson.js?v=ac254f7048",
+    "./assets/browse.js": "./assets/browse.js?v=ac254f7048",
+    "./assets/format.js": "./assets/format.js?v=ac254f7048",
+    "./assets/notation.js": "./assets/notation.js?v=ac254f7048",
+    "./assets/selection.js": "./assets/selection.js?v=ac254f7048",
+    "./assets/sheet.js": "./assets/sheet.js?v=ac254f7048",
+    "./assets/theme.js": "./assets/theme.js?v=ac254f7048"
   }
 }
 </script>
@@ -293,6 +295,13 @@
   <footer id="footer"></footer>
 </div>
 
-<script type="module" src="assets/app.js?v=771003771b"></script>
+<!-- data-artifact carries the increments artifact's own versioned URL, read by
+     assets/app.js at startup. It is data fetched at runtime, not a module
+     import, so it is not in the import map above - but dist/increments.json's
+     own bytes are folded into the same hash (tools/build_version.py), so a
+     data-only change moves this version exactly as a code change does, and
+     the version is not typed a second time in JS. -->
+<script type="module" id="app-module" src="assets/app.js?v=ac254f7048"
+        data-artifact="dist/increments.json?v=ac254f7048"></script>
 </body>
 </html>

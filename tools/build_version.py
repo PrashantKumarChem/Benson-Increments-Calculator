@@ -38,6 +38,10 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from benson.build import ARTIFACT_PATH  # noqa: E402
+
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
@@ -55,12 +59,18 @@ def versioned_assets(asset_dir: str = ASSET_DIR) -> list[str]:
     Sorted, because the hash must not depend on what order the filesystem
     happens to hand them back in - the same tree has to give the same string on
     a contributor's machine and on the runner.
+
+    dist/increments.json is included last: it is not under asset_dir and it is
+    not a module the import map remaps, but it is fetched by the same page
+    under the same cache-busting discipline (index.html's data-artifact), so a
+    data-only change has to move the version exactly as a code change does.
     """
-    return sorted(
+    assets = sorted(
         os.path.join(asset_dir, name)
         for name in os.listdir(asset_dir)
         if name.endswith((".js", ".css"))
     )
+    return assets + [ARTIFACT_PATH]
 
 
 def version_of(paths: list[str]) -> str:

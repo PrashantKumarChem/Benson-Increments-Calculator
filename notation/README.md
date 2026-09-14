@@ -7,9 +7,10 @@ which is not something a plain text search can do, since those four characters
 appear nowhere in the printed name.
 
 Most of the reading is derived from the notation itself, which is why a new
-category of groups is understood without anyone editing code. These three files
-hold the part that cannot be derived, so the chemistry stays in data where a
-chemist can change it.
+category of groups is understood without anyone editing code - `benson/notation.py`
+works this out once, at build time, and `dist/increments.json` carries the
+result for the site. These three files hold the part that cannot be derived,
+so the chemistry stays in data where a chemist can change it.
 
 Each file is a two-column CSV, same as the increment files.
 
@@ -17,8 +18,9 @@ Each file is a two-column CSV, same as the increment files.
 
 The same reading adds up to a molecular formula — the groups chosen for decane
 come to C10H22, and for ethanol C2H6O. `summarise()` in `assets/notation.js`
-does this and is covered by `tools/notation.test.mjs`, but nothing in the page
-shows it.
+adds up the artifact's precomputed compositions to do this, and is covered by
+`tools/notation.test.mjs`; `summarise()` in `benson/notation.py` is the same
+rule, covered by `benson/tests/test_notation.py`. Nothing in the page shows it.
 
 The reason is that a formula is only true of the molecule once *every* group of
 that molecule has been chosen, and a half-finished one reads as wrong rather
@@ -27,7 +29,7 @@ than as unfinished. Choose `C-(H)2(C)(N)` and no nitrogen appears, because the
 student has not added yet. The accounting is right and the display is
 misleading, which is the wrong way round for a teaching tool.
 
-The parsing stays because searching needs it anyway, and because the tables
+The reading stays because searching needs it anyway, and because the tables
 below took some working out. Switching the check on later is a matter of
 rendering what `summarise()` already returns.
 
@@ -40,9 +42,10 @@ Write a composition as element symbols separated by spaces, with a count where
 there is more than one: `C`, `C O`, `N O2`.
 
 A group whose central notation is missing from this file is reported rather
-than skipped: tools/notation.test.mjs fails until it is listed, so a formula can
-never come out quietly short of an atom. Adding an element to the data therefore
-means adding a row here.
+than skipped: `benson/tests/test_notation.py`'s
+`test_every_name_in_the_data_is_understood` runs over the real data and fails
+until it is listed, so a formula can never come out quietly short of an atom.
+Adding an element to the data therefore means adding a row here.
 
 ## ligand_atoms.csv
 
