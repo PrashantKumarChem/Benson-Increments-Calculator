@@ -22,11 +22,15 @@ from benson.data import (
     METADATA_NAME,
     NOTATION_DIR,
     OPTIONAL_COLUMNS,
+    REFERENCES_PATH,
+    REFERENCE_COLUMNS,
     Category,
     find_categories,
     read_category,
     read_metadata,
     read_pairs,
+    read_references,
+    unresolved_sources,
 )
 from benson.notation import NOTATION_FILES, load_notation
 from benson.values import Value, read_uncertainty, read_value, to_kj
@@ -269,6 +273,47 @@ def check_unique_names(categories: list[Category], report: Report) -> None:
                            "unique across categories, not just within one file")
 
 
+def check_references(categories: list[Category], report: Report) -> None:
+    """data/references.csv, and every row's Source against it.
+
+    A Source is a key, not a citation, so the fault that matters is a key that
+    names nothing: the row then claims a source nobody can look up. In the file
+    itself, only what would make a key ambiguous or a reference empty is
+    checked here. Whether a citation is right is not something a validator
+    can know - see .claude/rules/citations.md.
+    """
+    name = os.path.basename(REFERENCES_PATH)
+    references = read_references(REFERENCES_PATH)
+
+    if os.path.exists(REFERENCES_PATH):
+        # Read as a category file is, so each line is numbered where it starts.
+        table = read_category(REFERENCES_PATH)
+        missing = [column for column in REFERENCE_COLUMNS if column not in table.columns]
+        if missing:
+            report.add(name, 1, f"header is missing {', '.join(missing)} - expected "
+                                f"{','.join(REFERENCE_COLUMNS)}")
+        keyed = {reference.line for reference in references}
+        for line, cells in table.records:
+            if len(cells) > len(table.columns):
+                report.add(name, line, f"{len(cells)} columns, expected {len(table.columns)} - "
+                                       "an unquoted comma in the citation?")
+            elif line not in keyed:
+                report.add(name, line, "no Key - nothing can name this reference")
+
+        first_seen: dict[str, int] = {}
+        for reference in references:
+            if reference.key in first_seen:
+                report.add(name, reference.line,
+                           f"{reference.key!r} is already a key on line {first_seen[reference.key]}")
+            else:
+                first_seen[reference.key] = reference.line
+            if not reference.citation:
+                report.add(name, reference.line, f"{reference.key!r} has no citation")
+
+    for file, line, row in unresolved_sources(categories, references):
+        report.add(file, line, f"{row.group}: Source {row.source!r} is not a key in {REFERENCES_PATH}")
+
+
 def main() -> int:
     categories = find_categories()
     if not categories:
@@ -281,6 +326,7 @@ def main() -> int:
     check_unique_names(categories, report)
     check_metadata(categories, report)
     check_notation(categories, report)
+    check_references(categories, report)
 
     if report:
         print(f"{len(report.problems)} problem(s) found:\n", file=sys.stderr)
@@ -290,8 +336,9 @@ def main() -> int:
 
     total = sum(len(c.rows) for c in categories)
     described = sum(1 for c in categories if read_metadata().get(c.file, {}).get("quantity"))
-    print(f"OK - {len(categories)} category files ({described} described), {total} increments, "
-          "notation files consistent.")
+    cited = sum(1 for c in categories for row in c.rows if row.source)
+    print(f"OK - {len(categories)} category files ({described} described), {total} increments "
+          f"({cited} with a Source), {len(read_references())} references, notation files consistent.")
     return 0
 
 

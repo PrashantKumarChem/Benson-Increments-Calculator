@@ -13,17 +13,16 @@ fails on any difference, which is the bargain the asset version already keeps
 here.
 
 **What this does not emit yet, and why.** `02-data-schema.md`'s sketch also
-shows `uncertainty` and `references` blocks. Neither has a consumer before WP5
-and WP6, and both need something this data does not have yet: `uncertainty`'s
-figure is a chemistry judgement between candidate values (D11, H4) that is not
-this package's to make, and `references` needs `data/references.csv`, which
-does not exist until WP5. Emitting either now would be inventing an answer
-ahead of the work that earns it. Per-increment `ref` is skipped for the same
-reason.
+shows an `uncertainty` block: the method's own error, one figure for any total.
+Choosing that figure is a chemistry judgement between candidate values (D11,
+H4) that is not this package's to make, so emitting it now would be inventing
+an answer ahead of the work that earns it.
 
 A row's own `uncertainty` is not that figure. It is the ± the row's source
 prints, from the optional Uncertainty column, converted to kJ/mol as its value
-is; like `verified` and `note`, it is null wherever its column is blank.
+is; like `verified`, `note` and `ref`, it is null wherever its column is blank.
+`references` lists data/references.csv in file order, numbered by that order,
+and a row's `ref` is the key of the reference its Source names.
 
 The schema doc's `search` block is a map keyed by exact query text, which
 cannot hold arbitrary typing. What is actually precomputed - each increment's
@@ -41,7 +40,16 @@ import json
 import os
 import sys
 
-from benson.data import CSV_DIR, METADATA_FIELDS, NOTATION_DIR, find_categories, read_metadata
+from benson.data import (
+    CSV_DIR,
+    METADATA_FIELDS,
+    NOTATION_DIR,
+    REFERENCES_PATH,
+    find_categories,
+    read_metadata,
+    read_references,
+    unresolved_sources,
+)
 from benson.notation import build_index, load_notation
 from benson.notation import read as read_notation
 from benson.values import KJ_TO_KCAL_DISPLAY, read_uncertainty, read_value, to_kj
@@ -59,7 +67,7 @@ class BuildError(Exception):
     """
 
 
-def _content_hash(csv_dir: str, notation_dir: str) -> str:
+def _content_hash(csv_dir: str, notation_dir: str, references_path: str) -> str:
     """A hash of every source file the build reads - name and bytes both.
 
     Not a date and not a git SHA (see the module docstring's neighbour, D2):
@@ -76,7 +84,8 @@ def _content_hash(csv_dir: str, notation_dir: str) -> str:
     sit on disk, which a build input must not.
     """
     paths = sorted(glob.glob(os.path.join(csv_dir, "*.csv"))) + \
-        sorted(glob.glob(os.path.join(notation_dir, "*.csv")))
+        sorted(glob.glob(os.path.join(notation_dir, "*.csv"))) + \
+        [path for path in [references_path] if os.path.exists(path)]
     digest = hashlib.sha256()
     for path in paths:
         digest.update(os.path.basename(path).encode("utf-8"))
@@ -128,6 +137,9 @@ def _increment_entry(entry, notation, category_unit: str) -> dict:
         # optional cell is null rather than absent, as low and high are, so
         # every increment carries the same keys.
         "uncertainty": to_kj(read_uncertainty(row.uncertainty), unit),
+        # The key, not a number: a reference's number is its place in the
+        # artifact's references, so it is stated once, there.
+        "ref": row.source or None,
         "verified": row.verified or None,
         "note": row.note or None,
         "kind": decomposed.kind,
@@ -140,11 +152,22 @@ def _increment_entry(entry, notation, category_unit: str) -> dict:
     }
 
 
-def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR) -> dict:
+def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
+                   references_path: str = REFERENCES_PATH) -> dict:
     """Everything the consumers need, read from the source and derived once."""
     categories = find_categories(csv_dir)
     if not categories:
         raise BuildError(f"No CSV files found in {csv_dir}/")
+
+    references = read_references(references_path)
+    unresolved = unresolved_sources(categories, references)
+    if unresolved:
+        # A ref naming no reference would reach a page as a citation mark that
+        # points at nothing. validate_data.py reports it; the build refuses as
+        # well, so that a local rebuild cannot write one either.
+        problems = "\n".join(f"  {file}:{line}: {row.group}: Source {row.source!r}"
+                             for file, line, row in unresolved)
+        raise BuildError(f"{len(unresolved)} Source(s) name no key in {references_path}:\n{problems}")
 
     notation = load_notation(notation_dir)
     if notation.problems:
@@ -165,15 +188,22 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR) -> 
     return {
         "schema": SCHEMA,
         "generated_by": "benson/build.py - do not edit by hand",
-        "content_hash": _content_hash(csv_dir, notation_dir),
+        "content_hash": _content_hash(csv_dir, notation_dir, references_path),
         "display": {"kj_to_kcal": KJ_TO_KCAL_DISPLAY},
         "categories": categories_out,
+        # Numbered by their order in the file, here and nowhere else.
+        "references": [
+            {"number": number, "key": reference.key, "citation": reference.citation,
+             "doi": reference.doi or None}
+            for number, reference in enumerate(references, start=1)
+        ],
         "increments": increments_out,
     }
 
 
-def write_artifact(path: str = ARTIFACT_PATH, csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR) -> dict:
-    artifact = build_artifact(csv_dir, notation_dir)
+def write_artifact(path: str = ARTIFACT_PATH, csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
+                   references_path: str = REFERENCES_PATH) -> dict:
+    artifact = build_artifact(csv_dir, notation_dir, references_path)
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(artifact, handle, indent=2)

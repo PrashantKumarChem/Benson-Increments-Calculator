@@ -18,13 +18,17 @@ from benson.data import (
     CSV_DIR,
     NOTATION_DIR,
     OPTIONAL_COLUMNS,
+    REFERENCES_PATH,
     Category,
+    Reference,
     Row,
     find_categories,
     read_category,
     read_metadata,
     read_pairs,
+    read_references,
     title_for,
+    unresolved_sources,
 )
 from benson.values import read_value
 
@@ -257,6 +261,58 @@ class OptionalColumns(Fixture):
         path = self.write("01_A.csv", "Group,Value,Note\nC-(C)(H)3,-42\n\n,no name\nC-(C)2(H)2,-20.9,x")
         self.assertEqual(read_category(path).numbered_rows,
                          [(2, Row("C-(C)(H)3", "-42")), (5, Row("C-(C)2(H)2", "-20.9", note="x"))])
+
+
+class ReadingReferences(Fixture):
+    def references(self):
+        return read_references(os.path.join(self.folder, "references.csv"))
+
+    def test_every_reference_in_file_order_with_the_line_it_is_on(self):
+        # Order is the numbering, so it is pinned with keys that do not sort
+        # into it.
+        self.write("references.csv",
+                   'Key,Citation,DOI\nZED,"Zed, A. A work, 2000.",10.0000/zed\nABE,"Abe, B. Another, 1999.",')
+        self.assertEqual(self.references(), [
+            Reference(2, "ZED", "Zed, A. A work, 2000.", "10.0000/zed"),
+            Reference(3, "ABE", "Abe, B. Another, 1999.", ""),
+        ])
+
+    def test_columns_are_found_by_title(self):
+        self.write("references.csv", "DOI,Key,Citation\n,REF1,A citation")
+        self.assertEqual(self.references(), [Reference(2, "REF1", "A citation", "")])
+
+    def test_a_line_without_a_key_is_not_a_reference(self):
+        self.write("references.csv", "Key,Citation,DOI\n,An orphan citation,\nREF1,A citation,")
+        self.assertEqual([reference.key for reference in self.references()], ["REF1"])
+
+    def test_a_header_and_no_rows_is_no_references(self):
+        self.write("references.csv", "Key,Citation,DOI")
+        self.assertEqual(self.references(), [])
+
+    def test_no_references_file_is_no_references(self):
+        self.assertEqual(self.references(), [])
+
+
+class ResolvingSources(Fixture):
+    REF1 = Reference(2, "REF1", "A citation", "")
+
+    def test_a_source_that_names_no_reference_is_unresolved(self):
+        category = read_category(self.write("01_A.csv", "Group,Value,Source\nC-(C)(H)3,-42,REF1\nC-(C)2(H)2,-20.9,NOPE"))
+        self.assertEqual(unresolved_sources([category], [self.REF1]),
+                         [("01_A.csv", 3, Row("C-(C)2(H)2", "-20.9", source="NOPE"))])
+
+    def test_a_blank_source_is_not_unresolved(self):
+        category = read_category(self.write("01_A.csv", "Group,Value,Source\nC-(C)(H)3,-42,\nC-(C)2(H)2,-20.9"))
+        self.assertEqual(unresolved_sources([category], []), [])
+
+    def test_a_key_is_matched_exactly(self):
+        # A key is an identifier, not a name to be forgiving about.
+        category = read_category(self.write("01_A.csv", "Group,Value,Source\nC-(C)(H)3,-42,ref1"))
+        self.assertEqual(len(unresolved_sources([category], [self.REF1])), 1)
+
+    def test_every_source_in_the_served_files_names_a_reference(self):
+        categories = find_categories(str(ROOT / CSV_DIR))
+        self.assertEqual(unresolved_sources(categories, read_references(str(ROOT / REFERENCES_PATH))), [])
 
 
 class FindingCategories(Fixture):

@@ -212,3 +212,55 @@ def find_categories(csv_dir: str = CSV_DIR) -> list[Category]:
     return [read_category(p) for p in sorted(glob.glob(os.path.join(csv_dir, "*.csv")))]
 
 
+#: What a row's Source names. Hand-edited: one row per published work, under a
+#: short key the increment files use in place of a full citation. Nobody numbers
+#: them - a reference's number is its place in this file, so inserting one
+#: renumbers the rest with nothing to edit by hand.
+REFERENCES_PATH = "data/references.csv"
+#: The columns of REFERENCES_PATH, found by title. A DOI may be blank.
+REFERENCE_COLUMNS = ("Key", "Citation", "DOI")
+
+
+class Reference(NamedTuple):
+    """One published work a row may name as its Source."""
+
+    line: int
+    key: str
+    citation: str
+    doi: str
+
+
+def read_references(path: str = REFERENCES_PATH) -> list[Reference]:
+    """Every reference with a key, in file order. An absent file means none.
+
+    File order is the numbering, so nothing here sorts. A line without a key is
+    not a reference, since no row could name it; tools/validate_data.py reports
+    it rather than letting it vanish.
+    """
+    if not os.path.exists(path):
+        return []
+    table = read_category(path)
+
+    def cell(cells, column):
+        if column not in table.columns:
+            return ""
+        index = table.columns.index(column)
+        return cells[index] if index < len(cells) else ""
+
+    return [Reference(line, cell(cells, "Key"), cell(cells, "Citation"), cell(cells, "DOI"))
+            for line, cells in table.records if cell(cells, "Key")]
+
+
+def unresolved_sources(categories: list[Category], references: list[Reference]) -> list[tuple[str, int, Row]]:
+    """Each row whose Source names no reference, as (file, line, row).
+
+    A blank Source is not one of them. A row with no source recorded says so
+    honestly; a Source naming nothing claims a citation nobody can find.
+    """
+    keys = {reference.key for reference in references}
+    return [(category.file, line, row)
+            for category in categories
+            for line, row in category.numbered_rows
+            if row.source and row.source not in keys]
+
+
