@@ -2,6 +2,7 @@
 paths:
   - "CSV_data_files/**"
   - "notation/**"
+  - "data/**"
 ---
 
 # Working with the increment data
@@ -13,6 +14,9 @@ as a fact.
 
 - **Every value needs a source.** A number without a citation cannot be checked
   by anyone, and an uncited value in a teaching tool is worse than a missing one.
+  A row names its source by a `Source` key into `data/references.csv`. How the
+  citation behind that key is written and verified is
+  [`citations.md`](citations.md)'s rule; this one is about the files.
 - **Do not "fix" a chemistry value because it looks wrong.** Raise it, with the
   reasoning and the source. Some entries are deliberate and documented — the
   four `[COd]` ketene rows, for instance, are a chemist's call that was
@@ -23,6 +27,9 @@ as a fact.
   printed source. Which table a given row came from is not yet recorded, so do not
   credit a row or a category to one paper. Later revisions exist but cover fewer
   elements.
+- **Leave `Source` and `Verified` blank until someone has the printed source in
+  hand.** A blank is honest. A filled-in guess reads exactly like a check that
+  happened, and nothing downstream can tell the two apart.
 
 ## File format
 
@@ -31,20 +38,60 @@ then the category name **spelled as it should appear on the page**. The
 capitalisation in the filename is what users see, which is why no list of
 chemical acronyms lives in the code.
 
-Exactly two columns: the group name, then its value in kJ/mol. A published range
-is written `1.05 to 1.76` and is averaged. **The separator is the word `to`, not
-a hyphen** — a hyphen also starts a negative number, and a form that has to work
-out which one it is in front of is a form two implementations can work out
-differently. A row still written `1.05-1.76` is refused by name.
+The first two columns are required: the group name, then its value. They are
+found by position, so their titles are free text. A published range is written
+`1.05 to 1.76` and is averaged. **The separator is the word `to`, not a hyphen**
+— a hyphen also starts a negative number, and a form that has to work out which
+one it is in front of is a form two implementations can work out differently. A
+row still written `1.05-1.76` is refused by name.
+
+Any further column is optional, found by its exact title, and may be blank or
+left out altogether. A row may stop before its trailing optional cells.
+
+| Column | What it holds |
+|---|---|
+| `Unit` | `kJ/mol` or `kcal/mol`, overriding for this row the unit `notation/categories.csv` declares for its category. A value is stored as its source prints it; the build converts once. |
+| `Uncertainty` | The ± the source prints for this group, in the row's unit: one unsigned number. |
+| `Source` | A `Key` in `data/references.csv` — never a citation. |
+| `Verified` | Who checked the value against its printed source, and where: `date;initials;page`. |
+| `Note` | Free text. |
+
+A column with any other title is refused, so a misspelt `Sources` cannot drop
+what it holds without a word.
+
+**Widening a file in this repository breaks the gen-2 notebook until WP7
+retires it.** Its `get_value_dicts` skips any file that does not have exactly
+two columns, printing a warning and nothing more, so the whole category
+disappears from the notebook — and no check here notices, since
+`check_parity.mjs` is gone. Widening one before then is a decision to take
+deliberately, not a side effect of adding a `Source`.
 
 **The files have no trailing newline.** Appending a row with `>>` corrupts the
 last existing row. It fails loudly rather than silently, but it wastes a cycle.
 
-## Two rules the validator enforces, and why
+## `data/references.csv`
+
+One row per published work, with the columns `Key,Citation,DOI`. A row's
+`Source` names a `Key`, so a citation is written once, here, however many rows
+cite it. `DOI` may be blank. Nobody writes a reference number down: a
+reference's number is its place in this file, assigned when the artifact is
+built, so inserting one renumbers the rest.
+
+A reference with a DOI also has to pass the DOI lock
+(`node tools/build_doi_lock.mjs`, then `node --test tools/doi_lock.test.mjs`).
+Today the lock refuses one outright, because it compares a DOI's record with
+fields — the work's type, title, authors, year, volume and first page — that no
+column holds yet. Giving them one is part of adding the first reference with a
+DOI.
+
+## Rules the validator enforces, and why
 
 - **A group name must be unique across every file, not just within one.**
   Anything that annotates a group from outside these files — a source, an
   uncertainty, a synonym — can only key on the name.
+- **Every `Source` must be a key in `data/references.csv`.** A key naming
+  nothing claims a citation nobody can find, and the build refuses one as well.
+  A blank `Source` is not a fault.
 - **No file may contain both a published range and a negative value.** This was
   once unreadable: pandas types a whole column as strings as soon as one cell is
   a range, and the notebook split those strings on the range separator, so while
@@ -63,7 +110,7 @@ python tools/build_dist.py        # regenerates dist/increments.json, the built 
 python tools/build_version.py     # moves the asset version - the artifact's bytes are folded in
 ```
 
-The site no longer runs a second reading of the data to check against (WP3 moved it onto the artifact; WP4 retired `check_parity.mjs`, the check that used to compare them). The gen-2 notebook still reads these files with its own parser until WP7, and the "no ranges and negatives in one file" rule two sections up is what stands between a new row and that parser silently mishandling it — that is why the rule stays even though nothing here re-proves the notebook against new data automatically.
+The site no longer runs a second reading of the data to check against (WP3 moved it onto the artifact; WP4 retired `check_parity.mjs`, the check that used to compare them). The gen-2 notebook still reads these files with its own parser until WP7, and the "no ranges and negatives in one file" rule above is what stands between a new row and that parser silently mishandling it — that is why the rule stays even though nothing here re-proves the notebook against new data automatically.
 
 `dist/increments.json` is generated. Never hand-edit it — a browser cannot
 list a directory, so `benson/build.py` derives the artifact from these files

@@ -50,9 +50,13 @@ Adding a category needs no code changes:
    the category name **spelled as it should be displayed**. `03_CHNO_Groups.csv`
    becomes the "CHNO Groups" section, so capitalisation in the filename is what
    you get.
-2. Give it exactly two columns: the group name, and its value in kJ/mol.
+2. Give it two columns: the group name, and its value in kJ/mol.
    A published range is written `1.05 to 1.76` and is averaged. The separator is
    the word, not a hyphen, because a hyphen also starts a negative number.
+   Optional columns may follow - a per-row `Unit`, `Uncertainty`, `Source`,
+   `Verified` and `Note`; see [.claude/rules/data.md](.claude/rules/data.md).
+   Keep a file to two columns for now, though: the notebook skips any file
+   that has more.
 3. Check the file, rebuild the artifact, and move the asset version (the
    artifact's own bytes are folded into it, so a data-only change bumps it
    too):
@@ -175,9 +179,11 @@ assets/fonts/           IBM Plex Mono, shipped with the site (see License)
 CSV_data_files/         the increment data
 notation/               what the group names mean, the words students use, and
                         what each category of numbers is (categories.csv)
+data/references.csv     the published works an increment's Source can name
 benson/                 the data rules, in Python - the only place one is written
 dist/increments.json    the generated artifact the site fetches; benson/build.py
-                        derives it from CSV_data_files/ and notation/
+                        derives it from CSV_data_files/, notation/ and
+                        data/references.csv
 tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```

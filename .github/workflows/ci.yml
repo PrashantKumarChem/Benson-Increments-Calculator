@@ -33,14 +33,17 @@ jobs:
           echo "$out"
           echo "$out" | grep -qE '^Ran [1-9][0-9]* tests? in' || { echo "No tests ran."; exit 1; }
 
-      # Checks what a contributor can actually get wrong: two columns per file,
-      # every value a number or a range, no duplicate or blank group names, and
-      # the filename convention.
+      # Checks what a contributor can actually get wrong: a group name and a
+      # value on every row, optional columns only under titles the schema
+      # knows, every value a number or a range, no duplicate or blank group
+      # names, every Source a key in data/references.csv, and the filename
+      # convention.
       - name: Validate CSV files
         run: python tools/validate_data.py
 
       # dist/increments.json is the artifact benson/build.py emits from
-      # CSV_data_files/ and notation/ - everything a consumer needs, derived
+      # CSV_data_files/, notation/ and data/references.csv - everything a
+      # consumer needs, derived
       # once. Regenerated and diffed: a stale committed copy would ship a value
       # or a notation reading the source no longer says.
       - name: Confirm the increments artifact is current

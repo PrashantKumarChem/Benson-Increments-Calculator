@@ -12,7 +12,7 @@ works this out once, at build time, and `dist/increments.json` carries the
 result for the site. These three files hold the part that cannot be derived,
 so the chemistry stays in data where a chemist can change it.
 
-Each file is a two-column CSV, same as the increment files.
+Each file is a two-column CSV.
 
 ## A formula check, deliberately not switched on
 
@@ -131,8 +131,10 @@ File,Quantity,Symbol,Unit,Source,Note
 
 - **Quantity** — what the numbers measure, spelled out.
 - **Symbol** — how to head a total made of them, e.g. `ΔHf°`.
-- **Unit** — display only. Nothing converts between units, and nothing should
-  start to: totals are summable only within one.
+- **Unit** — the unit the category's values are stored in, as their source
+  prints them: `kJ/mol` (the default, if blank) or `kcal/mol`. The build
+  converts every value to kJ/mol once, so a total always adds like with like. A
+  row whose source prints another unit can say so in its own `Unit` column.
 - **Source** — where the values came from.
 - **Note** — anything a reader should know before using them.
 
