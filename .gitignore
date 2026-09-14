@@ -127,3 +127,9 @@ package-lock.json
 
 # Claude Code local settings. The tracked part of .claude/ is rules/ only.
 .claude/settings.local.json
+
+# The generated increments artifact is committed and served by GitHub Pages;
+# everything else under dist/ (Python packaging output) stays ignored.
+!/dist/
+/dist/*
+!/dist/increments.json

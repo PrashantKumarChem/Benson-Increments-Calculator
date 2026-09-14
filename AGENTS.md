@@ -59,6 +59,7 @@ All of these must pass before and after every change:
 python tools/build_version.py     # regenerates the asset hash; CI fails on a diff
 python tools/validate_data.py     # the increment CSVs and the manifest
 python tools/validate_assets.py   # every asset requested at one version
+python tools/build_dist.py        # regenerates dist/increments.json; CI fails on a diff
 node   tools/validate_css.mjs     # the stylesheet parses; every token exists
 node --test tools/*.test.mjs      # unit tests
 python -m unittest discover -s benson/tests -t .   # the benson package's tests
@@ -107,6 +108,7 @@ than none — it teaches contributors to distrust the tooling.
 | `CSV_data_files/manifest.json` | `tools/build_data.py` |
 | the asset version in `index.html` | `tools/build_version.py` |
 | `tools/doi_lock.json` | `tools/build_doi_lock.mjs` |
+| `dist/increments.json` | `tools/build_dist.py` (`benson/build.py`) |
 
 Regenerate them; commit the result. CI regenerates independently and fails if
 the committed copy differs. Hand-editing one produces a change that passes

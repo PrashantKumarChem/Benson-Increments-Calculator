@@ -1,0 +1,7301 @@
+{
+  "schema": 1,
+  "generated_by": "benson/build.py - do not edit by hand",
+  "content_hash": "d6e8e244ca8b3333",
+  "display": {
+    "kj_to_kcal": 0.239006
+  },
+  "categories": [
+    {
+      "file": "01_CH_Groups.csv",
+      "title": "CH Groups",
+      "unit": "kJ/mol",
+      "quantity": "standard enthalpy of formation",
+      "symbol": "\u0394Hf\u00b0",
+      "source": "Published Benson tables (pending final review)",
+      "note": "",
+      "count": 44
+    },
+    {
+      "file": "02_CHO_Groups.csv",
+      "title": "CHO Groups",
+      "unit": "kJ/mol",
+      "quantity": "standard enthalpy of formation",
+      "symbol": "\u0394Hf\u00b0",
+      "source": "Published Benson tables (pending final review)",
+      "note": "",
+      "count": 82
+    },
+    {
+      "file": "03_CHNO_Groups.csv",
+      "title": "CHNO Groups",
+      "unit": "kJ/mol",
+      "quantity": "standard enthalpy of formation",
+      "symbol": "\u0394Hf\u00b0",
+      "source": "Published Benson tables (pending final review)",
+      "note": "",
+      "count": 57
+    },
+    {
+      "file": "04_Corrections.csv",
+      "title": "Corrections",
+      "unit": "kJ/mol",
+      "quantity": "ring and steric correction",
+      "symbol": "\u0394Hf\u00b0",
+      "source": "Published Benson tables (pending final review)",
+      "note": "Added once per ring or interaction rather than per atom",
+      "count": 24
+    },
+    {
+      "file": "05_Cyclohexane_A_Values.csv",
+      "title": "Cyclohexane A Values",
+      "unit": "kJ/mol",
+      "quantity": "conformational free-energy preference",
+      "symbol": "\u0394G\u00b0",
+      "source": "",
+      "note": "Axial substituent penalty. Not an enthalpy of formation. 15 of the 29 values are published as ranges",
+      "count": 29
+    }
+  ],
+  "increments": [
+    {
+      "label": "C-(C)(H)3",
+      "category": "01_CH_Groups.csv",
+      "value": -42.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-42",
+      "unit": "kJ/mol",
+      "storedValue": -42.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 3
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cch3",
+        "ch3",
+        "methyl"
+      ],
+      "synonyms": [
+        "methyl"
+      ]
+    },
+    {
+      "label": "C-(C)2(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -20.9,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-20.9",
+      "unit": "kJ/mol",
+      "storedValue": -20.9,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cc2h2",
+        "ch2",
+        "methylene"
+      ],
+      "synonyms": [
+        "methylene"
+      ]
+    },
+    {
+      "label": "C-(C)3(H)",
+      "category": "01_CH_Groups.csv",
+      "value": -7.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-7",
+      "unit": "kJ/mol",
+      "storedValue": -7.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 3
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cc3h",
+        "ch",
+        "methine"
+      ],
+      "synonyms": [
+        "methine"
+      ]
+    },
+    {
+      "label": "C-(C)4",
+      "category": "01_CH_Groups.csv",
+      "value": 2.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "2",
+      "unit": "kJ/mol",
+      "storedValue": 2.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 4
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cc4",
+        "c",
+        "quaternarycarbon"
+      ],
+      "synonyms": [
+        "quaternary carbon"
+      ]
+    },
+    {
+      "label": "Cd-(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": 26.2,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "26.2",
+      "unit": "kJ/mol",
+      "storedValue": 26.2,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdh2",
+        "ch2",
+        "terminalalkene"
+      ],
+      "synonyms": [
+        "terminal alkene"
+      ]
+    },
+    {
+      "label": "Cd-(C)(H)",
+      "category": "01_CH_Groups.csv",
+      "value": 35.8,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "35.8",
+      "unit": "kJ/mol",
+      "storedValue": 35.8,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdch",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(C)2",
+      "category": "01_CH_Groups.csv",
+      "value": 42.6,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "42.6",
+      "unit": "kJ/mol",
+      "storedValue": 42.6,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdc2",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(Cd)(H)",
+      "category": "01_CH_Groups.csv",
+      "value": 28.4,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "28.4",
+      "unit": "kJ/mol",
+      "storedValue": 28.4,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcdh",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(Cd)(C)",
+      "category": "01_CH_Groups.csv",
+      "value": 36.7,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "36.7",
+      "unit": "kJ/mol",
+      "storedValue": 36.7,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcdc",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(Cd)2",
+      "category": "01_CH_Groups.csv",
+      "value": 53.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "53",
+      "unit": "kJ/mol",
+      "storedValue": 53.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcd2",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(Ct)(H)",
+      "category": "01_CH_Groups.csv",
+      "value": 36.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "36",
+      "unit": "kJ/mol",
+      "storedValue": 36.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcth",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(Ct)(C)",
+      "category": "01_CH_Groups.csv",
+      "value": 40.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "40",
+      "unit": "kJ/mol",
+      "storedValue": 40.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdctc",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(CB)(H)",
+      "category": "01_CH_Groups.csv",
+      "value": 28.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "28",
+      "unit": "kJ/mol",
+      "storedValue": 28.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcbh",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(CB)(C)",
+      "category": "01_CH_Groups.csv",
+      "value": 36.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "36",
+      "unit": "kJ/mol",
+      "storedValue": 36.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcbc",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(CB)2",
+      "category": "01_CH_Groups.csv",
+      "value": 50.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "50",
+      "unit": "kJ/mol",
+      "storedValue": 50.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcb2",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(H)",
+      "category": "01_CH_Groups.csv",
+      "value": 113.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "113",
+      "unit": "kJ/mol",
+      "storedValue": 113.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cth",
+        "ch",
+        "terminalalkyne"
+      ],
+      "synonyms": [
+        "terminal alkyne"
+      ]
+    },
+    {
+      "label": "Ct-(C)",
+      "category": "01_CH_Groups.csv",
+      "value": 115.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "115",
+      "unit": "kJ/mol",
+      "storedValue": 115.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ctc",
+        "ct",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(Cd)",
+      "category": "01_CH_Groups.csv",
+      "value": 126.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "126",
+      "unit": "kJ/mol",
+      "storedValue": 126.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ctcd",
+        "ct",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(Ct)",
+      "category": "01_CH_Groups.csv",
+      "value": 118.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "118",
+      "unit": "kJ/mol",
+      "storedValue": 118.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ctct",
+        "ct",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(CB) + CB-(Ct)",
+      "category": "01_CH_Groups.csv",
+      "value": 125.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "125",
+      "unit": "kJ/mol",
+      "storedValue": 125.0,
+      "kind": "named",
+      "composition": {
+        "C": 2
+      },
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "ctcbcbct"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(H)",
+      "category": "01_CH_Groups.csv",
+      "value": 13.8,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "13.8",
+      "unit": "kJ/mol",
+      "storedValue": 13.8,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbh",
+        "ch",
+        "aromaticch"
+      ],
+      "synonyms": [
+        "aromatic CH"
+      ]
+    },
+    {
+      "label": "CB-(C)",
+      "category": "01_CH_Groups.csv",
+      "value": 23.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "23",
+      "unit": "kJ/mol",
+      "storedValue": 23.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbc",
+        "cb",
+        "c",
+        "aromaticcarbon"
+      ],
+      "synonyms": [
+        "aromatic carbon"
+      ]
+    },
+    {
+      "label": "CB-(Cd)",
+      "category": "01_CH_Groups.csv",
+      "value": 27.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "27",
+      "unit": "kJ/mol",
+      "storedValue": 27.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbcd",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(CB)",
+      "category": "01_CH_Groups.csv",
+      "value": 21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "21",
+      "unit": "kJ/mol",
+      "storedValue": 21.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbcb",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C(allene)",
+      "category": "01_CH_Groups.csv",
+      "value": 141.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "141",
+      "unit": "kJ/mol",
+      "storedValue": 141.0,
+      "kind": "named",
+      "composition": {
+        "C": 1
+      },
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "callene"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cis- (one t-butyl)",
+      "category": "01_CH_Groups.csv",
+      "value": 4.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "4",
+      "unit": "kJ/mol",
+      "storedValue": 4.0,
+      "kind": "named",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cisonetbutyl"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cis- (two t-butyl)",
+      "category": "01_CH_Groups.csv",
+      "value": 17.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "17",
+      "unit": "kJ/mol",
+      "storedValue": 17.0,
+      "kind": "named",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cistwotbutyl"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)(H)3",
+      "category": "01_CH_Groups.csv",
+      "value": -42.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-42",
+      "unit": "kJ/mol",
+      "storedValue": -42.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 3
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccdh3",
+        "ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)(C)(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -20.1,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-20.1",
+      "unit": "kJ/mol",
+      "storedValue": -20.1,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccdch2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)2(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -18.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-18",
+      "unit": "kJ/mol",
+      "storedValue": -18.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccd2h2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)(C)2(H)",
+      "category": "01_CH_Groups.csv",
+      "value": -7.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-7",
+      "unit": "kJ/mol",
+      "storedValue": -7.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccdc2h",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)2(C)(H)",
+      "category": "01_CH_Groups.csv",
+      "value": -7.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-7",
+      "unit": "kJ/mol",
+      "storedValue": -7.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 2
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccd2ch",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)(C)3",
+      "category": "01_CH_Groups.csv",
+      "value": 6.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "6",
+      "unit": "kJ/mol",
+      "storedValue": 6.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccdc3",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Ct)(C)(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -20.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-20",
+      "unit": "kJ/mol",
+      "storedValue": -20.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cctch2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Ct)(C)2(H)",
+      "category": "01_CH_Groups.csv",
+      "value": -6.5,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-6.5",
+      "unit": "kJ/mol",
+      "storedValue": -6.5,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cctc2h",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Ct)(C)3",
+      "category": "01_CH_Groups.csv",
+      "value": 5.5,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "5.5",
+      "unit": "kJ/mol",
+      "storedValue": 5.5,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cctc3",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)(H)3",
+      "category": "01_CH_Groups.csv",
+      "value": -42.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-42",
+      "unit": "kJ/mol",
+      "storedValue": -42.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 3
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccbh3",
+        "ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)(C)(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -20.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-20",
+      "unit": "kJ/mol",
+      "storedValue": -20.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccbch2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)(C)2(H)",
+      "category": "01_CH_Groups.csv",
+      "value": -4.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-4",
+      "unit": "kJ/mol",
+      "storedValue": -4.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccbc2h",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)(C)3",
+      "category": "01_CH_Groups.csv",
+      "value": 11.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "11",
+      "unit": "kJ/mol",
+      "storedValue": 11.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccbc3",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)2(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -20.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-20",
+      "unit": "kJ/mol",
+      "storedValue": -20.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccb2h2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)3(H)",
+      "category": "01_CH_Groups.csv",
+      "value": -4.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-4",
+      "unit": "kJ/mol",
+      "storedValue": -4.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 3
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccb3h",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CB)4",
+      "category": "01_CH_Groups.csv",
+      "value": 31.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "31",
+      "unit": "kJ/mol",
+      "storedValue": 31.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 4
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccb4",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(Cd)(CB)(H)2",
+      "category": "01_CH_Groups.csv",
+      "value": -18.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-18",
+      "unit": "kJ/mol",
+      "storedValue": -18.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccdcbh2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)3(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -42.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-42",
+      "unit": "kJ/mol",
+      "storedValue": -42.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 3
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 3
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch3o",
+        "ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": -33.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-33",
+      "unit": "kJ/mol",
+      "storedValue": -33.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2oc",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -29.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-29",
+      "unit": "kJ/mol",
+      "storedValue": -29.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2ocd",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)(CB)",
+      "category": "02_CHO_Groups.csv",
+      "value": -26.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-26",
+      "unit": "kJ/mol",
+      "storedValue": -26.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2ocb",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": -23.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-23",
+      "unit": "kJ/mol",
+      "storedValue": -23.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2oct",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(O)(C)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -26.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-26",
+      "unit": "kJ/mol",
+      "storedValue": -26.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "choc2",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(O)(Cd)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-21",
+      "unit": "kJ/mol",
+      "storedValue": -21.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "chocd2",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(O)(C)3",
+      "category": "02_CHO_Groups.csv",
+      "value": -21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-21",
+      "unit": "kJ/mol",
+      "storedValue": -21.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coc3",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -67.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-67",
+      "unit": "kJ/mol",
+      "storedValue": -67.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2o2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(O)2(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": -65.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-65",
+      "unit": "kJ/mol",
+      "storedValue": -65.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 2
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cho2c",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(O)2(C)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -48.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-48",
+      "unit": "kJ/mol",
+      "storedValue": -48.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 2
+        },
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "co2c2",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(O)3(H)",
+      "category": "02_CHO_Groups.csv",
+      "value": -108.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-108",
+      "unit": "kJ/mol",
+      "storedValue": -108.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 3
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "co3h",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(O)3(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": -105.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-105",
+      "unit": "kJ/mol",
+      "storedValue": -105.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 3
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "co3c",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(O)4",
+      "category": "02_CHO_Groups.csv",
+      "value": -162.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-162",
+      "unit": "kJ/mol",
+      "storedValue": -162.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 4
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "co4",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(O)(H)",
+      "category": "02_CHO_Groups.csv",
+      "value": 36.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "36",
+      "unit": "kJ/mol",
+      "storedValue": 36.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdoh",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(O)(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": 43.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "43",
+      "unit": "kJ/mol",
+      "storedValue": 43.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdoc",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(O)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": 37.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "37",
+      "unit": "kJ/mol",
+      "storedValue": 37.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdocd",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(O)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": 37.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "37",
+      "unit": "kJ/mol",
+      "storedValue": 37.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdoct",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": 25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "25",
+      "unit": "kJ/mol",
+      "storedValue": 25.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbo",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": 180.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "180",
+      "unit": "kJ/mol",
+      "storedValue": 180.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cto",
+        "ct",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(O)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": 49.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "49",
+      "unit": "kJ/mol",
+      "storedValue": 49.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdoco",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(H)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -242.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-242",
+      "unit": "kJ/mol",
+      "storedValue": -242.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 2
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "oh2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(H)(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": -159.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-159",
+      "unit": "kJ/mol",
+      "storedValue": -159.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ohc",
+        "oh",
+        "hydroxyl",
+        "alcohol"
+      ],
+      "synonyms": [
+        "hydroxyl",
+        "alcohol"
+      ]
+    },
+    {
+      "label": "O-(H)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -190.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-190",
+      "unit": "kJ/mol",
+      "storedValue": -190.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ohcd",
+        "oh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(H)(CB)",
+      "category": "02_CHO_Groups.csv",
+      "value": -190.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-190",
+      "unit": "kJ/mol",
+      "storedValue": -190.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ohcb",
+        "oh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(H)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": -201.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-201",
+      "unit": "kJ/mol",
+      "storedValue": -201.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ohct",
+        "oh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(C)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -99.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-99",
+      "unit": "kJ/mol",
+      "storedValue": -99.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "oc2",
+        "o",
+        "ether"
+      ],
+      "synonyms": [
+        "ether"
+      ]
+    },
+    {
+      "label": "O-(C)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -124.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-124",
+      "unit": "kJ/mol",
+      "storedValue": -124.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "occd",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(C)(CB)",
+      "category": "02_CHO_Groups.csv",
+      "value": -124.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-124",
+      "unit": "kJ/mol",
+      "storedValue": -124.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "occb",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(C)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": -141.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-141",
+      "unit": "kJ/mol",
+      "storedValue": -141.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "occt",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(Ct)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -150.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-150",
+      "unit": "kJ/mol",
+      "storedValue": -150.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "octcd",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(Cd)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -137.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-137",
+      "unit": "kJ/mol",
+      "storedValue": -137.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ocd2",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(CB)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -136.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-136",
+      "unit": "kJ/mol",
+      "storedValue": -136.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ocb2",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -109.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-109",
+      "unit": "kJ/mol",
+      "storedValue": -109.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 2
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coh2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": -123.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-123",
+      "unit": "kJ/mol",
+      "storedValue": -123.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cohc",
+        "coh",
+        "aldehyde",
+        "cho"
+      ],
+      "synonyms": [
+        "aldehyde",
+        "CHO"
+      ]
+    },
+    {
+      "label": "CO-(H)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -113.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-113",
+      "unit": "kJ/mol",
+      "storedValue": -113.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cohcd",
+        "coh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": -107.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-107",
+      "unit": "kJ/mol",
+      "storedValue": -107.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cohct",
+        "coh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)(CB)",
+      "category": "02_CHO_Groups.csv",
+      "value": -122.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-122",
+      "unit": "kJ/mol",
+      "storedValue": -122.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cohcb",
+        "coh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(C)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -133.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-133",
+      "unit": "kJ/mol",
+      "storedValue": -133.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coc2",
+        "co",
+        "ketone"
+      ],
+      "synonyms": [
+        "ketone"
+      ]
+    },
+    {
+      "label": "CO-(C)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -123.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-123",
+      "unit": "kJ/mol",
+      "storedValue": -123.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coccd",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(C)(CB)",
+      "category": "02_CHO_Groups.csv",
+      "value": -130.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-130",
+      "unit": "kJ/mol",
+      "storedValue": -130.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coccb",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(C)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": -113.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-113",
+      "unit": "kJ/mol",
+      "storedValue": -113.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocct",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(Cd)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -113.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-113",
+      "unit": "kJ/mol",
+      "storedValue": -113.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocd2",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(CB)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -118.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-118",
+      "unit": "kJ/mol",
+      "storedValue": -118.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocb2",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(Callene)",
+      "category": "02_CHO_Groups.csv",
+      "value": -40.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-40",
+      "unit": "kJ/mol",
+      "storedValue": -40.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "Callene",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocallene",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)3(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -42.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-42",
+      "unit": "kJ/mol",
+      "storedValue": -42.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 3
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 3
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch3co",
+        "ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(CO)(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": -22.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-22",
+      "unit": "kJ/mol",
+      "storedValue": -22.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2coc",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(CO)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -16.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-16",
+      "unit": "kJ/mol",
+      "storedValue": -16.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2cocd",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(CO)(CB)",
+      "category": "02_CHO_Groups.csv",
+      "value": -11.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-11",
+      "unit": "kJ/mol",
+      "storedValue": -11.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2cocb",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(CO)(Ct)",
+      "category": "02_CHO_Groups.csv",
+      "value": -9.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-9",
+      "unit": "kJ/mol",
+      "storedValue": -9.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2coct",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(CO)(C)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -4.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-4",
+      "unit": "kJ/mol",
+      "storedValue": -4.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "chcoc2",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(CO)(Cd)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -12.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-12",
+      "unit": "kJ/mol",
+      "storedValue": -12.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "chcocd2",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(CO)(C)3",
+      "category": "02_CHO_Groups.csv",
+      "value": 9.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "9",
+      "unit": "kJ/mol",
+      "storedValue": 9.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ccoc3",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(CO)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -10.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-10",
+      "unit": "kJ/mol",
+      "storedValue": -10.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CO",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2co2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -29.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-29",
+      "unit": "kJ/mol",
+      "storedValue": -29.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2oco",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(CO)(H)",
+      "category": "02_CHO_Groups.csv",
+      "value": 21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "21",
+      "unit": "kJ/mol",
+      "storedValue": 21.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcoh",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(CO)(C)",
+      "category": "02_CHO_Groups.csv",
+      "value": 31.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "31",
+      "unit": "kJ/mol",
+      "storedValue": 31.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcoc",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(CO)(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": 38.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "38",
+      "unit": "kJ/mol",
+      "storedValue": 38.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcocd",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": 18.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "18",
+      "unit": "kJ/mol",
+      "storedValue": 18.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbco",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": 120.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "120",
+      "unit": "kJ/mol",
+      "storedValue": 120.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ctco",
+        "ct",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(H)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -69.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-69",
+      "unit": "kJ/mol",
+      "storedValue": -69.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "oho",
+        "oh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(C)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -24.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-24",
+      "unit": "kJ/mol",
+      "storedValue": -24.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "oco",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(H)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -243.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-243",
+      "unit": "kJ/mol",
+      "storedValue": -243.0,
+      "kind": "group",
+      "composition": {
+        "O": 1,
+        "H": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ohco",
+        "oh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(C)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -180.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-180",
+      "unit": "kJ/mol",
+      "storedValue": -180.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "occo",
+        "o",
+        "esteroxygen"
+      ],
+      "synonyms": [
+        "ester oxygen"
+      ]
+    },
+    {
+      "label": "O-(O)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -80.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-80",
+      "unit": "kJ/mol",
+      "storedValue": -80.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ooco",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(Cd)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -187.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-187",
+      "unit": "kJ/mol",
+      "storedValue": -187.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ocdco",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(CB)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -182.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-182",
+      "unit": "kJ/mol",
+      "storedValue": -182.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ocbco",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(CO)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -202.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-202",
+      "unit": "kJ/mol",
+      "storedValue": -202.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "oco2",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -134.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-134",
+      "unit": "kJ/mol",
+      "storedValue": -134.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coho",
+        "coh",
+        "carboxylicacid",
+        "cooh"
+      ],
+      "synonyms": [
+        "carboxylic acid",
+        "COOH"
+      ]
+    },
+    {
+      "label": "CO-(C)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -147.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-147",
+      "unit": "kJ/mol",
+      "storedValue": -147.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coco",
+        "co",
+        "estercarbonyl"
+      ],
+      "synonyms": [
+        "ester carbonyl"
+      ]
+    },
+    {
+      "label": "CO-(Cd)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -134.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-134",
+      "unit": "kJ/mol",
+      "storedValue": -134.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocdo",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(Ct)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -115.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-115",
+      "unit": "kJ/mol",
+      "storedValue": -115.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocto",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(CB)(O)",
+      "category": "02_CHO_Groups.csv",
+      "value": -143.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-143",
+      "unit": "kJ/mol",
+      "storedValue": -143.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocbo",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -106.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-106",
+      "unit": "kJ/mol",
+      "storedValue": -106.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cohco",
+        "coh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(C)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -121.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-121",
+      "unit": "kJ/mol",
+      "storedValue": -121.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocco",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(CB)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -110.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-110",
+      "unit": "kJ/mol",
+      "storedValue": -110.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocbco",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(O)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -129.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-129",
+      "unit": "kJ/mol",
+      "storedValue": -129.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "coo2",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(O)(CO)",
+      "category": "02_CHO_Groups.csv",
+      "value": -123.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-123",
+      "unit": "kJ/mol",
+      "storedValue": -123.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cooco",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "[COd]-Cd(H)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -78.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-78",
+      "unit": "kJ/mol",
+      "storedValue": -78.0,
+      "kind": "unreadable",
+      "composition": null,
+      "central": null,
+      "ligands": [],
+      "reason": "its composition has not been settled yet",
+      "aliases": [
+        "codcdh2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "[COd]-Cd(C)(H)",
+      "category": "02_CHO_Groups.csv",
+      "value": -58.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-58",
+      "unit": "kJ/mol",
+      "storedValue": -58.0,
+      "kind": "unreadable",
+      "composition": null,
+      "central": null,
+      "ligands": [],
+      "reason": "its composition has not been settled yet",
+      "aliases": [
+        "codcdch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "[COd]-Cd(C)2",
+      "category": "02_CHO_Groups.csv",
+      "value": -47.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-47",
+      "unit": "kJ/mol",
+      "storedValue": -47.0,
+      "kind": "unreadable",
+      "composition": null,
+      "central": null,
+      "ligands": [],
+      "reason": "its composition has not been settled yet",
+      "aliases": [
+        "codcdc2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "[COd]-Cd(Cd)",
+      "category": "02_CHO_Groups.csv",
+      "value": -50.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-50",
+      "unit": "kJ/mol",
+      "storedValue": -50.0,
+      "kind": "unreadable",
+      "composition": null,
+      "central": null,
+      "ligands": [],
+      "reason": "its composition has not been settled yet",
+      "aliases": [
+        "codcdcd"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)3(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -42.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-42",
+      "unit": "kJ/mol",
+      "storedValue": -42.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 3
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 3
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch3n",
+        "ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(C)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -23.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-23",
+      "unit": "kJ/mol",
+      "storedValue": -23.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2cn",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(C)2(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -18.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-18",
+      "unit": "kJ/mol",
+      "storedValue": -18.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "chc2n",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(C)3(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -13.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-13",
+      "unit": "kJ/mol",
+      "storedValue": -13.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 3
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cc3n",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(CB)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -26.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-26",
+      "unit": "kJ/mol",
+      "storedValue": -26.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2cbn",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(C)(CB)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -15.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-15",
+      "unit": "kJ/mol",
+      "storedValue": -15.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "chccbn",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(C)2(CB)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -6.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-6",
+      "unit": "kJ/mol",
+      "storedValue": -6.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cc2cbn",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(H)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 36.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "36",
+      "unit": "kJ/mol",
+      "storedValue": 36.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdhn",
+        "cdh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(C)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 41.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "41",
+      "unit": "kJ/mol",
+      "storedValue": 41.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcn",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "25",
+      "unit": "kJ/mol",
+      "storedValue": 25.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbn",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(NI)(H)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 10.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "10",
+      "unit": "kJ/mol",
+      "storedValue": 10.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbnih",
+        "cbh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(NI)(CB)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 15.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "15",
+      "unit": "kJ/mol",
+      "storedValue": 15.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbnicb",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(NI)(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 12.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "12",
+      "unit": "kJ/mol",
+      "storedValue": 12.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbnic",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(NI)(O)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -18.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-18",
+      "unit": "kJ/mol",
+      "storedValue": -18.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        },
+        {
+          "token": "O",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbnio",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(NI)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 1.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "1",
+      "unit": "kJ/mol",
+      "storedValue": 1.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbnin",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(NI)(CO)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 7.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "7",
+      "unit": "kJ/mol",
+      "storedValue": 7.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbnico",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CdN-(H)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 28.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "28",
+      "unit": "kJ/mol",
+      "storedValue": 28.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "CdN",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdnh2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CdN-(C)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 22.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "22",
+      "unit": "kJ/mol",
+      "storedValue": 22.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CdN",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdnc2",
+        "cdn",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CdN-(H)(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 23.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "23",
+      "unit": "kJ/mol",
+      "storedValue": 23.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "CdN",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdnhc",
+        "cdnh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CdN-(H)(Cd)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 20.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "20",
+      "unit": "kJ/mol",
+      "storedValue": 20.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "CdN",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdnhcd",
+        "cdnh",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(N)(CO)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-21",
+      "unit": "kJ/mol",
+      "storedValue": -21.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "N",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2nco",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)(C)(N)(CO)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -12.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-12",
+      "unit": "kJ/mol",
+      "storedValue": -12.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        },
+        {
+          "token": "CO",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "chcnco",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(O)(CN)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 105.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "105",
+      "unit": "kJ/mol",
+      "storedValue": 105.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "O",
+          "count": 1
+        },
+        {
+          "token": "CN",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2ocn",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(C)(CN)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-21",
+      "unit": "kJ/mol",
+      "storedValue": -21.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "CN",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2ccn",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(H)2(Cd)(CN)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -23.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-23",
+      "unit": "kJ/mol",
+      "storedValue": -23.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "CN",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ch2cdcn",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-(CN)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 35.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "35",
+      "unit": "kJ/mol",
+      "storedValue": 35.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "CB",
+      "ligands": [
+        {
+          "token": "CN",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cbcn",
+        "cb",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ct-(CN)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 123.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "123",
+      "unit": "kJ/mol",
+      "storedValue": 123.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Ct",
+      "ligands": [
+        {
+          "token": "CN",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ctcn",
+        "ct",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CN-(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 115.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "115",
+      "unit": "kJ/mol",
+      "storedValue": 115.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "N": 1
+      },
+      "central": "CN",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cnc",
+        "cn",
+        "nitrile"
+      ],
+      "synonyms": [
+        "nitrile"
+      ]
+    },
+    {
+      "label": "CN-(Cd)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 115.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "115",
+      "unit": "kJ/mol",
+      "storedValue": 115.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "N": 1
+      },
+      "central": "CN",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cncd",
+        "cn"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CN-(CB)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 115.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "115",
+      "unit": "kJ/mol",
+      "storedValue": 115.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "N": 1
+      },
+      "central": "CN",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cncb",
+        "cn"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CN-(Ct)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 115.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "115",
+      "unit": "kJ/mol",
+      "storedValue": 115.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "N": 1
+      },
+      "central": "CN",
+      "ligands": [
+        {
+          "token": "Ct",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cnct",
+        "cn"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cd-(Cd)(CN)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 166.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "166",
+      "unit": "kJ/mol",
+      "storedValue": 166.0,
+      "kind": "group",
+      "composition": {
+        "C": 1
+      },
+      "central": "Cd",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "CN",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cdcdcn",
+        "cd",
+        "c"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(C)(H)2(NO2)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-25",
+      "unit": "kJ/mol",
+      "storedValue": -25.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 2
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "NO2",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cch2no2",
+        "ch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C-(C)2(H)(NO2)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-25",
+      "unit": "kJ/mol",
+      "storedValue": -25.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "H": 1
+      },
+      "central": "C",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 2
+        },
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "NO2",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cc2hno2",
+        "ch"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CB-NO2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 20.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "20",
+      "unit": "kJ/mol",
+      "storedValue": 20.0,
+      "kind": "named",
+      "composition": {
+        "C": 1,
+        "N": 1,
+        "O": 2
+      },
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cbno2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N-(H)2(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 18.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "18",
+      "unit": "kJ/mol",
+      "storedValue": 18.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 2
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nh2c",
+        "nh2",
+        "primaryamine"
+      ],
+      "synonyms": [
+        "primary amine"
+      ]
+    },
+    {
+      "label": "N-(H)(C)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 65.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "65",
+      "unit": "kJ/mol",
+      "storedValue": 65.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 1
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nhc2",
+        "nh",
+        "secondaryamine"
+      ],
+      "synonyms": [
+        "secondary amine"
+      ]
+    },
+    {
+      "label": "N-(C)3",
+      "category": "03_CHNO_Groups.csv",
+      "value": 102.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "102",
+      "unit": "kJ/mol",
+      "storedValue": 102.0,
+      "kind": "group",
+      "composition": {
+        "N": 1
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 3
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nc3",
+        "n",
+        "tertiaryamine"
+      ],
+      "synonyms": [
+        "tertiary amine"
+      ]
+    },
+    {
+      "label": "N-(H)2(CB)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -11.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-11",
+      "unit": "kJ/mol",
+      "storedValue": -11.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 2
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nh2cb",
+        "nh2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N-(H)2(Cd)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 0.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "0",
+      "unit": "kJ/mol",
+      "storedValue": 0.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 2
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 2
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nh2cd",
+        "nh2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N-(H)(Cd)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 19.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "19",
+      "unit": "kJ/mol",
+      "storedValue": 19.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 1
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nhcd2",
+        "nh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N-(H)(Cd)(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 41.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "41",
+      "unit": "kJ/mol",
+      "storedValue": 41.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 1
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "Cd",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nhcdc",
+        "nh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N-(CO)(H)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": -60.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-60",
+      "unit": "kJ/mol",
+      "storedValue": -60.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 2
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ncoh2",
+        "nh2",
+        "amide"
+      ],
+      "synonyms": [
+        "amide"
+      ]
+    },
+    {
+      "label": "N-(CO)(C)(H)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -20.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-20",
+      "unit": "kJ/mol",
+      "storedValue": -20.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 1
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ncoch",
+        "nh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N-(CO)(C)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 17.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "17",
+      "unit": "kJ/mol",
+      "storedValue": 17.0,
+      "kind": "group",
+      "composition": {
+        "N": 1
+      },
+      "central": "N",
+      "ligands": [
+        {
+          "token": "CO",
+          "count": 1
+        },
+        {
+          "token": "C",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ncoc2",
+        "n"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NI-(H)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 64.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "64",
+      "unit": "kJ/mol",
+      "storedValue": 64.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "H": 1
+      },
+      "central": "NI",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nih",
+        "nh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NI-(CB)2",
+      "category": "03_CHNO_Groups.csv",
+      "value": 79.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "79",
+      "unit": "kJ/mol",
+      "storedValue": 79.0,
+      "kind": "group",
+      "composition": {
+        "N": 1
+      },
+      "central": "NI",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 2
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nicb2",
+        "ni",
+        "n"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NI-(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 96.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "96",
+      "unit": "kJ/mol",
+      "storedValue": 96.0,
+      "kind": "group",
+      "composition": {
+        "N": 1
+      },
+      "central": "NI",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nic",
+        "ni",
+        "n"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NI-(Cd)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 98.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "98",
+      "unit": "kJ/mol",
+      "storedValue": 98.0,
+      "kind": "group",
+      "composition": {
+        "N": 1
+      },
+      "central": "NI",
+      "ligands": [
+        {
+          "token": "Cd",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "nicd",
+        "ni",
+        "n"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "O-(NI)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -12.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-12",
+      "unit": "kJ/mol",
+      "storedValue": -12.0,
+      "kind": "group",
+      "composition": {
+        "O": 1
+      },
+      "central": "O",
+      "ligands": [
+        {
+          "token": "NI",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "oni",
+        "o"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(H)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -128.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-128",
+      "unit": "kJ/mol",
+      "storedValue": -128.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1,
+        "H": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "H",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cohn",
+        "coh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(C)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -136.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-136",
+      "unit": "kJ/mol",
+      "storedValue": -136.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocn",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO-(CB)(N)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -128.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-128",
+      "unit": "kJ/mol",
+      "storedValue": -128.0,
+      "kind": "group",
+      "composition": {
+        "C": 1,
+        "O": 1
+      },
+      "central": "CO",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        },
+        {
+          "token": "N",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "cocbn",
+        "co"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NC-(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": 210.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "210",
+      "unit": "kJ/mol",
+      "storedValue": 210.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "C": 1
+      },
+      "central": "NC",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "ncc",
+        "nc"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "ONO-(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-25",
+      "unit": "kJ/mol",
+      "storedValue": -25.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "O": 2
+      },
+      "central": "ONO",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "onoc",
+        "ono"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NO2-(C)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -35.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-35",
+      "unit": "kJ/mol",
+      "storedValue": -35.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "O": 2
+      },
+      "central": "NO2",
+      "ligands": [
+        {
+          "token": "C",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "no2c",
+        "no2",
+        "nitro"
+      ],
+      "synonyms": [
+        "nitro"
+      ]
+    },
+    {
+      "label": "NO2-(CB)",
+      "category": "03_CHNO_Groups.csv",
+      "value": -25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "-25",
+      "unit": "kJ/mol",
+      "storedValue": -25.0,
+      "kind": "group",
+      "composition": {
+        "N": 1,
+        "O": 2
+      },
+      "central": "NO2",
+      "ligands": [
+        {
+          "token": "CB",
+          "count": 1
+        }
+      ],
+      "reason": null,
+      "aliases": [
+        "no2cb",
+        "no2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Gauche alkane",
+      "category": "04_Corrections.csv",
+      "value": 3.4,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "3.4",
+      "unit": "kJ/mol",
+      "storedValue": 3.4,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "gauchealkane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Ortho correction",
+      "category": "04_Corrections.csv",
+      "value": 2.5,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "2.5",
+      "unit": "kJ/mol",
+      "storedValue": 2.5,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "orthocorrection"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cis correction",
+      "category": "04_Corrections.csv",
+      "value": 4.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "4",
+      "unit": "kJ/mol",
+      "storedValue": 4.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "ciscorrection"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cis (one tert-butyl)",
+      "category": "04_Corrections.csv",
+      "value": 17.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "17",
+      "unit": "kJ/mol",
+      "storedValue": 17.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cisonetertbutyl"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cis (two tert-butyl)",
+      "category": "04_Corrections.csv",
+      "value": 44.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "44",
+      "unit": "kJ/mol",
+      "storedValue": 44.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cistwotertbutyl"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclopropane",
+      "category": "04_Corrections.csv",
+      "value": 118.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "118",
+      "unit": "kJ/mol",
+      "storedValue": 118.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclopropane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclobutane",
+      "category": "04_Corrections.csv",
+      "value": 111.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "111",
+      "unit": "kJ/mol",
+      "storedValue": 111.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclobutane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclopentane",
+      "category": "04_Corrections.csv",
+      "value": 28.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "28",
+      "unit": "kJ/mol",
+      "storedValue": 28.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclopentane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclohexane",
+      "category": "04_Corrections.csv",
+      "value": 2.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "2",
+      "unit": "kJ/mol",
+      "storedValue": 2.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclohexane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cycloheptane",
+      "category": "04_Corrections.csv",
+      "value": 28.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "28",
+      "unit": "kJ/mol",
+      "storedValue": 28.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cycloheptane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclooctane",
+      "category": "04_Corrections.csv",
+      "value": 43.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "43",
+      "unit": "kJ/mol",
+      "storedValue": 43.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclooctane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclononane",
+      "category": "04_Corrections.csv",
+      "value": 56.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "56",
+      "unit": "kJ/mol",
+      "storedValue": 56.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclononane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclodecane",
+      "category": "04_Corrections.csv",
+      "value": 55.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "55",
+      "unit": "kJ/mol",
+      "storedValue": 55.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclodecane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cycloundecane",
+      "category": "04_Corrections.csv",
+      "value": 51.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "51",
+      "unit": "kJ/mol",
+      "storedValue": 51.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cycloundecane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclododecane",
+      "category": "04_Corrections.csv",
+      "value": 21.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "21",
+      "unit": "kJ/mol",
+      "storedValue": 21.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclododecane"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclopropene",
+      "category": "04_Corrections.csv",
+      "value": 225.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "225",
+      "unit": "kJ/mol",
+      "storedValue": 225.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclopropene"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclobutene",
+      "category": "04_Corrections.csv",
+      "value": 125.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "125",
+      "unit": "kJ/mol",
+      "storedValue": 125.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclobutene"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclopentene",
+      "category": "04_Corrections.csv",
+      "value": 25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "25",
+      "unit": "kJ/mol",
+      "storedValue": 25.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclopentene"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclohexene",
+      "category": "04_Corrections.csv",
+      "value": 5.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "5",
+      "unit": "kJ/mol",
+      "storedValue": 5.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclohexene"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cycloheptene",
+      "category": "04_Corrections.csv",
+      "value": 22.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "22",
+      "unit": "kJ/mol",
+      "storedValue": 22.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cycloheptene"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclooctene (cis)",
+      "category": "04_Corrections.csv",
+      "value": 25.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "25",
+      "unit": "kJ/mol",
+      "storedValue": 25.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclooctenecis"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclooctene (trans)",
+      "category": "04_Corrections.csv",
+      "value": 64.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "64",
+      "unit": "kJ/mol",
+      "storedValue": 64.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclooctenetrans"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclononene (cis)",
+      "category": "04_Corrections.csv",
+      "value": 41.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "41",
+      "unit": "kJ/mol",
+      "storedValue": 41.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclononenecis"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "cyclononene (trans)",
+      "category": "04_Corrections.csv",
+      "value": 54.0,
+      "decimals": 0,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "54",
+      "unit": "kJ/mol",
+      "storedValue": 54.0,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cyclononenetrans"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "D",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 0.03,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "0.03",
+      "unit": "kJ/mol",
+      "storedValue": 0.03,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "d"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "F",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 1.405,
+      "decimals": 2,
+      "isRange": true,
+      "low": 1.05,
+      "high": 1.76,
+      "source": "1.05 to 1.76",
+      "unit": "kJ/mol",
+      "storedValue": 1.405,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "f"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Cl",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 2.45,
+      "decimals": 2,
+      "isRange": true,
+      "low": 2.22,
+      "high": 2.68,
+      "source": "2.22 to 2.68",
+      "unit": "kJ/mol",
+      "storedValue": 2.45,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cl"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Br",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 2.405,
+      "decimals": 2,
+      "isRange": true,
+      "low": 2.01,
+      "high": 2.8,
+      "source": "2.01 to 2.80",
+      "unit": "kJ/mol",
+      "storedValue": 2.405,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "br"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "I",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 2.26,
+      "decimals": 2,
+      "isRange": true,
+      "low": 1.97,
+      "high": 2.55,
+      "source": "1.97 to 2.55",
+      "unit": "kJ/mol",
+      "storedValue": 2.26,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "i"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "OH",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 3.4299999999999997,
+      "decimals": 2,
+      "isRange": true,
+      "low": 2.51,
+      "high": 4.35,
+      "source": "2.51 to 4.35",
+      "unit": "kJ/mol",
+      "storedValue": 3.4299999999999997,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "oh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "OCH3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 2.7199999999999998,
+      "decimals": 2,
+      "isRange": true,
+      "low": 2.3,
+      "high": 3.14,
+      "source": "2.30 to 3.14",
+      "unit": "kJ/mol",
+      "storedValue": 2.7199999999999998,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "och3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "OC6H5",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 2.72,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "2.72",
+      "unit": "kJ/mol",
+      "storedValue": 2.72,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "oc6h5"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "OCOCH3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 3.245,
+      "decimals": 2,
+      "isRange": true,
+      "low": 2.85,
+      "high": 3.64,
+      "source": "2.85 to 3.64",
+      "unit": "kJ/mol",
+      "storedValue": 3.245,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "ococh3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "OSi(CH3)3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 3.1,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "3.1",
+      "unit": "kJ/mol",
+      "storedValue": 3.1,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "osich33"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NH2",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 6.130000000000001,
+      "decimals": 2,
+      "isRange": true,
+      "low": 5.15,
+      "high": 7.11,
+      "source": "5.15 to 7.11",
+      "unit": "kJ/mol",
+      "storedValue": 6.130000000000001,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "nh2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "N(CH3)2",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 7.535,
+      "decimals": 2,
+      "isRange": true,
+      "low": 6.28,
+      "high": 8.79,
+      "source": "6.28 to 8.79",
+      "unit": "kJ/mol",
+      "storedValue": 7.535,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "nch32"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "NO2",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 4.6,
+      "decimals": 1,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "4.6",
+      "unit": "kJ/mol",
+      "storedValue": 4.6,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "no2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "SH",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 5.06,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "5.06",
+      "unit": "kJ/mol",
+      "storedValue": 5.06,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "sh"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "SO2CH3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 10.46,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "10.46",
+      "unit": "kJ/mol",
+      "storedValue": 10.46,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "so2ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CH3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 7.28,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "7.28",
+      "unit": "kJ/mol",
+      "storedValue": 7.28,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "ch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C2H5",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 7.49,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "7.49",
+      "unit": "kJ/mol",
+      "storedValue": 7.49,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "c2h5"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CH(CH3)2",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 9.25,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "9.25",
+      "unit": "kJ/mol",
+      "storedValue": 9.25,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "chch32"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C(CH3)3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 20.08,
+      "decimals": 2,
+      "isRange": true,
+      "low": 19.66,
+      "high": 20.5,
+      "source": "19.66 to 20.50",
+      "unit": "kJ/mol",
+      "storedValue": 20.08,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cch33"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CF3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 10.25,
+      "decimals": 2,
+      "isRange": true,
+      "low": 10.04,
+      "high": 10.46,
+      "source": "10.04 to 10.46",
+      "unit": "kJ/mol",
+      "storedValue": 10.25,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cf3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "C6H5",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 11.72,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "11.72",
+      "unit": "kJ/mol",
+      "storedValue": 11.72,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "c6h5"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CH2Br",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 7.49,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "7.49",
+      "unit": "kJ/mol",
+      "storedValue": 7.49,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "ch2br"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "Si(CH3)3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 10.46,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "10.46",
+      "unit": "kJ/mol",
+      "storedValue": 10.46,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "sich33"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CH=CH2",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 6.695,
+      "decimals": 2,
+      "isRange": true,
+      "low": 6.28,
+      "high": 7.11,
+      "source": "6.28 to 7.11",
+      "unit": "kJ/mol",
+      "storedValue": 6.695,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "chch2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CHO",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 2.8449999999999998,
+      "decimals": 2,
+      "isRange": true,
+      "low": 2.34,
+      "high": 3.35,
+      "source": "2.34 to 3.35",
+      "unit": "kJ/mol",
+      "storedValue": 2.8449999999999998,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "cho"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "COCH3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 5.23,
+      "decimals": 2,
+      "isRange": true,
+      "low": 4.18,
+      "high": 6.28,
+      "source": "4.18 to 6.28",
+      "unit": "kJ/mol",
+      "storedValue": 5.23,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "coch3"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO2-",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 8.37,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "8.37",
+      "unit": "kJ/mol",
+      "storedValue": 8.37,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "co2"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO2H",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 5.86,
+      "decimals": 2,
+      "isRange": false,
+      "low": null,
+      "high": null,
+      "source": "5.86",
+      "unit": "kJ/mol",
+      "storedValue": 5.86,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "co2h"
+      ],
+      "synonyms": []
+    },
+    {
+      "label": "CO2CH3",
+      "category": "05_Cyclohexane_A_Values.csv",
+      "value": 5.23,
+      "decimals": 2,
+      "isRange": true,
+      "low": 5.02,
+      "high": 5.44,
+      "source": "5.02 to 5.44",
+      "unit": "kJ/mol",
+      "storedValue": 5.23,
+      "kind": "energy",
+      "composition": {},
+      "central": null,
+      "ligands": [],
+      "reason": null,
+      "aliases": [
+        "co2ch3"
+      ],
+      "synonyms": []
+    }
+  ]
+}

@@ -9,7 +9,7 @@ Those stay, and keep testing assets/benson.js, until the website stops parsing.
 """
 import unittest
 
-from benson.values import InvalidValueError, parse_value, read_value
+from benson.values import KCAL_TO_KJ, InvalidValueError, parse_value, read_value, to_kj
 
 
 class PlainNumbers(unittest.TestCase):
@@ -139,6 +139,40 @@ class HowTheSourceWroteIt(unittest.TestCase):
         for text in ["-42", "0.03", "1.05 to 1.76"]:
             with self.subTest(text=text):
                 self.assertEqual(parse_value(text), read_value(text).value)
+
+
+class Units(unittest.TestCase):
+    """D18: a stored value converts to kJ/mol once, using the unit its category
+    declares. Every category declares kJ/mol today, so the identity case is what
+    actually runs; the kcal/mol case pins the rule for the day a category is
+    re-entered in it - this is not a data migration, just the mechanism.
+    """
+
+    def test_kj_mol_is_the_identity(self):
+        self.assertEqual(to_kj(-42, "kJ/mol"), -42)
+        self.assertEqual(to_kj(1.405, "kJ/mol"), 1.405)
+
+    def test_a_blank_unit_is_treated_as_kj_mol(self):
+        # notation/categories.csv is optional, and Unit may be left blank even
+        # where the row exists - a category nobody has described yet must not
+        # silently double or halve every value it holds.
+        self.assertEqual(to_kj(-42, ""), -42)
+        self.assertEqual(to_kj(-42, None), -42)
+
+    def test_none_passes_through(self):
+        # A Value only has low/high when it is a range; the other is None.
+        self.assertIsNone(to_kj(None, "kJ/mol"))
+        self.assertIsNone(to_kj(None, "kcal/mol"))
+
+    def test_kcal_mol_converts_by_the_thermochemical_calorie(self):
+        # 1 thermochemical calorie = 4.184 J, exactly.
+        self.assertEqual(KCAL_TO_KJ, 4.184)
+        self.assertEqual(to_kj(-10, "kcal/mol"), -41.84)
+        self.assertEqual(to_kj(-10, "kcal/mol"), -10 * KCAL_TO_KJ)
+
+    def test_an_unknown_unit_is_refused_rather_than_guessed(self):
+        with self.assertRaises(ValueError):
+            to_kj(-42, "cal/mol")
 
 
 if __name__ == "__main__":
