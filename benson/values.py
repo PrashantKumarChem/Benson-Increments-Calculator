@@ -100,3 +100,34 @@ def parse_value(raw) -> float:
     that can drift apart.
     """
     return read_value(raw).value
+
+
+#: 1 thermochemical calorie = 4.184 J, exactly (D18). Converts a value as its
+#: source prints it into the kJ/mol the site sums. Every category declares
+#: kJ/mol today, so nothing actually converts yet - the rule lives here so the
+#: day a category is re-entered in kcal/mol, the build has it in one place
+#: rather than reinventing it.
+KCAL_TO_KJ = 4.184
+
+#: For showing the running total in kcal/mol beside kJ/mol. Not KCAL_TO_KJ's
+#: reciprocal (1 / 4.184 = 0.23900574...): this is assets/benson.js's own
+#: constant, copied verbatim so a displayed kcal total keeps reading exactly as
+#: it always has. The two factors serve different purposes and both belong.
+KJ_TO_KCAL_DISPLAY = 0.239006
+
+
+def to_kj(value: Optional[float], unit: str) -> Optional[float]:
+    """A value, in the unit its category declares, converted to kJ/mol.
+
+    None passes through unchanged - a Value only has low/high when it is a
+    range. Every category declares kJ/mol today (D18), so this is the identity
+    for all of them; it exists so the conversion has a home before it is needed.
+    """
+    if value is None:
+        return None
+    unit = (unit or "kJ/mol").strip()
+    if unit == "kJ/mol":
+        return value
+    if unit == "kcal/mol":
+        return value * KCAL_TO_KJ
+    raise ValueError(f"{unit!r} is not a unit this package can convert - only 'kJ/mol' and 'kcal/mol'")

@@ -53,23 +53,27 @@ Adding a category needs no code changes:
 2. Give it exactly two columns: the group name, and its value in kJ/mol.
    A published range is written `1.05 to 1.76` and is averaged. The separator is
    the word, not a hyphen, because a hyphen also starts a negative number.
-3. Regenerate the category index and check the file:
+3. Regenerate the category index, check the file, and rebuild the artifact:
 
    ```bash
    python tools/build_data.py
    python tools/validate_data.py
+   python tools/build_dist.py
    ```
 
 4. Optionally add a row to `notation/categories.csv` saying what the numbers
    are — the quantity, its symbol, the unit and a source. This is what lets the
    running total head itself `ΔHf°` rather than just `Total`. It is optional,
    and a category without a row works exactly as before.
-5. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`.
+5. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`
+   and `dist/increments.json`.
 
 The index exists because a browser cannot list a folder the way the notebook's
 `glob` could. `validate_data.py` catches the mistakes that actually happen —
 a missing value, a duplicate group name, a stray comma, a stale index — and CI
 runs it on every push, so a broken contribution cannot reach the site.
+`dist/increments.json` is the artifact `benson/build.py` derives from the CSVs
+for every consumer; CI regenerates it too and fails on a diff.
 
 ## Running it locally
 

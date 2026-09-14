@@ -46,6 +46,16 @@ jobs:
           python tools/build_data.py
           git diff --exit-code CSV_data_files/manifest.json
 
+      # dist/increments.json is the artifact benson/build.py emits from
+      # CSV_data_files/ and notation/ - everything a consumer needs, derived
+      # once. Regenerated and diffed the same way the manifest above is: a
+      # stale committed copy would ship a value or a notation reading the
+      # source no longer says.
+      - name: Confirm the increments artifact is current
+        run: |
+          python tools/build_dist.py
+          git diff --exit-code dist/increments.json
+
       # An asset the page requests without a version is one a returning visitor
       # can be served from cache while the rest of the page is current. That has
       # broken the site once already; a stale module can also change a value
