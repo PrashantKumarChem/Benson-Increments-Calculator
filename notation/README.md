@@ -99,8 +99,8 @@ Three things point at the second reading:
 
 If that is right, all four contribute `C O` and the `(H)2` is describing the
 neighbour rather than this group's own hydrogens. It is a chemist's call, not a
-programmer's, so the rows stay `unknown` until someone checks them against their
-printed source. Changing four cells in this file is the whole fix.
+programmer's, so the rows stay `unknown` pending a final review. Changing four
+cells in this file is the whole fix.
 
 ## synonyms.csv
 
@@ -123,7 +123,7 @@ every column but the first may be left blank.
 
 ```
 File,Quantity,Symbol,Unit,Source,Note
-01_CH_Groups.csv,standard enthalpy of formation,ΔHf°,kJ/mol,Published Benson tables (being checked),
+01_CH_Groups.csv,standard enthalpy of formation,ΔHf°,kJ/mol,Published Benson tables (pending final review),
 ```
 
 - **Quantity** — what the numbers measure, spelled out.
