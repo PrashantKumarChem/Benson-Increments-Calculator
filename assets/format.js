@@ -88,10 +88,11 @@ export function rangeSpread(entries) {
  * "Estimated dHf" over a sum containing an A-value would state something
  * untrue, so the heading follows what was actually chosen.
  *
- * The quantity of a category is declared in CSV_data_files/categories.csv and
- * is optional, so `symbol` may be missing. When it is, the honest answer is
- * the unlabelled total rather than a guess: a category that has not said what
- * it holds cannot have its heading inferred.
+ * The quantity of a category is declared in notation/categories.csv, and
+ * carried on the artifact's own category entries; it is optional, so `symbol`
+ * may be missing. When it is, the honest answer is the unlabelled total rather
+ * than a guess: a category that has not said what it holds cannot have its
+ * heading inferred.
  */
 export function describeTotal(entries, categoriesByFile = new Map()) {
   const fallback = { label: "Total", quantities: [], mixed: false };

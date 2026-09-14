@@ -53,33 +53,38 @@ Adding a category needs no code changes:
 2. Give it exactly two columns: the group name, and its value in kJ/mol.
    A published range is written `1.05 to 1.76` and is averaged. The separator is
    the word, not a hyphen, because a hyphen also starts a negative number.
-3. Regenerate the category index, check the file, and rebuild the artifact:
+3. Regenerate the category index, check the file, rebuild the artifact, and
+   move the asset version (the artifact's own bytes are folded into it, so a
+   data-only change bumps it too):
 
    ```bash
    python tools/build_data.py
    python tools/validate_data.py
    python tools/build_dist.py
+   python tools/build_version.py
    ```
 
 4. Optionally add a row to `notation/categories.csv` saying what the numbers
    are — the quantity, its symbol, the unit and a source. This is what lets the
    running total head itself `ΔHf°` rather than just `Total`. It is optional,
    and a category without a row works exactly as before.
-5. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`
-   and `dist/increments.json`.
+5. Commit the CSV together with the regenerated `CSV_data_files/manifest.json`,
+   `dist/increments.json` and `index.html`.
 
 The index exists because a browser cannot list a folder the way the notebook's
 `glob` could. `validate_data.py` catches the mistakes that actually happen —
 a missing value, a duplicate group name, a stray comma, a stale index — and CI
 runs it on every push, so a broken contribution cannot reach the site.
 `dist/increments.json` is the artifact `benson/build.py` derives from the CSVs
-for every consumer; CI regenerates it too and fails on a diff.
+for every consumer; CI regenerates it too and fails on a diff, and so does the
+asset version.
 
 ## Running it locally
 
-The site is plain HTML, CSS and JavaScript with no build step or dependencies.
-It does need to be *served* rather than opened from disk, because browsers block
-pages loaded over `file://` from reading the CSV files:
+The site is plain HTML, CSS and JavaScript, with no build step for the browser
+and no runtime dependencies. It does need to be *served* rather than opened
+from disk, because browsers block pages loaded over `file://` from fetching
+`dist/increments.json`, the generated data file the site reads:
 
 ```bash
 python -m http.server 8000
@@ -122,7 +127,7 @@ throughout. CI runs it.
 ### Tests
 
 ```bash
-node --test tools/*.test.mjs    # value parsing, the tally, formatting, browsing, notation
+node --test tools/*.test.mjs    # the artifact, the tally, formatting, browsing, searching
 python -m unittest discover -s benson/tests -t .   # the benson package's rules
 node tools/validate_css.mjs     # the stylesheet parses, and every token it names exists
 ```
@@ -154,18 +159,18 @@ broken copy to confirm it fails. CI installs a browser for it; nothing else
 here needs one, which is why it is a separate script rather than a test.
 
 `check_parity.mjs` loads all 236 increments twice — once through the notebook's
-own code, once through the site's — and fails on any difference. Because a
-molecule's total is a sum of these values, agreement on every increment means
-agreement on every total.
+own code, once from `dist/increments.json`, the artifact the site itself reads
+— and fails on any difference. Because a molecule's total is a sum of these
+values, agreement on every increment means agreement on every total.
 
 ## Layout
 
 ```
 index.html              the calculator
-assets/benson.js        reading and parsing the CSV data (no DOM)
+assets/benson.js        fetching the increment artifact and handing it back (no DOM)
 assets/browse.js        which increments are shown, and how they group (no DOM)
 assets/format.js        how a value is written on the page (no DOM)
-assets/notation.js      reading Benson notation: what a group name is made of (no DOM)
+assets/notation.js      searching the increments, and adding up a formula (no DOM)
 assets/selection.js     the chosen increments and the running total (no DOM)
 assets/sheet.js         how far the phone sheet slides, and what a swipe meant (no DOM)
 assets/theme.js         light, dark, and having chosen neither (no DOM)
@@ -175,6 +180,9 @@ assets/fonts/           IBM Plex Mono, shipped with the site (see License)
 CSV_data_files/         the increment data, plus the generated manifest
 notation/               what the group names mean, the words students use, and
                         what each category of numbers is (categories.csv)
+benson/                 the data rules, in Python - the only place one is written
+dist/increments.json    the generated artifact the site fetches; benson/build.py
+                        derives it from CSV_data_files/ and notation/
 tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```
@@ -215,9 +223,12 @@ top without any code holding an opinion about which methyl matters most.
 Names that cannot be worked out from the notation — that `C-(C)(H)3` is called a
 methyl, that `CO-(C)2` is a ketone — live in `notation/synonyms.csv`, alongside
 small tables saying what the notation is made of. See
-[notation/README.md](notation/README.md); nothing about the chemistry is written
-into the code, so a new category of groups is searchable the moment its CSV is
-added.
+[notation/README.md](notation/README.md); nothing about the chemistry is
+written into the code. `benson/notation.py` works the reading out once, at
+build time, and `dist/increments.json` carries the result - so a new category
+of groups is searchable once its CSV is added *and the artifact is rebuilt*
+(`python tools/build_dist.py`), which `git diff --exit-code` in CI will ask
+for if it is forgotten.
 
 ## The notebook
 

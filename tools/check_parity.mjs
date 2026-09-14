@@ -1,11 +1,19 @@
 /**
- * Prove the web version reads the data the same way the notebook does.
+ * Prove the site reads the data the same way the notebook does.
  *
  * Runs the notebook's own loading code (via tools/export_reference_values.py)
- * and the browser's loading code (assets/benson.js) over the same CSV files and
- * compares every value. Molecule totals are sums of these values, so if every
- * increment agrees, every total agrees — which is a stronger guarantee than
- * checking a handful of worked examples.
+ * over the CSV files, and reads dist/increments.json - the artifact
+ * benson/build.py derives from the same files - and compares every value.
+ * Molecule totals are sums of these values, so if every increment agrees,
+ * every total agrees — which is a stronger guarantee than checking a handful
+ * of worked examples.
+ *
+ * After WP3, the site's own reading is the artifact rather than a second
+ * parser: the two-implementations-checked-against-each-other shape this file
+ * used to have is gone, because there is only one implementation of the value
+ * rule left in JavaScript to check against - none. What remains worth proving
+ * is that the artifact and the notebook still agree, and this is where that
+ * proof lives until WP4 retires it for the conformance fixture.
  *
  *     node tools/check_parity.mjs
  */
@@ -13,8 +21,6 @@ import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-
-import { loadCategories } from "../assets/benson.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PYTHON = process.env.PYTHON ?? "python";
@@ -32,25 +38,14 @@ function referenceValues() {
 }
 
 async function siteValues() {
-  const categories = await loadCategories({
-    readText: (relative) => readFile(path.join(ROOT, relative), "utf8"),
-  });
-  const values = new Map();
-  const problems = [];
-  for (const category of categories) {
-    for (const row of category.rows) values.set(`${category.file}::${row.label}`, row.value);
-    for (const problem of category.problems) problems.push({ file: category.file, ...problem });
-  }
-  return { values, problems };
+  const text = await readFile(path.join(ROOT, "dist", "increments.json"), "utf8");
+  const artifact = JSON.parse(text);
+  return new Map(artifact.increments.map((entry) => [`${entry.category}::${entry.label}`, entry.value]));
 }
 
 const failures = [];
 const reference = referenceValues();
-const { values: site, problems } = await siteValues();
-
-for (const problem of problems) {
-  failures.push(`${problem.file}:${problem.line}: the site could not read '${problem.text}' - ${problem.reason}`);
-}
+const site = await siteValues();
 
 for (const [key, entry] of reference) {
   if (entry.error) {

@@ -12,16 +12,13 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { loadCategories } from "../assets/benson.js";
-import { buildIndex, loadNotation } from "../assets/notation.js";
+import { loadArtifact } from "../assets/benson.js";
 import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "../assets/browse.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readText = (relative) => readFile(path.join(ROOT, relative), "utf8");
 
-const categories = await loadCategories({ readText });
-const notation = await loadNotation({ readText });
-const index = buildIndex(categories, notation);
+const { categories, index } = await loadArtifact({ readText, path: "dist/increments.json" });
 
 const CH = "01_CH_Groups.csv";
 const A_VALUES = "05_Cyclohexane_A_Values.csv";

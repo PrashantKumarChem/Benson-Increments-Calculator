@@ -54,7 +54,7 @@
  * wants to run it locally is told how, once, below.
  *
  * The server is here rather than borrowed for the same reason. The page reads
- * its CSVs with fetch, so file:// will not do, and a dependency for thirty
+ * its data with fetch, so file:// will not do, and a dependency for thirty
  * lines of static file serving would cost more than it saves.
  */
 import { createServer } from "node:http";

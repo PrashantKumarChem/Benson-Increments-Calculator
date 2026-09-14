@@ -41,9 +41,9 @@ holds the current architecture and roadmap.
 
 ## Running the site
 
-The site is plain HTML, CSS and JavaScript with no build step. It must be
-**served** rather than opened from disk, because browsers block a `file://` page
-from reading the CSV data:
+The site is plain HTML, CSS and JavaScript with no build step for the browser
+to run. It must be **served** rather than opened from disk, because browsers
+block a `file://` page from fetching `dist/increments.json`:
 
 ```bash
 python -m http.server 8000     # then open http://localhost:8000/

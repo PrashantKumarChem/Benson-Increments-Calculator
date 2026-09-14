@@ -25,26 +25,32 @@ which `check_render.mjs` needs and which is installed outside the repository.
 
 ## The asset version
 
-`tools/build_version.py` writes a hash of the stylesheet and the modules into
-**ten** slots in `index.html`: the stylesheet link, eight import-map entries, and
-the module `src`.
+`tools/build_version.py` writes a hash of the stylesheet, the modules, and
+`dist/increments.json` into **eleven** slots in `index.html`: the stylesheet
+link, eight import-map entries, the module `src`, and the `data-artifact`
+attribute that same `<script>` tag carries. The artifact's own bytes are folded
+into the hash so a data-only change bumps the version exactly as a code change
+does - `assets/app.js` reads `data-artifact` at startup rather than hardcoding
+the artifact's URL a second time.
 
-Change anything under `assets/` and you must regenerate it:
+Change anything under `assets/`, or regenerate `dist/increments.json`, and you
+must regenerate the version:
 
 ```bash
 python tools/build_version.py
 python tools/validate_assets.py
 ```
 
-Skipping this means a returning visitor can be served a cached module under a
-string claiming to be current. GitHub Pages caches each file for ten minutes,
-and each file's ten minutes start when that file was last fetched — so a visitor
-can get a fresh `index.html` and a stale `app.js`. That is how the site once
-ended up stuck on "Loading increment data".
+Skipping this means a returning visitor can be served a cached module - or a
+stale artifact - under a string claiming to be current. GitHub Pages caches
+each file for ten minutes, and each file's ten minutes start when that file
+was last fetched — so a visitor can get a fresh `index.html` and a stale
+`app.js`. That is how the site once ended up stuck on "Loading increment
+data".
 
-`validate_assets.py` checks that the ten slots agree with each other. It cannot
-check that the version *moved*; that is what the CI step comparing a regenerated
-`index.html` is for.
+`validate_assets.py` checks that the eleven slots agree with each other. It
+cannot check that the version *moved*; that is what the CI step comparing a
+regenerated `index.html` is for.
 
 **The two font files are the exception.** They are named from `styles.css`, not
 from `index.html`, and they are immutable — replacing a face means a new
