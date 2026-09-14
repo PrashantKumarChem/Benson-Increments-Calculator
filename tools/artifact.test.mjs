@@ -124,14 +124,18 @@ function searchArtifact(query, artifactIncrements) {
   return found.sort((a, b) => a.score - b.score);
 }
 
-test("searching the artifact's precomputed aliases matches searching the live index", () => {
+test("searching the artifact's precomputed aliases matches searching the live index, in order", () => {
+  // Not sorted before comparing: the tie-break is the property this test
+  // exists to pin. searchArtifact() orders by (score, artifact array index);
+  // search() orders by (score, categoryIndex, rowIndex). They agree only
+  // because find_categories() reads files in filename order and the artifact
+  // is emitted in that same category-then-row order - sorting both lists by
+  // label first would hide a tie-break mismatch behind a set comparison.
   for (const query of QUERIES) {
     const fromArtifact = searchArtifact(query, artifact.increments)
-      .map(({ label, score, matchedSynonym }) => ({ label, score, matchedSynonym }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+      .map(({ label, score, matchedSynonym }) => ({ label, score, matchedSynonym }));
     const fromIndex = search(query, index)
-      .map(({ label, score, matchedSynonym }) => ({ label, score, matchedSynonym }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+      .map(({ label, score, matchedSynonym }) => ({ label, score, matchedSynonym }));
     assert.deepEqual(fromArtifact, fromIndex, `query ${JSON.stringify(query)}`);
   }
 });
