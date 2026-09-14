@@ -9,9 +9,11 @@
  * the DOIs resolve to today. See tools/doi_lock.mjs for what is compared, and for
  * what none of it proves.
  *
- * It resolves only the DOIs the citations already carry. It never searches, and
- * it never supplies a DOI: a citation recorded as `doi: null` has nothing to
- * resolve, and stays that way until a person finds and verifies one.
+ * The citations are the ones tools/citations.mjs collects: the thermochemistry
+ * test's, and each reference in data/references.csv. It resolves only the DOIs
+ * they already carry. It never searches, and it never supplies a DOI: a citation
+ * with no DOI has nothing to resolve, and stays that way until a person finds
+ * and verifies one.
  *
  * Nothing is written unless every DOI resolves. A file missing a record would
  * turn a check that fails into a check that is not there.
@@ -20,7 +22,7 @@ import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { CITATIONS } from "./thermochemistry_data.mjs";
+import { CITATIONS } from "./citations.mjs";
 import {
   LOCK_FILE,
   ResolverUnreachable,
