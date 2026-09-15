@@ -15,7 +15,7 @@ import unittest
 from pathlib import Path
 
 from benson.build import ARTIFACT_PATH, BuildError, build_artifact, write_artifact
-from benson.data import CSV_DIR, NOTATION_DIR
+from benson.data import CSV_DIR, NOTATION_DIR, REFERENCES_PATH
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -31,19 +31,25 @@ MINIMAL_NOTATION = {
 
 
 class Fixture(unittest.TestCase):
-    """A scratch CSV_DIR and a scratch NOTATION_DIR, so no test touches the real data."""
+    """A scratch CSV_DIR, NOTATION_DIR and references file, so no test touches the real data."""
 
     def setUp(self):
         self._csv = tempfile.TemporaryDirectory()
         self._notation = tempfile.TemporaryDirectory()
+        self._data = tempfile.TemporaryDirectory()
         self.csv_dir = self._csv.name
         self.notation_dir = self._notation.name
+        # Passed explicitly, and absent until a test writes it: no references
+        # file is a valid state, and the relative default would read the
+        # repository's own.
+        self.references_path = os.path.join(self._data.name, "references.csv")
         for name, text in MINIMAL_NOTATION.items():
             self._write(self.notation_dir, name, text)
 
     def tearDown(self):
         self._csv.cleanup()
         self._notation.cleanup()
+        self._data.cleanup()
 
     @staticmethod
     def _write(folder, name, text):
@@ -56,8 +62,11 @@ class Fixture(unittest.TestCase):
     def write_notation(self, name, text):
         self._write(self.notation_dir, name, text)
 
+    def write_references(self, text):
+        self._write(self._data.name, "references.csv", text)
+
     def build(self):
-        return build_artifact(self.csv_dir, self.notation_dir)
+        return build_artifact(self.csv_dir, self.notation_dir, self.references_path)
 
 
 class TheShapeOfTheArtifact(Fixture):
@@ -181,6 +190,86 @@ class UnitConversion(Fixture):
         [increment] = self.build()["increments"]
         self.assertEqual(increment["value"], increment["storedValue"])
 
+    def test_a_row_s_own_unit_overrides_its_category_s(self):
+        # One file may hold sources printed in different units; only the row
+        # that says so converts.
+        self.declare_unit("01_A.csv", "kJ/mol")
+        self.write_csv("01_A.csv", "Group,Value,Unit\nC-(C)(H)3,-42,\nC-(C)2(H)2,-5.00,kcal/mol")
+        methyl, methylene = self.build()["increments"]
+        self.assertEqual((methyl["unit"], methyl["value"]), ("kJ/mol", -42))
+        self.assertEqual((methylene["unit"], methylene["storedValue"]), ("kcal/mol", -5.00))
+        self.assertAlmostEqual(methylene["value"], -5.00 * 4.184)
+
+    def test_a_kj_mol_row_in_a_kcal_mol_category_is_not_converted(self):
+        self.declare_unit("01_A.csv", "kcal/mol")
+        self.write_csv("01_A.csv", "Group,Value,Unit\nC-(C)(H)3,-42,kJ/mol")
+        [increment] = self.build()["increments"]
+        self.assertEqual((increment["unit"], increment["value"], increment["storedValue"]), ("kJ/mol", -42, -42))
+
+
+class OptionalFields(Fixture):
+    """What a row's optional columns say, carried to every consumer. Blank is null."""
+
+    def test_a_two_column_row_carries_null_for_every_optional_field(self):
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        [increment] = self.build()["increments"]
+        for key in ("uncertainty", "verified", "note"):
+            with self.subTest(key=key):
+                self.assertIn(key, increment)
+                self.assertIsNone(increment[key])
+
+    def test_verified_and_note_are_carried_as_written(self):
+        self.write_csv("01_A.csv", 'Group,Value,Verified,Note\nC-(C)(H)3,-42,2000-01-01;AB;p1,"a note, with a comma"')
+        [increment] = self.build()["increments"]
+        self.assertEqual((increment["verified"], increment["note"]), ("2000-01-01;AB;p1", "a note, with a comma"))
+
+    def test_an_uncertainty_is_converted_as_its_value_is(self):
+        self.write_notation("categories.csv", "File,Quantity,Symbol,Unit,Source,Note\n01_A.csv,,,kcal/mol,,\n")
+        self.write_csv("01_A.csv", "Group,Value,Uncertainty\nC-(C)(H)3,-10.00,0.5")
+        [increment] = self.build()["increments"]
+        self.assertAlmostEqual(increment["uncertainty"], 0.5 * 4.184)
+
+
+class References(Fixture):
+    """data/references.csv, numbered by file order, and a row's Source as the key of one."""
+
+    def test_references_are_numbered_by_their_order_in_the_file(self):
+        # Keys that do not sort into file order, so a sort could not pass for it.
+        self.write_references('Key,Citation,DOI\nZED,"Zed, A. A work, 2000.",10.0000/zed\n'
+                              'ABE,"Abe, B. Another, 1999.",')
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        self.assertEqual(self.build()["references"], [
+            {"number": 1, "key": "ZED", "citation": "Zed, A. A work, 2000.", "doi": "10.0000/zed"},
+            {"number": 2, "key": "ABE", "citation": "Abe, B. Another, 1999.", "doi": None},
+        ])
+
+    def test_a_row_carries_the_key_its_source_names(self):
+        self.write_references("Key,Citation,DOI\nREF1,A citation,")
+        self.write_csv("01_A.csv", "Group,Value,Source\nC-(C)(H)3,-42,REF1\nC-(C)2(H)2,-20.9,")
+        methyl, methylene = self.build()["increments"]
+        self.assertEqual((methyl["ref"], methylene["ref"]), ("REF1", None))
+
+    def test_no_references_file_builds_an_empty_list(self):
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        self.assertEqual(self.build()["references"], [])
+
+    def test_a_source_that_names_no_reference_refuses_to_build(self):
+        self.write_references("Key,Citation,DOI\nREF1,A citation,")
+        self.write_csv("01_A.csv", "Group,Value,Source\nC-(C)(H)3,-42,REF2")
+        with self.assertRaises(BuildError) as caught:
+            self.build()
+        self.assertIn("01_A.csv:2", str(caught.exception))
+        self.assertIn("'REF2'", str(caught.exception))
+
+    def test_a_changed_reference_changes_the_content_hash(self):
+        # The artifact carries the references, so their bytes are a build input
+        # like any CSV's: a citation corrected and not rebuilt must show as stale.
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        self.write_references("Key,Citation,DOI\nREF1,A citation,")
+        first = self.build()["content_hash"]
+        self.write_references("Key,Citation,DOI\nREF1,A corrected citation,")
+        self.assertNotEqual(first, self.build()["content_hash"])
+
 
 class Reproducibility(Fixture):
     def test_building_twice_from_the_same_source_is_byte_identical(self):
@@ -196,7 +285,7 @@ class Reproducibility(Fixture):
         with tempfile.TemporaryDirectory() as other_csv_dir:
             with open(os.path.join(other_csv_dir, "01_A.csv"), "w", encoding="utf-8", newline="") as handle:
                 handle.write("Group,Value\nC-(C)(H)3,-42")
-            second = build_artifact(other_csv_dir, self.notation_dir)["content_hash"]
+            second = build_artifact(other_csv_dir, self.notation_dir, self.references_path)["content_hash"]
 
         self.assertEqual(first, second, "the hash is a function of the bytes read, not of where they live")
 
@@ -213,7 +302,7 @@ class WritingTheArtifact(Fixture):
         self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
         with tempfile.TemporaryDirectory() as out_dir:
             path = os.path.join(out_dir, "increments.json")
-            written = write_artifact(path, self.csv_dir, self.notation_dir)
+            written = write_artifact(path, self.csv_dir, self.notation_dir, self.references_path)
             with open(path, encoding="utf-8") as handle:
                 self.assertEqual(json.load(handle), written)
 
@@ -223,7 +312,7 @@ class TheRepositoryData(unittest.TestCase):
 
     def test_the_committed_data_builds_without_a_guard_firing(self):
         try:
-            artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR))
+            artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH))
         except BuildError as error:
             self.fail(f"the repository's own data should build: {error}")
         self.assertEqual(len(artifact["increments"]), 236)
@@ -231,7 +320,7 @@ class TheRepositoryData(unittest.TestCase):
     def test_no_real_category_converts_a_value_yet(self):
         # D18: "Building this changes no value." Every category on main
         # declares kJ/mol, so every increment's stored and summed value agree.
-        artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR))
+        artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH))
         for increment in artifact["increments"]:
             with self.subTest(label=increment["label"]):
                 self.assertEqual(increment["unit"], "kJ/mol")
@@ -244,7 +333,7 @@ class TheRepositoryData(unittest.TestCase):
         self.assertTrue(path.exists(), f"{ARTIFACT_PATH} is missing - run: python tools/build_dist.py")
         with open(path, encoding="utf-8") as handle:
             committed = json.load(handle)
-        built = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR))
+        built = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH))
         self.assertEqual(committed, built)
 
 

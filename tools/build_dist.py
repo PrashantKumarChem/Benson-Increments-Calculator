@@ -1,6 +1,7 @@
 """Regenerate dist/increments.json, the artifact benson/build.py emits.
 
-Run this after changing anything under CSV_data_files/ or notation/; CI
+Run this after changing anything under CSV_data_files/ or notation/, or
+data/references.csv; CI
 regenerates it independently and fails if the committed copy is out of date -
 the same bargain the asset version already keeps in this repository.
 

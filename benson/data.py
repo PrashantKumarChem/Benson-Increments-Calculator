@@ -1,8 +1,8 @@
 """Finding the source data and reading it into records.
 
 What counts as a category file and the order its filename declares, reading
-one into rows, the notation-style two-column files, and the metadata saying
-what a category's numbers are.
+one into rows, the notation-style two-column files, the metadata saying what a
+category's numbers are, and the references a row's Source names.
 
 Reading does not judge: tools/validate_data.py asks whether what was read is
 valid, once the rows are in hand. A folder that is not this repository's is
@@ -15,6 +15,7 @@ import glob
 import os
 import re
 from dataclasses import dataclass, field
+from typing import NamedTuple, Optional
 
 from benson.values import cell_text
 
@@ -25,7 +26,7 @@ CSV_DIR = "CSV_data_files"
 #
 # It lives in NOTATION_DIR rather than beside the increments, because that
 # folder is for what the data means rather than for the data. Keeping CSV_DIR
-# to nothing but two-column increment files is not tidiness: the notebook globs
+# to nothing but increment files is not tidiness: the notebook globs
 # it and reads whatever it finds as increments, so a six-column file there
 # would become a category of nonsense buttons in the reference implementation.
 # What the group names are made of, the words students use for them, and what
@@ -51,6 +52,25 @@ def title_for(stem: str) -> str:
     return " ".join(name.split("_"))
 
 
+#: The columns a category file may carry after its group name and value, found
+#: by header name. The first two are found by position instead: their titles
+#: have always been free text ("Delta_Hf kJ/mol"), and every file written that
+#: way has to stay valid untouched (D9).
+OPTIONAL_COLUMNS = ("Unit", "Uncertainty", "Source", "Verified", "Note")
+
+
+class Row(NamedTuple):
+    """One increment as its file writes it. A column the file does not have reads as blank."""
+
+    group: str
+    value: str
+    unit: str = ""
+    uncertainty: str = ""
+    source: str = ""
+    verified: str = ""
+    note: str = ""
+
+
 @dataclass
 class Category:
     """One CSV file: its identity on disk and what was read from it."""
@@ -64,9 +84,44 @@ class Category:
     records: list[tuple[int, tuple[str, ...]]] = field(default_factory=list)
 
     @property
-    def rows(self) -> list[tuple[str, str]]:
+    def width(self) -> int:
+        """The most cells a row may hold: one per column, and never fewer than the two required."""
+        return max(len(self.columns), 2)
+
+    def cell(self, cells, column: str) -> str:
+        """A line's cell under an optional column; blank where there is none.
+
+        A line may stop before its trailing optional cells, which says no more
+        about them than a blank cell would. So may a file leave a column out
+        altogether, which is what keeps a two-column file valid.
+        """
+        try:
+            index = self.columns.index(column, 2)
+        except ValueError:
+            return ""
+        return cells[index] if index < len(cells) else ""
+
+    def row_of(self, cells) -> Optional[Row]:
+        """The increment a line holds, or None when it is not a group name and a value.
+
+        A line with more cells than the header has columns is not a row: the
+        extra cell has to have come from a stray comma, and reading it as
+        anything would put a value under the wrong column.
+        """
+        if not 2 <= len(cells) <= self.width or not cells[0]:
+            return None
+        return Row(cells[0], cells[1], *(self.cell(cells, column) for column in OPTIONAL_COLUMNS))
+
+    @property
+    def numbered_rows(self) -> list[tuple[int, Row]]:
+        """Each increment with the line it starts on, so a fault is reported where it is."""
+        rows = ((line, self.row_of(cells)) for line, cells in self.records)
+        return [(line, row) for line, row in rows if row is not None]
+
+    @property
+    def rows(self) -> list[Row]:
         """The lines that are a group name and a value, which is what the category holds."""
-        return [cells for _, cells in self.records if len(cells) == 2 and cells[0]]
+        return [row for _, row in self.numbered_rows]
 
     @property
     def file(self) -> str:
@@ -155,5 +210,57 @@ def find_categories(csv_dir: str = CSV_DIR) -> list[Category]:
     than quietly ignored, because the notebook would read it as increments.
     """
     return [read_category(p) for p in sorted(glob.glob(os.path.join(csv_dir, "*.csv")))]
+
+
+#: What a row's Source names. Hand-edited: one row per published work, under a
+#: short key the increment files use in place of a full citation. Nobody numbers
+#: them - a reference's number is its place in this file, so inserting one
+#: renumbers the rest with nothing to edit by hand.
+REFERENCES_PATH = "data/references.csv"
+#: The columns of REFERENCES_PATH, found by title. A DOI may be blank.
+REFERENCE_COLUMNS = ("Key", "Citation", "DOI")
+
+
+class Reference(NamedTuple):
+    """One published work a row may name as its Source."""
+
+    line: int
+    key: str
+    citation: str
+    doi: str
+
+
+def read_references(path: str = REFERENCES_PATH) -> list[Reference]:
+    """Every reference with a key, in file order. An absent file means none.
+
+    File order is the numbering, so nothing here sorts. A line without a key is
+    not a reference, since no row could name it; tools/validate_data.py reports
+    it rather than letting it vanish.
+    """
+    if not os.path.exists(path):
+        return []
+    table = read_category(path)
+
+    def cell(cells, column):
+        if column not in table.columns:
+            return ""
+        index = table.columns.index(column)
+        return cells[index] if index < len(cells) else ""
+
+    return [Reference(line, cell(cells, "Key"), cell(cells, "Citation"), cell(cells, "DOI"))
+            for line, cells in table.records if cell(cells, "Key")]
+
+
+def unresolved_sources(categories: list[Category], references: list[Reference]) -> list[tuple[str, int, Row]]:
+    """Each row whose Source names no reference, as (file, line, row).
+
+    A blank Source is not one of them. A row with no source recorded says so
+    honestly; a Source naming nothing claims a citation nobody can find.
+    """
+    keys = {reference.key for reference in references}
+    return [(category.file, line, row)
+            for category in categories
+            for line, row in category.numbered_rows
+            if row.source and row.source not in keys]
 
 

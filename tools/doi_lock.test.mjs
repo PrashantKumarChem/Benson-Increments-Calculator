@@ -1,8 +1,9 @@
 /**
  * Does every cited DOI resolve to the work its citation names?
  *
- * Offline. Each citation in tools/thermochemistry_data.mjs is compared with
- * tools/doi_lock.json, the record of what its DOI resolved to when
+ * Offline. Each citation tools/citations.mjs collects - the thermochemistry
+ * test's, and data/references.csv's - is compared with tools/doi_lock.json, the
+ * record of what its DOI resolved to when
  * tools/build_doi_lock.mjs last ran. CI reruns that generator and fails if the
  * committed file differs, which is what stops the file from being edited to agree
  * with a wrong DOI. tools/doi_lock.mjs says what is compared, and what none of
@@ -19,7 +20,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { CITATIONS } from "./thermochemistry_data.mjs";
+import { CITATIONS, referenceCitations } from "./citations.mjs";
 import {
   LOCK_FILE,
   NotACitationRecord,
@@ -121,6 +122,22 @@ const A026 = {
   volume: "93",
   page: "146-151",
 };
+
+test("a reference in data/references.csv is checked as a citation, and one with a DOI needs work fields", () => {
+  const [reference] = referenceCitations({
+    references: [{ number: 1, key: "REF1", citation: "A throwaway citation", doi: "10.0000/ref1" }],
+  });
+  assert.equal(reference.citedBy, "data/references.csv REF1");
+  assert.equal(reference.doi, "10.0000/ref1");
+  // No column holds the fields a DOI's record is compared with yet, so the first
+  // reference given a DOI is refused by name rather than passed unchecked.
+  assert.match(problemsOf(reference, {}), /no `work` fields/);
+});
+
+test("an artifact with no references list is refused, not read as having none", () => {
+  assert.throws(() => referenceCitations({ increments: [] }), /has no references list/);
+  assert.deepEqual(referenceCitations({ references: [] }), []);
+});
 
 test("a neighbouring DOI is refused, naming who cites it, both titles and what differs", () => {
   const wrong = { ...HALL_BALDT, doi: "10.1021/ja00730a026" };

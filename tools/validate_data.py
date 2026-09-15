@@ -21,14 +21,19 @@ from benson.data import (
     METADATA_FIELDS,
     METADATA_NAME,
     NOTATION_DIR,
+    OPTIONAL_COLUMNS,
+    REFERENCES_PATH,
+    REFERENCE_COLUMNS,
     Category,
     find_categories,
     read_category,
     read_metadata,
     read_pairs,
+    read_references,
+    unresolved_sources,
 )
 from benson.notation import NOTATION_FILES, load_notation
-from benson.values import Value, read_value
+from benson.values import Value, read_uncertainty, read_value, to_kj
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
 # cannot print one. Reporting a problem must not itself become one.
@@ -61,13 +66,23 @@ def check_category(category: Category, report: Report) -> None:
         report.add(name, 0, "file is empty")
         return
 
-    if len(category.columns) != 2:
-        report.add(name, 1, f"header has {len(category.columns)} columns, expected exactly 2 "
-                            "(group name, then value in kJ/mol)")
+    if len(category.columns) < 2:
+        report.add(name, 1, "header has one column, expected at least two (group name, then value)")
         return
 
     if not all(category.columns):
         report.add(name, 1, "header has an empty column title")
+
+    # The reader finds an optional column by its exact title and ignores any
+    # other, so a misspelt one would drop what it holds without a word. That is
+    # the silent kind of fault, and the one worth refusing by name.
+    optional = category.columns[2:]
+    for column in dict.fromkeys(optional):
+        if column and column not in OPTIONAL_COLUMNS:
+            report.add(name, 1, f"header column {column!r} is not one a category file can carry - after "
+                                f"the group name and value, a column is one of {', '.join(OPTIONAL_COLUMNS)}")
+        elif column and optional.count(column) > 1:
+            report.add(name, 1, f"header names {column!r} more than once")
 
     if not category.records:
         report.add(name, 0, "file has a header but no data rows")
@@ -83,17 +98,33 @@ def check_category(category: Category, report: Report) -> None:
         if len(row) == 1 and "," not in row[0]:
             report.add(name, line, "no comma - expected two columns")
             continue
-        if len(row) != 2:
-            report.add(name, line, f"{len(row)} columns, expected 2 - a stray comma in the group name?")
+        if not 2 <= len(row) <= category.width:
+            expected = "2" if category.width == 2 else f"2 to {category.width}"
+            report.add(name, line, f"{len(row)} columns, expected {expected} - a stray comma in the group name?")
             continue
 
-        label, raw_value = row
+        label, raw_value = row[0], row[1]
         if not label:
             report.add(name, line, "missing group name")
         elif label in first_seen:
             report.add(name, line, f"{label!r} already appears on line {first_seen[label]}")
         else:
             first_seen[label] = line
+
+        # The build converts with both of these, so a Unit it cannot convert or
+        # an Uncertainty that is not a number would stop it with a traceback
+        # rather than a line a contributor can act on. Each asks the package's
+        # own rule rather than restating it.
+        unit = category.cell(row, "Unit")
+        if unit:
+            try:
+                to_kj(0.0, unit)
+            except ValueError as exc:
+                report.add(name, line, f"{label or 'row'}: {exc}")
+        try:
+            read_uncertainty(category.cell(row, "Uncertainty"))
+        except ValueError as exc:
+            report.add(name, line, f"{label or 'row'}: {exc}")
 
         try:
             reading = read_value(raw_value)
@@ -202,7 +233,7 @@ def check_notation(categories: list[Category], report: Report) -> None:
     been renamed. Whether a name can be read at all is a question about both the
     data and the parser, so the notation tests ask it.
     """
-    known = {label for category in categories for label, _ in category.rows}
+    known = {row.group for category in categories for row in category.rows}
     problems = []
     for spec in NOTATION_FILES:
         path = os.path.join(NOTATION_DIR, spec.name)
@@ -234,14 +265,53 @@ def check_unique_names(categories: list[Category], report: Report) -> None:
     """
     seen: dict[str, str] = {}
     for category in categories:
-        for line, row in category.records:
-            if len(row) != 2 or not row[0]:
-                continue
-            owner = seen.setdefault(row[0], category.file)
+        for line, row in category.numbered_rows:
+            owner = seen.setdefault(row.group, category.file)
             if owner != category.file:
                 report.add(category.file, line,
-                           f"{row[0]!r} is already defined in {owner} - a group name has to be "
+                           f"{row.group!r} is already defined in {owner} - a group name has to be "
                            "unique across categories, not just within one file")
+
+
+def check_references(categories: list[Category], report: Report) -> None:
+    """data/references.csv, and every row's Source against it.
+
+    A Source is a key, not a citation, so the fault that matters is a key that
+    names nothing: the row then claims a source nobody can look up. In the file
+    itself, only what would make a key ambiguous or a reference empty is
+    checked here. Whether a citation is right is not something a validator
+    can know - see .claude/rules/citations.md.
+    """
+    name = os.path.basename(REFERENCES_PATH)
+    references = read_references(REFERENCES_PATH)
+
+    if os.path.exists(REFERENCES_PATH):
+        # Read as a category file is, so each line is numbered where it starts.
+        table = read_category(REFERENCES_PATH)
+        missing = [column for column in REFERENCE_COLUMNS if column not in table.columns]
+        if missing:
+            report.add(name, 1, f"header is missing {', '.join(missing)} - expected "
+                                f"{','.join(REFERENCE_COLUMNS)}")
+        keyed = {reference.line for reference in references}
+        for line, cells in table.records:
+            if len(cells) > len(table.columns):
+                report.add(name, line, f"{len(cells)} columns, expected {len(table.columns)} - "
+                                       "an unquoted comma in the citation?")
+            elif line not in keyed:
+                report.add(name, line, "no Key - nothing can name this reference")
+
+        first_seen: dict[str, int] = {}
+        for reference in references:
+            if reference.key in first_seen:
+                report.add(name, reference.line,
+                           f"{reference.key!r} is already a key on line {first_seen[reference.key]}")
+            else:
+                first_seen[reference.key] = reference.line
+            if not reference.citation:
+                report.add(name, reference.line, f"{reference.key!r} has no citation")
+
+    for file, line, row in unresolved_sources(categories, references):
+        report.add(file, line, f"{row.group}: Source {row.source!r} is not a key in {REFERENCES_PATH}")
 
 
 def main() -> int:
@@ -256,6 +326,7 @@ def main() -> int:
     check_unique_names(categories, report)
     check_metadata(categories, report)
     check_notation(categories, report)
+    check_references(categories, report)
 
     if report:
         print(f"{len(report.problems)} problem(s) found:\n", file=sys.stderr)
@@ -265,8 +336,9 @@ def main() -> int:
 
     total = sum(len(c.rows) for c in categories)
     described = sum(1 for c in categories if read_metadata().get(c.file, {}).get("quantity"))
-    print(f"OK - {len(categories)} category files ({described} described), {total} increments, "
-          "notation files consistent.")
+    cited = sum(1 for c in categories for row in c.rows if row.source)
+    print(f"OK - {len(categories)} category files ({described} described), {total} increments "
+          f"({cited} with a Source), {len(read_references())} references, notation files consistent.")
     return 0
 
 

@@ -9,7 +9,7 @@ Those stay, and keep testing assets/benson.js, until the website stops parsing.
 """
 import unittest
 
-from benson.values import KCAL_TO_KJ, InvalidValueError, parse_value, read_value, to_kj
+from benson.values import KCAL_TO_KJ, InvalidValueError, parse_value, read_uncertainty, read_value, to_kj
 
 
 class PlainNumbers(unittest.TestCase):
@@ -173,6 +173,28 @@ class Units(unittest.TestCase):
     def test_an_unknown_unit_is_refused_rather_than_guessed(self):
         with self.assertRaises(ValueError):
             to_kj(-42, "cal/mol")
+
+
+class Uncertainties(unittest.TestCase):
+    """A row's optional Uncertainty: the ± its source prints, or nothing at all."""
+
+    def test_a_blank_cell_is_no_uncertainty(self):
+        for text in ["", "   ", '""']:
+            with self.subTest(text=text):
+                self.assertIsNone(read_uncertainty(text))
+
+    def test_an_unsigned_number_is_read(self):
+        self.assertEqual(read_uncertainty("0.5"), 0.5)
+        self.assertEqual(read_uncertainty(" 2 "), 2.0)
+        self.assertEqual(read_uncertainty(".4"), 0.4)
+
+    def test_a_sign_a_range_or_words_are_refused(self):
+        # A range would otherwise be averaged by the value rule into a figure
+        # nobody printed; a sign on a magnitude is a mistake, not information.
+        for text in ["-0.5", "0.1 to 0.3", "±0.5", "0.5 kJ/mol", "about 1"]:
+            with self.subTest(text=text):
+                with self.assertRaises(InvalidValueError):
+                    read_uncertainty(text)
 
 
 if __name__ == "__main__":

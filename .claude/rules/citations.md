@@ -2,18 +2,23 @@
 paths:
   - "tools/*.test.mjs"
   - "tools/thermochemistry_data.mjs"
+  - "data/references.csv"
 ---
 
-# Citing a published value in a test
+# Citing a published value
 
 A test that compares the calculator against the literature is only as good as
-its citations. Nobody can check the chemistry by reading the code, so the
-citation is the only thing standing between a published value and a rumour.
+its citations, and so is a value the calculator serves. Nobody can check the
+chemistry by reading the code, so the citation is the only thing standing
+between a published value and a rumour.
 
-This rule covers tests, and `tools/thermochemistry_data.mjs`, where the
-thermochemistry test keeps its cited values. The increment data files are
-covered by [`data.md`](data.md), and a two-column data row has nowhere to keep
-the fields below — do not try to add them there.
+This rule covers every citation the repository keeps: the tests' — including
+`tools/thermochemistry_data.mjs`, where the thermochemistry test keeps its
+cited values — and `data/references.csv`, whose keys the increment rows name as
+their `Source`. An increment row carries its value as the source prints it, the
+source's own uncertainty where it gives one, and that key; the citation and its
+link belong in the reference, never on the row. The format of the data files,
+and what the validator checks in them, is [`data.md`](data.md)'s.
 
 Two properties matter, and they are separate:
 
