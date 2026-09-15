@@ -471,20 +471,22 @@ async function main() {
           `${JSON.stringify(kjAfterCellClick)}`);
       }
 
-      // The keyboard path: focus a row's name button directly (Tab would work
-      // too, but is slower and no more meaningful here), walk to the next row
-      // with an arrow key, and add with the same "+" the card grid answers to.
-      await page.locator(".table tbody tr").nth(2).locator("th button").focus();
-      const focusedBefore = await page.evaluate(() => document.activeElement?.textContent ?? null);
+      // The keyboard path: focus a row's name button, walk with an arrow key to
+      // the very next row - not merely somewhere else, which a row skipped
+      // would also satisfy - and add with the same "+" the card grid answers to.
+      const nameButton = (index) =>
+        page.locator(".table tbody tr").nth(index).locator("th button").first();
+      await nameButton(2).focus();
       await page.keyboard.press("ArrowDown");
-      const moved = await page.evaluate(() => ({
+      const walked = await nameButton(3).evaluate((button) => ({
+        landed: document.activeElement === button,
         text: document.activeElement?.textContent ?? null,
-        inLibrary: !!document.activeElement?.closest("#library"),
+        wanted: button.textContent,
       }));
-      if (!moved.inLibrary || moved.text === focusedBefore) {
+      if (!walked.landed) {
         fail("ArrowDown does not walk from one table row to the next",
-          `focus was on ${JSON.stringify(focusedBefore)}, and after ArrowDown reads ` +
-          `${JSON.stringify(moved.text)} (in #library: ${moved.inLibrary})`);
+          `from the third row's name, focus should reach ${JSON.stringify(walked.wanted)} ` +
+          `and reads ${JSON.stringify(walked.text)}`);
       }
 
       const kjBeforeKeyboardAdd = await page.textContent("#kj");
@@ -510,12 +512,74 @@ async function main() {
       await page.waitForTimeout(120);
       const kjAfterDrag = await page.textContent("#kj");
       const dragSelection = await page.evaluate(() => String(getSelection()));
-      if (kjAfterDrag !== kjBeforeDrag || !dragSelection) {
+      if (kjAfterDrag !== kjBeforeDrag) {
         fail("selecting the text of a table cell adds its increment",
-          `total read ${JSON.stringify(kjBeforeDrag)} before the drag and ` +
-          `${JSON.stringify(kjAfterDrag)} after, and the selection is ${JSON.stringify(dragSelection)}`);
+          `total read ${JSON.stringify(kjBeforeDrag)} before the drag and ${JSON.stringify(kjAfterDrag)} after`);
+      }
+      if (!dragSelection) {
+        fail("selecting the text of a table cell does not leave it selected",
+          "the selection is empty after the drag");
       }
 
+      // A click on a cell has to leave the keyboard something to act on.
+      // Pressing a card focuses it, so + adds another straight after; a row
+      // takes no focus of its own, and until it handed focus to its name button
+      // + did nothing after a row was clicked - the same mode split, by key.
+      const focusRow = page.locator(".table tbody tr").nth(8);
+      await focusRow.locator("td.num").first().click();
+      await page.waitForTimeout(120);
+      await page.keyboard.press("+");
+      await page.waitForTimeout(120);
+      const clickThenPlus = {
+        badge: await focusRow.locator(".tally").textContent().catch(() => null),
+        onName: await focusRow.locator("th button").first()
+          .evaluate((button) => document.activeElement === button),
+      };
+      if (clickThenPlus.badge !== "×2" || !clickThenPlus.onName) {
+        fail("after a table row is clicked, + does not add another of it",
+          `the row's count badge reads ${JSON.stringify(clickThenPlus.badge)}, expected "×2", ` +
+          `and focus ${clickThenPlus.onName ? "is" : "is NOT"} on the row's name`);
+      }
+
+      await page.close();
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* A citation link in a table row is followed, not added             */
+    /* ---------------------------------------------------------------- */
+    // No row carries a Source yet, so no row holds a link - which is why this
+    // gives one row a reference here rather than waiting for the data to. Once
+    // a value is cited, its mark sits inside a row that adds on any click, and
+    // without an exclusion of its own following the citation changed the total.
+    {
+      const page = await browser.newPage({ viewport: { width: 1180, height: 900 } });
+      await page.route("**/dist/increments.json*", async (route) => {
+        const response = await route.fetch();
+        const artifact = await response.json();
+        artifact.increments[0].ref = artifact.references[0]?.key ?? null;
+        await route.fulfill({ response, json: artifact });
+      });
+      await page.goto(base, { waitUntil: "load" });
+      await page.waitForSelector(".grid button", { timeout: 15000 });
+      await page.locator('#views button[data-mode="table"]').click();
+      await page.waitForSelector(".table tbody tr", { timeout: 15000 });
+      await settle(page);
+
+      const link = page.locator(".table tbody tr").first().locator(".cite-mark a");
+      const links = await link.count();
+      if (links !== 1) {
+        fail("a table row given a reference shows no citation link to follow",
+          `${links} links in the first row; the artifact may hold no reference to cite`);
+      } else {
+        const kjBeforeLink = await page.textContent("#kj");
+        await link.click();
+        await page.waitForTimeout(120);
+        const kjAfterLink = await page.textContent("#kj");
+        if (kjAfterLink !== kjBeforeLink) {
+          fail("following a citation link in a table row adds its increment",
+            `total read ${JSON.stringify(kjBeforeLink)} before and ${JSON.stringify(kjAfterLink)} after`);
+        }
+      }
       await page.close();
     }
   } catch (error) {
@@ -542,8 +606,9 @@ function report() {
     "grid at 1180px, the sheet holds still, and nothing spills sideways at 320px. " +
     "The method's uncertainty reads under the total at 320, 390 and 1180px, and its " +
     "mark leads to a note that is not covered at 390px. A table row adds and steps " +
-    "its count by clicking anywhere in it, selecting a cell's text does not add it, " +
-    "and the arrow keys and + still walk and add across rows.");
+    "its count by clicking anywhere in it, + adds another after a click, neither " +
+    "selecting a cell's text nor following its citation adds it, and the arrow " +
+    "keys and + still walk and add across rows.");
   return 0;
 }
 
