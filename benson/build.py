@@ -182,6 +182,25 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
     if not categories:
         raise BuildError(f"No CSV files found in {csv_dir}/")
 
+    # A group name keys everything that annotates it from outside CSV_DIR - a
+    # source, an uncertainty, a synonym - so two rows sharing one, whether in
+    # the same file or two different ones, would make such a row ambiguous
+    # about which it describes, and build_index() would silently carry both
+    # into the artifact as if they were unrelated increments.
+    # tools/validate_data.py's check_category() and check_unique_names()
+    # already report the within-file and across-file cases respectively, and
+    # always run first in this repository's own pipeline - guarded here too,
+    # the same reason build_artifact()'s other refusals do not rely on that
+    # ordering: it is a public function a caller can call on its own.
+    files_by_label: dict[str, list[str]] = {}
+    for category in categories:
+        for row in category.rows:
+            files_by_label.setdefault(row.group, []).append(category.file)
+    duplicates = sorted((label, files) for label, files in files_by_label.items() if len(files) > 1)
+    if duplicates:
+        problems = "\n".join(f"  {label!r} appears in {', '.join(files)}" for label, files in duplicates)
+        raise BuildError(f"{len(duplicates)} duplicate group name(s):\n{problems}")
+
     references = read_references(references_path)
     unresolved = unresolved_sources(categories, references)
     if unresolved:

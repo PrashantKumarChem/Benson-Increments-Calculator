@@ -226,6 +226,21 @@ def check_metadata(categories: list[Category], report: Report) -> None:
             report.add(METADATA_NAME, line,
                        f"{len(row)} columns, expected {len(header)} - an unquoted comma in the note?")
 
+        # A category's own row's Unit is checked in check_category(), and
+        # data/uncertainty.csv's Unit is checked in check_uncertainty() - this
+        # is the one column of the same name build.py actually reads
+        # (_category_entry's declared.get("unit")) that nothing validated,
+        # so an unconvertible one reached a contributor as build_dist.py
+        # crashing rather than this file naming the row and the fix.
+        if "Unit" in header:
+            unit_index = header.index("Unit")
+            unit = row[unit_index] if unit_index < len(row) else ""
+            if unit:
+                try:
+                    to_kj(0.0, unit)
+                except ValueError as exc:
+                    report.add(METADATA_NAME, line, f"{name or 'row'}: {exc}")
+
 
 def check_notation(categories: list[Category], report: Report) -> None:
     """The notation files say what the group names are made of.
