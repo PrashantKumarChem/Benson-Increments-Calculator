@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 A single Python package, `benson/`, now owns every data rule (value parsing,
 notation decomposition, search-key generation, reference and uncertainty
-handling) that used to be implemented twice — once for the website, once for
-the notebook.
+handling) that used to be duplicated in the website's own JavaScript. The
+website now fetches a generated artifact and implements no chemistry rule of
+its own. The notebook does not yet import `benson` — it still has its own
+separate implementation, pending a rewrite on a not-yet-merged pull request
+(see the note under "Removed" below).
 
 ### Added
 - `benson/` — a pure Python, zero-runtime-dependency package with the value,
@@ -31,16 +34,10 @@ the notebook.
   website's UI.
 - `tools/build_doi_lock.mjs`, which resolves every cited DOI against doi.org
   and fails CI on a mismatch.
-- A generation-4 notebook (`Benson Increments Calculator.ipynb`) that
-  imports `benson` directly, installs from GitHub, runs in Google Colab with
-  nothing cloned locally, and accepts a user's own CSV data through the same
-  `benson.build.build_artifact()` the curated data is built with.
 
 ### Changed
 - The website (`assets/*.js`) fetches the generated artifact and renders —
   it no longer parses CSVs or implements any chemistry rule of its own.
-- The mixed-range/negative validator guard in `tools/validate_data.py` is
-  relaxed, now that the notebook parser it protected is retired.
 
 ### Removed
 - `tools/check_parity.mjs`, the check that used to compare the website's and
@@ -49,11 +46,14 @@ the notebook.
   conformance.json` for what's left.
 - `CSV_data_files/manifest.json` and `tools/build_data.py`, which lost their
   only reader when the site switched to the artifact.
-- `tools/export_reference_values.py`, the manual comparison tool that read
-  the notebook's own parsing functions — retired along with the notebook
-  generation it read.
-- The generation-2 notebook (its own CSV parser, no shared package),
-  archived to `Archives/` with a frozen copy of the data it read.
+
+<!--
+  The notebook rewrite (a new generation-4 notebook, the H3 validator-guard
+  relax, and the retirement of tools/export_reference_values.py and the
+  generation-2 notebook) is on a separate, not-yet-merged pull request
+  (#37) as of this entry. Add those to this section once it actually lands
+  here - not before, the same mistake this file exists to stop making.
+-->
 
 ## [1.0.0] - 2024-09-12
 
