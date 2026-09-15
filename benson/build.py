@@ -244,7 +244,29 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
         raise BuildError(f"{uncertainty_path} has {len(figure_problems)} problem(s):\n{problems}")
 
     index = build_index(categories, notation)
-    increments_out = [_increment_entry(entry, notation, unit_by_file[entry.category.file]) for entry in index]
+    increments_out = []
+    for entry in index:
+        try:
+            increments_out.append(_increment_entry(entry, notation, unit_by_file[entry.category.file]))
+        except ValueError as exc:
+            # tools/validate_data.py already refuses an unreadable value or
+            # unit before this ever runs, in the pipeline every check uses -
+            # but build_artifact() is a public function, callable on its own
+            # (a notebook's bring-your-own-data path does exactly that), so it
+            # cannot assume that check already ran. Without this, a truncated
+            # range or an unconvertible Unit reached the caller as a raw
+            # InvalidValueError/ValueError instead of this function's own
+            # BuildError, breaking the one promise every other refusal here
+            # keeps: a clean, located message.
+            raise BuildError(f"{entry.category.file}: {entry.label!r}: {exc}") from exc
+
+    try:
+        uncertainty_out = [_uncertainty_entry(figure) for figure in figures]
+    except ValueError as exc:
+        # method_figure_problems() above already validates each figure's value
+        # and unit, so this should be unreachable in practice - guarded anyway
+        # rather than resting on that ordering, for the same reason as above.
+        raise BuildError(f"{uncertainty_path}: {exc}") from exc
 
     return {
         "schema": SCHEMA,
@@ -258,7 +280,7 @@ def build_artifact(csv_dir: str = CSV_DIR, notation_dir: str = NOTATION_DIR,
              "doi": reference.doi or None, "work": works[reference.key]}
             for number, reference in enumerate(references, start=1)
         ],
-        "uncertainty": [_uncertainty_entry(figure) for figure in figures],
+        "uncertainty": uncertainty_out,
         "increments": increments_out,
     }
 

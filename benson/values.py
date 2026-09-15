@@ -6,9 +6,9 @@ starts a negative number. Anything else is refused, loudly.
 
 The value is in whatever unit its category declares. Nothing here converts.
 
-`assets/benson.js` applies the same rule in the browser until the website reads
-a generated artifact instead of parsing, and `tools/check_parity.mjs` holds that
-copy to the notebook's own reading in the meantime.
+This is the only place the rule is written. `assets/benson.js` used to carry
+its own copy for the browser; it now only renders `benson.build`'s generated
+artifact, and the notebook imports this module directly.
 """
 from __future__ import annotations
 
@@ -16,17 +16,22 @@ import re
 from dataclasses import dataclass
 from typing import Optional
 
-NUMBER_RE = re.compile(r"^-?\d*\.?\d+$")
+# re.ASCII: \d would otherwise match any Unicode decimal digit (Arabic-Indic,
+# fullwidth, ...), which float() also happily accepts - so a cell written in
+# one of those would be read as a number rather than refused, silently
+# carrying a non-ASCII character into `source` for the rest of the pipeline
+# to trip on. Every regex in this module that reads a value shares this.
+NUMBER_RE = re.compile(r"^-?\d*\.?\d+$", re.ASCII)
 # "1.05 to 1.76" is a published range and is averaged. The separator is a word
 # rather than a hyphen because a hyphen also starts a negative number: reading
 # "-42" needs to know that its dash is a sign, and every implementation that
 # has to work that out is one that can work it out differently. "to" cannot be
 # a sign, so the two forms stop overlapping and the rule stops needing care.
-RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s+to\s+(-?\d*\.?\d+)$")
+RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s+to\s+(-?\d*\.?\d+)$", re.ASCII)
 # The form this replaced. Matched only so it can be refused by name: falling
 # through to "neither a number nor a range" would tell a contributor their row
 # is unreadable without telling them it used to be the house style.
-HYPHEN_RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$")
+HYPHEN_RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s*-\s*(-?\d*\.?\d+)$", re.ASCII)
 # A spreadsheet may quote a cell. One quote comes off each end and no more, which
 # is how the site reads a cell: taking every quote off would accept '""-42""'
 # here while the site refuses it.

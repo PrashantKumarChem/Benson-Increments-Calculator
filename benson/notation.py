@@ -17,8 +17,9 @@ which atoms a central notation stands for, the handful of names that break the
 pattern, and the words students use for a group. Adding a category of groups
 written in ordinary Benson notation therefore needs no change here.
 
-`assets/notation.js` applies the same rules in the browser until the website
-reads a generated artifact instead.
+This is the only place the rule is written. `assets/notation.js` used to
+carry its own copy for the browser; it now only searches and sums against
+`benson.build`'s precomputed, generated results.
 """
 from __future__ import annotations
 

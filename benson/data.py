@@ -37,8 +37,10 @@ METADATA_NAME = "categories.csv"
 #: The columns of METADATA_NAME, in order. "File" is the key; the rest may be blank.
 METADATA_FIELDS = ("quantity", "symbol", "unit", "source", "note")
 
-# 01_CH_Groups.csv -> ordering prefix, then the category name.
-FILENAME_RE = re.compile(r"^(\d{2})_([A-Za-z0-9_]+)\.csv$")
+# 01_CH_Groups.csv -> ordering prefix, then the category name. re.ASCII:
+# \d alone also matches non-ASCII decimal digits, which this filename
+# convention was never meant to accept.
+FILENAME_RE = re.compile(r"^(\d{2})_([A-Za-z0-9_]+)\.csv$", re.ASCII)
 
 
 def title_for(stem: str) -> str:
@@ -272,7 +274,9 @@ def _titled_cell(table: Category, cells, column: str) -> str:
     return cells[index] if index < len(cells) else ""
 
 
-YEAR_RE = re.compile(r"^\d{4}$")
+# re.ASCII: see benson/values.py's NUMBER_RE - \d alone also matches
+# non-ASCII decimal digits, which int() also accepts.
+YEAR_RE = re.compile(r"^\d{4}$", re.ASCII)
 
 
 def work_of(reference: Reference) -> Optional[dict]:
