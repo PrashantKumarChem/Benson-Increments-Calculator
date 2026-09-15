@@ -76,4 +76,6 @@ Every check passed both times. A person looking at the page caught both.
 `check_render.mjs` loads the page at 320, 390 and 1180 px, with and without
 increments chosen, and checks that the total is on screen, that it sits beside
 the increments on a wide screen, that adding one does not move the sheet, and
-that nothing spills sideways.
+that nothing spills sideways. It also checks that the method's uncertainty can
+be read under the total at each width and is absent with nothing chosen, and
+that following its citation mark on a phone leaves the note uncovered.

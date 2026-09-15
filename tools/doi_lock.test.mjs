@@ -125,13 +125,23 @@ const A026 = {
 
 test("a reference in data/references.csv is checked as a citation, and one with a DOI needs work fields", () => {
   const [reference] = referenceCitations({
-    references: [{ number: 1, key: "REF1", citation: "A throwaway citation", doi: "10.0000/ref1" }],
+    references: [{ number: 1, key: "REF1", citation: "A throwaway citation", doi: "10.0000/ref1", work: null }],
   });
   assert.equal(reference.citedBy, "data/references.csv REF1");
   assert.equal(reference.doi, "10.0000/ref1");
-  // No column holds the fields a DOI's record is compared with yet, so the first
-  // reference given a DOI is refused by name rather than passed unchecked.
+  // A reference that names no Type says nothing about which work its DOI is,
+  // so it is refused by name rather than passed unchecked.
   assert.match(problemsOf(reference, {}), /no `work` fields/);
+});
+
+test("a reference's work reaches the lock as its columns wrote it, and is compared like a test's", () => {
+  const [reference] = referenceCitations({
+    references: [{ number: 1, key: "HALL", citation: HALL_BALDT.citation, doi: HALL_BALDT.doi, work: HALL_BALDT.work }],
+  });
+  assert.deepEqual(reference.work, HALL_BALDT.work);
+  assert.equal(problemsOf(reference, { [HALL_BALDT.doi]: A025 }), "");
+  // The neighbouring DOI's record: the same comparison refuses it.
+  assert.match(problemsOf(reference, { [HALL_BALDT.doi]: A026 }), /does not resolve to the work its citation names/);
 });
 
 test("an artifact with no references list is refused, not read as having none", () => {

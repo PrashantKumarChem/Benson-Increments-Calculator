@@ -153,6 +153,35 @@ async function spill(page) {
   });
 }
 
+/**
+ * Whether the line under the total is on the page, painted, and inside the window.
+ *
+ * Asked by hit test as well as by rectangle, for the reason the phone check
+ * gives: a box can be right while something else covers it. Scrolled into
+ * view first, because on a phone the line sits in the sheet's own scrolling
+ * body.
+ */
+async function methodLine(page) {
+  await page.evaluate(() => document.getElementById("method").scrollIntoView({ block: "nearest" }));
+  await settle(page);
+  return page.evaluate(() => {
+    const line = document.getElementById("method");
+    const box = line.getBoundingClientRect();
+    const hit = document.elementFromPoint(box.left + Math.min(box.width / 2, 20), box.top + box.height / 2);
+    return {
+      shown: !line.hidden && box.height > 0,
+      painted: !!(hit && line.contains(hit)),
+      inside: box.left >= -0.5 && box.right <= innerWidth + 0.5,
+      text: line.textContent.trim(),
+      at: `${Math.round(box.left)},${Math.round(box.top)} ${Math.round(box.width)}x${Math.round(box.height)}`,
+    };
+  });
+}
+
+const lineReport = (line) =>
+  `shown: ${line.shown}, painted: ${line.painted}, inside the window: ${line.inside}, ` +
+  `box ${line.at}, text ${JSON.stringify(line.text.slice(0, 60))}`;
+
 async function main() {
   let chromium;
   try {
@@ -232,6 +261,17 @@ async function main() {
           fail(`the page is wider than the window at 1180px (${state})`,
             `${over.over}px of overflow, first past the edge: ${over.culprit}`);
         }
+
+        // The method's own uncertainty, under the total once there is one.
+        // Unlike the rest of this file, not a failure this page has had: it is
+        // checked because it went into the panel whose layout has broken twice
+        // with every other check passing.
+        const line = await methodLine(page);
+        const wanted = state === "with increments chosen";
+        if (wanted ? !(line.shown && line.painted && line.inside) : line.shown) {
+          fail(wanted ? "the method's uncertainty is not under the total on a wide screen"
+            : "the method's uncertainty is shown with nothing chosen", lineReport(line));
+        }
       }
       await page.close();
     }
@@ -299,6 +339,39 @@ async function main() {
         fail("the page is wider than the window at 390px",
           `${narrow.over}px of overflow, first past the edge: ${narrow.culprit}`);
       }
+
+      /* -------------------------------------------------------------- */
+      /* The line under the total, and the note its mark leads to        */
+      /* -------------------------------------------------------------- */
+      // Not failures this page has had either. On a phone the line is in the
+      // folded body, and the note is at the foot of a page whose foot the
+      // sheet sits over - so following the mark has to leave the note showing.
+      await page.locator("#panel-toggle").click();
+      await page.waitForTimeout(450);
+      const line = await methodLine(page);
+      if (!(line.shown && line.painted && line.inside)) {
+        fail("the method's uncertainty cannot be read in the open sheet at 390px", lineReport(line));
+      } else {
+        await page.locator("#method .cite-mark a").first().click();
+        await page.waitForTimeout(600);
+        await settle(page);
+        const note = await page.evaluate(() => {
+          const head = document.querySelector("#notes .notes-head");
+          if (!head) return null;
+          const box = head.getBoundingClientRect();
+          const hit = document.elementFromPoint(box.left + Math.min(box.width / 2, 20), box.top + box.height / 2);
+          return {
+            top: Math.round(box.top),
+            onScreen: box.top >= 0 && box.bottom <= innerHeight,
+            painted: !!(hit && head.contains(hit)),
+          };
+        });
+        if (!note || !note.onScreen || !note.painted) {
+          fail("following the mark under the total does not leave its note readable at 390px",
+            note ? `the note's heading is at ${note.top}px, and ${note.painted ? "is" : "is NOT"} what is painted there`
+              : "there is no note on the page");
+        }
+      }
       await page.close();
     }
 
@@ -327,6 +400,12 @@ async function main() {
           fail(`the page is wider than the window at 320px (${state})`,
             `${over.over}px of overflow, first past the edge: ${over.culprit}`);
         }
+        if (state === "filled, sheet open") {
+          const line = await methodLine(page);
+          if (!(line.shown && line.painted && line.inside)) {
+            fail("the method's uncertainty cannot be read in the open sheet at 320px", lineReport(line));
+          }
+        }
       }
       await page.close();
     }
@@ -351,7 +430,9 @@ function report() {
   }
 
   console.log("OK - the page renders: the total is on screen at 390px and beside the " +
-    "grid at 1180px, the sheet holds still, and nothing spills sideways at 320px.");
+    "grid at 1180px, the sheet holds still, and nothing spills sideways at 320px. " +
+    "The method's uncertainty reads under the total at 320, 390 and 1180px, and its " +
+    "mark leads to a note that is not covered at 390px.");
   return 0;
 }
 

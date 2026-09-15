@@ -19,7 +19,9 @@ import path from "node:path";
 import { loadArtifact } from "../assets/benson.js";
 import {
   MINUS,
+  ELEMENT_NAMES,
   combinedUncertainty,
+  describeMethodUncertainty,
   describeTotal,
   formatIncrement,
   formatKcal,
@@ -27,10 +29,11 @@ import {
   formatSelectionAsText,
   formatTotal,
   rangeSpread,
+  sourceOf,
 } from "../assets/format.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const { categories, index: rows } = await loadArtifact({
+const { categories, index: rows, references, uncertainty } = await loadArtifact({
   readText: (relative) => readFile(path.join(ROOT, relative), "utf8"),
   path: "dist/increments.json",
 });
@@ -137,6 +140,115 @@ test("ten groups at +-3 report the method figure, not the quadrature sum", () =>
 
 test("nothing chosen is still the method figure, not zero", () => {
   assert.equal(combinedUncertainty([], 5.5), 5.5);
+});
+
+/* -------------------------------------------------------------------------- */
+/* What the line under the total says                                           */
+/* -------------------------------------------------------------------------- */
+
+const byFile = new Map(categories.map((category) => [category.file, category]));
+/** A chosen increment, in the shape assets/selection.js keeps one. */
+const chosen = (row, count = 1) => ({ ...row, categoryFile: row.category.file, count });
+const say = (entries, figures = uncertainty) => describeMethodUncertainty(entries, byFile, figures, references);
+const textOf = (said) => said.sentences.map((sentence) => sentence.text);
+
+// Found by what they are rather than by name, so a renamed group cannot turn
+// one of these into a different kind of total without the test noticing.
+const enthalpy = (holds) => rows.find((row) => row.category.symbol === "ΔHf°" && holds(row.composition ?? {}));
+const HYDROCARBON = enthalpy((atoms) => atoms.C && atoms.H && !atoms.O && !atoms.N);
+const OXYGEN = enthalpy((atoms) => atoms.O && !atoms.N);
+const NITROGEN = enthalpy((atoms) => atoms.N);
+const A_VALUE = rows.find((row) => row.category.symbol === "ΔG°");
+const COHEN = references.find((reference) => reference.key === "Cohen1996");
+const LEAD = "Benson estimates of gas-phase ΔHf° are typically off by about 5.5 kJ/mol.";
+
+test("the figure served is Cohen 1996's, for gas-phase ΔHf° of carbon, hydrogen and oxygen", () => {
+  // The owner chose this figure and its wording. Changing either is a decision
+  // about what students are told, so it is made here on purpose or not at all.
+  assert.ok(HYDROCARBON && OXYGEN && NITROGEN && A_VALUE && COHEN, "a fixture row or reference is missing");
+  assert.deepEqual(
+    uncertainty.map(({ symbol, value, unit, phase, elements, ref }) => ({ symbol, value, unit, phase, elements, ref })),
+    [{ symbol: "ΔHf°", value: 5.5, unit: "kJ/mol", phase: "gas", elements: ["C", "H", "O"], ref: "Cohen1996" }],
+  );
+});
+
+test("nothing chosen says nothing about the method's error", () => {
+  assert.equal(say([]), null);
+});
+
+test("a total of carbon, hydrogen and oxygen groups gets the figure, citing its reference and note", () => {
+  assert.deepEqual(say([chosen(HYDROCARBON, 2), chosen(OXYGEN)]).sentences,
+    [{ text: LEAD, ref: COHEN.number, figure: 0 }]);
+});
+
+test("a total of A-values alone is told the figure is not for it", () => {
+  assert.deepEqual(say([chosen(A_VALUE, 2)]).sentences, [{
+    text: "No method error is given for a ΔG° total; the figure is for ΔHf°.", ref: null, figure: null,
+  }]);
+});
+
+test("a mixed total gets the figure for its enthalpy terms only", () => {
+  assert.deepEqual(textOf(say([chosen(HYDROCARBON), chosen(A_VALUE)])),
+    [LEAD, "The figure is for the ΔHf° terms only."]);
+});
+
+test("a nitrogen group is told the figure does not cover it", () => {
+  assert.deepEqual(textOf(say([chosen(HYDROCARBON), chosen(NITROGEN)])),
+    [LEAD, "The figure does not cover nitrogen."]);
+  assert.deepEqual(textOf(say([chosen(NITROGEN), chosen(A_VALUE)])),
+    [LEAD, "The figure is for the ΔHf° terms only.", "The figure does not cover nitrogen."]);
+});
+
+test("each element a figure was not measured on is named, and no other", () => {
+  const carbonAndHydrogenOnly = uncertainty.map((figure) => ({ ...figure, elements: ["C", "H"] }));
+  assert.deepEqual(textOf(say([chosen(HYDROCARBON), chosen(OXYGEN), chosen(NITROGEN)], carbonAndHydrogenOnly)),
+    [LEAD, "The figure does not cover nitrogen or oxygen."]);
+});
+
+test("the chosen groups' own uncertainties are not added up into the figure (D11)", () => {
+  // In quadrature, ten at 3 kJ/mol would read "about 9.5".
+  assert.deepEqual(textOf(say([chosen({ ...HYDROCARBON, uncertainty: 3 }, 10)])), [LEAD]);
+});
+
+test("a total from a category that has not said what it holds is told nothing", () => {
+  assert.equal(say([chosen(HYDROCARBON), { categoryFile: "99_Unknown.csv", count: 1, composition: { C: 1 } }]), null);
+});
+
+test("with no figure in the artifact there is nothing to say", () => {
+  assert.equal(say([chosen(HYDROCARBON)], []), null);
+});
+
+test("a figure citing a reference the artifact does not hold is an error, not an unmarked sentence", () => {
+  const uncited = uncertainty.map((figure) => ({ ...figure, ref: "Nobody2000" }));
+  assert.throws(() => say([chosen(HYDROCARBON)], uncited), /cites 'Nobody2000'/);
+});
+
+test("every element a served group holds has a word to be written with", () => {
+  const elements = new Set(rows.flatMap((row) => Object.keys(row.composition ?? {})));
+  assert.deepEqual([...elements].filter((element) => !(element in ELEMENT_NAMES)), []);
+});
+
+test("loadArtifact hands back the references and the figures as the artifact holds them", async () => {
+  const artifact = JSON.parse(await readFile(path.join(ROOT, "dist/increments.json"), "utf8"));
+  assert.deepEqual(references, artifact.references);
+  assert.deepEqual(uncertainty, artifact.uncertainty);
+});
+
+/* -------------------------------------------------------------------------- */
+/* The table's Source column                                                    */
+/* -------------------------------------------------------------------------- */
+
+test("a row naming no Source of its own keeps its category's description, word for word", () => {
+  assert.deepEqual(sourceOf(HYDROCARBON, references), { number: null, label: HYDROCARBON.category.source });
+  assert.equal(HYDROCARBON.category.source, "Published Benson tables (pending final review)");
+});
+
+test("a row whose Source names a reference shows that reference's number", () => {
+  assert.deepEqual(sourceOf({ ...HYDROCARBON, ref: "Cohen1996" }, references), { number: COHEN.number, label: null });
+});
+
+test("a row citing a reference the artifact does not hold is an error", () => {
+  assert.throws(() => sourceOf({ ...HYDROCARBON, ref: "Nobody2000" }, references), /cites 'Nobody2000'/);
 });
 
 /* -------------------------------------------------------------------------- */

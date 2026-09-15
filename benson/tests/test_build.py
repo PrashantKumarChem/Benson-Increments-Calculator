@@ -15,7 +15,7 @@ import unittest
 from pathlib import Path
 
 from benson.build import ARTIFACT_PATH, BuildError, build_artifact, write_artifact
-from benson.data import CSV_DIR, NOTATION_DIR, REFERENCES_PATH
+from benson.data import CSV_DIR, NOTATION_DIR, REFERENCES_PATH, UNCERTAINTY_PATH
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -43,6 +43,7 @@ class Fixture(unittest.TestCase):
         # file is a valid state, and the relative default would read the
         # repository's own.
         self.references_path = os.path.join(self._data.name, "references.csv")
+        self.uncertainty_path = os.path.join(self._data.name, "uncertainty.csv")
         for name, text in MINIMAL_NOTATION.items():
             self._write(self.notation_dir, name, text)
 
@@ -65,8 +66,11 @@ class Fixture(unittest.TestCase):
     def write_references(self, text):
         self._write(self._data.name, "references.csv", text)
 
+    def write_uncertainty(self, text):
+        self._write(self._data.name, "uncertainty.csv", text)
+
     def build(self):
-        return build_artifact(self.csv_dir, self.notation_dir, self.references_path)
+        return build_artifact(self.csv_dir, self.notation_dir, self.references_path, self.uncertainty_path)
 
 
 class TheShapeOfTheArtifact(Fixture):
@@ -239,9 +243,25 @@ class References(Fixture):
                               'ABE,"Abe, B. Another, 1999.",')
         self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
         self.assertEqual(self.build()["references"], [
-            {"number": 1, "key": "ZED", "citation": "Zed, A. A work, 2000.", "doi": "10.0000/zed"},
-            {"number": 2, "key": "ABE", "citation": "Abe, B. Another, 1999.", "doi": None},
+            {"number": 1, "key": "ZED", "citation": "Zed, A. A work, 2000.", "doi": "10.0000/zed", "work": None},
+            {"number": 2, "key": "ABE", "citation": "Abe, B. Another, 1999.", "doi": None, "work": None},
         ])
+
+    def test_a_reference_carries_the_work_its_columns_describe(self):
+        self.write_references("Key,Citation,DOI,Type,Title,Authors,Year,Volume,FirstPage,Publisher\n"
+                              "REF1,A citation,10.0000/ref1,journal-article,A title,Hall; Baldt,1971,93,140,")
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        [reference] = self.build()["references"]
+        self.assertEqual(reference["work"], {"type": "journal-article", "title": "A title",
+                                             "authors": ["Hall", "Baldt"], "year": 1971,
+                                             "volume": "93", "firstPage": "140"})
+
+    def test_a_work_the_lock_could_not_read_refuses_to_build(self):
+        self.write_references("Key,Citation,DOI,Type,Year\nREF1,A citation,10.0000/ref1,journal-article,1971a")
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+        with self.assertRaises(BuildError) as caught:
+            self.build()
+        self.assertIn(":2: REF1: Year '1971a' is not a year", str(caught.exception))
 
     def test_a_row_carries_the_key_its_source_names(self):
         self.write_references("Key,Citation,DOI\nREF1,A citation,")
@@ -271,6 +291,52 @@ class References(Fixture):
         self.assertNotEqual(first, self.build()["content_hash"])
 
 
+class MethodUncertainty(Fixture):
+    """data/uncertainty.csv, carried as the artifact's uncertainty block."""
+
+    HEADER = "Symbol,Value,Unit,Phase,Elements,Source,Note\n"
+
+    def setUp(self):
+        super().setUp()
+        self.write_notation("categories.csv", "File,Quantity,Symbol,Unit,Source,Note\n"
+                                              "01_A.csv,standard enthalpy of formation,ΔHf°,kJ/mol,,")
+        self.write_references("Key,Citation,DOI\nREF1,A citation,")
+        self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
+
+    def test_a_figure_is_carried_with_everything_the_page_says_beside_it(self):
+        self.write_uncertainty(self.HEADER + 'ΔHf°,5.5,kJ/mol,gas,C H O,REF1,"A note, with a comma"')
+        self.assertEqual(self.build()["uncertainty"], [{
+            "symbol": "ΔHf°", "value": 5.5, "decimals": 1, "unit": "kJ/mol", "storedValue": 5.5,
+            "phase": "gas", "elements": ["C", "H", "O"], "ref": "REF1", "note": "A note, with a comma",
+        }])
+
+    def test_a_figure_printed_in_kcal_mol_is_converted_as_a_value_is(self):
+        self.write_uncertainty(self.HEADER + "ΔHf°,1.32,kcal/mol,gas,C H O,REF1,A note")
+        [figure] = self.build()["uncertainty"]
+        self.assertAlmostEqual(figure["value"], 1.32 * 4.184)
+        self.assertEqual((figure["storedValue"], figure["unit"]), (1.32, "kcal/mol"))
+
+    def test_a_blank_unit_is_kj_mol(self):
+        self.write_uncertainty(self.HEADER + "ΔHf°,5.5,,gas,C H O,REF1,A note")
+        [figure] = self.build()["uncertainty"]
+        self.assertEqual((figure["value"], figure["unit"]), (5.5, "kJ/mol"))
+
+    def test_no_uncertainty_file_builds_an_empty_list(self):
+        self.assertEqual(self.build()["uncertainty"], [])
+
+    def test_a_figure_with_a_problem_refuses_to_build_and_names_its_line(self):
+        self.write_uncertainty(self.HEADER + "ΔHf°,5.5,kJ/mol,gas,C H O,REF2,A note")
+        with self.assertRaises(BuildError) as caught:
+            self.build()
+        self.assertIn("uncertainty.csv:2: Source 'REF2' is not a key", str(caught.exception))
+
+    def test_a_changed_figure_changes_the_content_hash(self):
+        self.write_uncertainty(self.HEADER + "ΔHf°,5.5,kJ/mol,gas,C H O,REF1,A note")
+        first = self.build()["content_hash"]
+        self.write_uncertainty(self.HEADER + "ΔHf°,5.6,kJ/mol,gas,C H O,REF1,A note")
+        self.assertNotEqual(first, self.build()["content_hash"])
+
+
 class Reproducibility(Fixture):
     def test_building_twice_from_the_same_source_is_byte_identical(self):
         self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42\nC-(C)2(H)2,-20.9")
@@ -285,7 +351,8 @@ class Reproducibility(Fixture):
         with tempfile.TemporaryDirectory() as other_csv_dir:
             with open(os.path.join(other_csv_dir, "01_A.csv"), "w", encoding="utf-8", newline="") as handle:
                 handle.write("Group,Value\nC-(C)(H)3,-42")
-            second = build_artifact(other_csv_dir, self.notation_dir, self.references_path)["content_hash"]
+            second = build_artifact(other_csv_dir, self.notation_dir, self.references_path,
+                                    self.uncertainty_path)["content_hash"]
 
         self.assertEqual(first, second, "the hash is a function of the bytes read, not of where they live")
 
@@ -302,7 +369,8 @@ class WritingTheArtifact(Fixture):
         self.write_csv("01_A.csv", "Group,Value\nC-(C)(H)3,-42")
         with tempfile.TemporaryDirectory() as out_dir:
             path = os.path.join(out_dir, "increments.json")
-            written = write_artifact(path, self.csv_dir, self.notation_dir, self.references_path)
+            written = write_artifact(path, self.csv_dir, self.notation_dir, self.references_path,
+                                     self.uncertainty_path)
             with open(path, encoding="utf-8") as handle:
                 self.assertEqual(json.load(handle), written)
 
@@ -312,7 +380,8 @@ class TheRepositoryData(unittest.TestCase):
 
     def test_the_committed_data_builds_without_a_guard_firing(self):
         try:
-            artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH))
+            artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH),
+                                   str(ROOT / UNCERTAINTY_PATH))
         except BuildError as error:
             self.fail(f"the repository's own data should build: {error}")
         self.assertEqual(len(artifact["increments"]), 236)
@@ -320,7 +389,8 @@ class TheRepositoryData(unittest.TestCase):
     def test_no_real_category_converts_a_value_yet(self):
         # D18: "Building this changes no value." Every category on main
         # declares kJ/mol, so every increment's stored and summed value agree.
-        artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH))
+        artifact = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH),
+                                   str(ROOT / UNCERTAINTY_PATH))
         for increment in artifact["increments"]:
             with self.subTest(label=increment["label"]):
                 self.assertEqual(increment["unit"], "kJ/mol")
@@ -333,7 +403,8 @@ class TheRepositoryData(unittest.TestCase):
         self.assertTrue(path.exists(), f"{ARTIFACT_PATH} is missing - run: python tools/build_dist.py")
         with open(path, encoding="utf-8") as handle:
             committed = json.load(handle)
-        built = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH))
+        built = build_artifact(str(ROOT / CSV_DIR), str(ROOT / NOTATION_DIR), str(ROOT / REFERENCES_PATH),
+                                   str(ROOT / UNCERTAINTY_PATH))
         self.assertEqual(committed, built)
 
 

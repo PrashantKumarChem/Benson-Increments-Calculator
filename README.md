@@ -29,6 +29,9 @@ so the reasoning stays visible and the arithmetic stays honest.
 - Switch to the table to see each value beside its unit, quantity and source
 - Running total in kJ/mol and kcal/mol, always on screen, headed by what it is
   a total *of* — and told plainly when it mixes two different quantities
+- Under the total, how far the method itself typically misses, where a
+  published figure applies, with its caveats and a numbered reference at the
+  foot of the page
 - Remove any single entry, undo the last addition, or reset
 - Copy the whole working out as text, for pasting into a report
 
@@ -157,8 +160,10 @@ at the page caught both.
 
 `check_render.mjs` loads the page at 320, 390 and 1180px, with and without
 increments chosen, and checks that the total is on screen, that it sits beside
-the increments on a wide screen, that adding one does not move the sheet, and
-that nothing spills sideways. Each of those has been run against a deliberately
+the increments on a wide screen, that adding one does not move the sheet, that
+nothing spills sideways, and that the method's uncertainty can be read under the
+total and its citation mark leads to a note the phone sheet does not cover.
+Each of those has been run against a deliberately
 broken copy to confirm it fails. CI installs a browser for it; nothing else
 here needs one, which is why it is a separate script rather than a test.
 
@@ -180,10 +185,12 @@ CSV_data_files/         the increment data
 notation/               what the group names mean, the words students use, and
                         what each category of numbers is (categories.csv)
 data/references.csv     the published works an increment's Source can name
+data/uncertainty.csv    the published figure for the method's own error, and
+                        what a reader needs to know about it
 benson/                 the data rules, in Python - the only place one is written
 dist/increments.json    the generated artifact the site fetches; benson/build.py
-                        derives it from CSV_data_files/, notation/ and
-                        data/references.csv
+                        derives it from CSV_data_files/, notation/,
+                        data/references.csv and data/uncertainty.csv
 tools/                  data tooling and tests
 Benson Increments Calculator.ipynb   the original notebook (see below)
 ```

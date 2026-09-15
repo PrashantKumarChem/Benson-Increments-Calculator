@@ -7,8 +7,8 @@
 import { fetchText, loadArtifact } from "./benson.js";
 import { countsByCategory, sectionsFor, toggleFilter, visibleRows } from "./browse.js";
 import {
-  describeTotal, formatIncrement, formatKcal, formatRange, formatSelectionAsText,
-  formatTotal, rangeSpread,
+  describeMethodUncertainty, describeTotal, formatIncrement, formatKcal, formatRange,
+  formatSelectionAsText, formatTotal, rangeSpread, sourceOf,
 } from "./format.js";
 import { createSelection, keyOf } from "./selection.js";
 import { sheetMetrics, swipeIntent } from "./sheet.js";
@@ -50,7 +50,16 @@ const view = {
   mode: "cards",
   /** kJ/mol -> kcal/mol, from the artifact's display block (assets/benson.js). */
   kjToKcal: 1,
+  /** The artifact's references, numbered, and its figures for the method's own error. */
+  references: [], uncertainty: [],
 };
+
+/**
+ * A citation mark: the reference's number, linking to where the page says more.
+ * The label is what a screen reader says for a link whose visible text is one digit.
+ */
+const citeMark = (number, target, label) =>
+  `<sup class="cite-mark"><a href="#${target}" aria-label="${escapeHtml(label)}">${number}</a></sup>`;
 
 /** One increment, as a card. */
 function cardHtml(increment, counts) {
@@ -91,6 +100,7 @@ function rowHtml(increment, counts) {
   const { label, category } = increment;
   const count = counts.get(keyOf(category.file, label)) ?? 0;
   const or = (text) => escapeHtml(text || "\u2014");
+  const source = sourceOf(increment, view.references);
   return `<tr class="${count ? "picked" : ""}">
       <th scope="row"><button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
         >${asFormula(label)}</button>${count
@@ -102,7 +112,9 @@ function rowHtml(increment, counts) {
       <td class="num soft">${increment.isRange ? escapeHtml(formatRange(increment)) : "&mdash;"}</td>
       <td class="soft">${or(category.unit)}</td>
       <td class="soft">${or(category.quantity)}</td>
-      <td class="soft">${or(category.source)}</td>
+      <td class="soft">${source.number
+        ? citeMark(source.number, `ref-${source.number}`, `Reference ${source.number}`)
+        : or(source.label)}</td>
     </tr>`;
 }
 
@@ -178,6 +190,18 @@ function renderTally() {
   // set as one string it inherited the figure's monospace and read as code.
   el("kcal").innerHTML =
     `${escapeHtml(formatKcal(totalKj * view.kjToKcal))}<span>kcal/mol</span>`;
+
+  // How far the method itself typically misses, where a figure is published
+  // for a total like this one, and a plain word where none is. format.js
+  // decides which; the figure and its citation come from the artifact.
+  const method = describeMethodUncertainty(entries, view.byFile, view.uncertainty, view.references);
+  el("method").hidden = !method;
+  if (method) {
+    el("method").innerHTML = method.sentences
+      .map(({ text, ref, figure }) => escapeHtml(text) +
+        (ref ? citeMark(ref, `method-note-${figure}`, `What this figure means, and reference ${ref}`) : ""))
+      .join(" ");
+  }
 
   // What the total is a total of. The categories do not all hold the same
   // quantity - a group increment is an enthalpy of formation, a cyclohexane
@@ -558,6 +582,36 @@ el("panel-toggle").addEventListener("click", () => {
   setPanelOpen(el("tally-panel").dataset.open !== "true");
 });
 
+// The citation mark under the total leads to the foot of the page. On a phone
+// the open sheet would sit over what it leads to, so following it shuts the
+// sheet; beside the grid the attribute changes nothing.
+el("method").addEventListener("click", (event) => {
+  if (event.target.closest("a")) setPanelOpen(false);
+});
+
+/**
+ * The foot of the page: what each method figure means, then the works cited.
+ *
+ * Written once, from the artifact. The note is the figure's own, from
+ * data/uncertainty.csv, because what a reader has to know to read a figure
+ * honestly is part of the figure. The numbers are the references' places in
+ * data/references.csv, given at build time, so none is written here.
+ */
+function renderNotes() {
+  const notes = view.uncertainty.map((figure, index) =>
+    `<h2 class="notes-head" id="method-note-${index}">About that figure</h2>` +
+    `<p>${escapeHtml(figure.note)}</p>`).join("");
+  const references = view.references.map((reference) =>
+    `<li id="ref-${reference.number}" value="${reference.number}">${escapeHtml(reference.citation)}` +
+    (reference.doi
+      ? `. <a href="https://doi.org/${escapeHtml(encodeURI(reference.doi))}">doi:${escapeHtml(reference.doi)}</a>`
+      : "") +
+    "</li>").join("");
+  el("notes").innerHTML = notes +
+    (references ? `<h2 class="notes-head">References</h2><ol>${references}</ol>` : "");
+  el("notes").hidden = !notes && !references;
+}
+
 /**
  * Swipe the sheet open and shut.
  *
@@ -849,11 +903,15 @@ try {
   // benson/build.py refuses to write one when a notation row cannot be read),
   // so there is nothing left for that fallback to catch, and one clear error
   // path is a truer picture of the one thing that can now go wrong: the fetch.
-  const { display, categories, index } = await loadArtifact({ readText: fetchText, path: ARTIFACT_URL });
+  const { display, categories, index, references, uncertainty } =
+    await loadArtifact({ readText: fetchText, path: ARTIFACT_URL });
   view.categories = categories;
   view.index = index;
   view.byFile = new Map(categories.map((category) => [category.file, category]));
   view.kjToKcal = display.kj_to_kcal;
+  view.references = references;
+  view.uncertainty = uncertainty;
+  renderNotes();
 
   el("footer").innerHTML =
     `${index.length} increments across ${categories.length} categories, built from the ` +

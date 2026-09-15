@@ -50,5 +50,11 @@ export async function loadArtifact({ readText, path = "dist/increments.json" } =
     return resolved;
   });
 
-  return { schema: artifact.schema, display: artifact.display, categories, index };
+  // The references and the method's uncertainty figures are handed back as the
+  // artifact holds them: a reference's number and a figure's note are already
+  // what the page shows.
+  return {
+    schema: artifact.schema, display: artifact.display, categories, index,
+    references: artifact.references, uncertainty: artifact.uncertainty,
+  };
 }

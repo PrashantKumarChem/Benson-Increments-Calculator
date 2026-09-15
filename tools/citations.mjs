@@ -8,12 +8,10 @@
  * CSV parser this repository has, rather than through a second one written in
  * JavaScript.
  *
- * A reference carries a key, a citation and a DOI, and nothing yet that says
- * which work its DOI is meant to be. tools/doi_lock.mjs compares a DOI's record
- * with a citation's `work` fields and refuses a DOI that has none, so the first
- * reference given a DOI fails tools/doi_lock.test.mjs by name until those fields
- * have a column to live in. No reference has been added yet, and giving that
- * column a shape before the first one exists would be guessing at it.
+ * A reference's `work` is what its Type, Title, Authors, Year, Volume, FirstPage
+ * and Publisher columns say, in the shape benson/build.py gives it - the shape
+ * the thermochemistry test writes by hand. tools/doi_lock.mjs compares a DOI's
+ * record with it, and refuses a DOI whose reference names no Type.
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -36,6 +34,8 @@ export function referenceCitations(artifact) {
     citedBy: `data/references.csv ${reference.key}`,
     citation: reference.citation,
     doi: reference.doi,
+    // Absent rather than null when there is none, as on the test's citations.
+    ...(reference.work ? { work: reference.work } : {}),
   }));
 }
 

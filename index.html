@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Benson Increments Calculator</title>
 <meta name="description" content="Estimate the standard heat of formation of an organic molecule by choosing Benson group increments.">
-<link rel="stylesheet" href="assets/styles.css?v=191c7faa9c">
+<link rel="stylesheet" href="assets/styles.css?v=19c08447a4">
 <!-- A remembered theme has to be on the page before it is first painted, and
      assets/app.js is a module, which means it is deferred until after that.
      Setting it there would show the wrong colours for a frame and then flip
@@ -72,14 +72,14 @@
 <script type="importmap">
 {
   "imports": {
-    "./assets/app.js": "./assets/app.js?v=191c7faa9c",
-    "./assets/benson.js": "./assets/benson.js?v=191c7faa9c",
-    "./assets/browse.js": "./assets/browse.js?v=191c7faa9c",
-    "./assets/format.js": "./assets/format.js?v=191c7faa9c",
-    "./assets/notation.js": "./assets/notation.js?v=191c7faa9c",
-    "./assets/selection.js": "./assets/selection.js?v=191c7faa9c",
-    "./assets/sheet.js": "./assets/sheet.js?v=191c7faa9c",
-    "./assets/theme.js": "./assets/theme.js?v=191c7faa9c"
+    "./assets/app.js": "./assets/app.js?v=19c08447a4",
+    "./assets/benson.js": "./assets/benson.js?v=19c08447a4",
+    "./assets/browse.js": "./assets/browse.js?v=19c08447a4",
+    "./assets/format.js": "./assets/format.js?v=19c08447a4",
+    "./assets/notation.js": "./assets/notation.js?v=19c08447a4",
+    "./assets/selection.js": "./assets/selection.js?v=19c08447a4",
+    "./assets/sheet.js": "./assets/sheet.js?v=19c08447a4",
+    "./assets/theme.js": "./assets/theme.js?v=19c08447a4"
   }
 }
 </script>
@@ -274,6 +274,12 @@
              bar is for, and a second unit of the same number is detail, which
              is what the body holds. -->
         <div class="kcal" id="kcal">0.00<span>kcal/mol</span></div>
+        <!-- How far the method itself typically misses, for a total like this
+             one: written by assets/app.js from the artifact's uncertainty
+             block. A line of its own, apart from the range band below, which
+             answers a different question - how far the published ranges move
+             this total. -->
+        <p class="method" id="method" hidden></p>
         <p class="mixed" id="mixed" hidden></p>
         <p class="empty" id="empty">Nothing chosen yet. Click a group to add it.</p>
         <p class="picks-head" id="picks-head" hidden>Contributions</p>
@@ -292,6 +298,12 @@
     </aside>
   </div>
 
+  <!-- What a figure on this page means, and the works it cites, numbered.
+       Written by assets/app.js from the artifact: the note is
+       data/uncertainty.csv's and each number is a reference's place in
+       data/references.csv, so this page states no figure or citation itself. -->
+  <section class="notes" id="notes" aria-label="Notes and references" hidden></section>
+
   <footer id="footer"></footer>
 </div>
 
@@ -301,7 +313,7 @@
      own bytes are folded into the same hash (tools/build_version.py), so a
      data-only change moves this version exactly as a code change does, and
      the version is not typed a second time in JS. -->
-<script type="module" id="app-module" src="assets/app.js?v=191c7faa9c"
-        data-artifact="dist/increments.json?v=191c7faa9c"></script>
+<script type="module" id="app-module" src="assets/app.js?v=19c08447a4"
+        data-artifact="dist/increments.json?v=19c08447a4"></script>
 </body>
 </html>
