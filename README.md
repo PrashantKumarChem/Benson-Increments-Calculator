@@ -100,9 +100,11 @@ python -m http.server 8000
 ### Changing anything in `assets/`
 
 Run `python tools/build_version.py`. The version is a short hash of the
-stylesheet and the modules, and the script writes it into every slot in
-`index.html` — a stylesheet link, a module `src`, and an import map that
-carries the same version to every module the page loads.
+stylesheet, the modules, and `dist/increments.json`'s own bytes — so a
+data-only change bumps it too — and the script writes it into every slot in
+`index.html` — a stylesheet link, a module `src`, an import map that carries
+the same version to every module the page loads, and the `data-artifact`
+attribute the page reads the artifact's own URL from.
 
 It used to be a date with a letter after it, picked by hand, under the rule
 that a value already in use is not a bump. That could only be checked by

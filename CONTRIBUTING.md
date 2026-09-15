@@ -41,7 +41,8 @@ Thank you for your interest in contributing to the Benson Increments Calculator!
 
 ## Code of Conduct
 
-Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+We expect contributors to treat each other with respect. This project does
+not yet have a formal, published code of conduct.
 
 ## License
 
