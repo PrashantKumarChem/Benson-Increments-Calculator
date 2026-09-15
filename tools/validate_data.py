@@ -38,7 +38,7 @@ from benson.data import (
     work_of,
 )
 from benson.notation import NOTATION_FILES, load_notation
-from benson.values import Value, read_uncertainty, read_value, to_kj
+from benson.values import read_uncertainty, read_value, to_kj
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
 # cannot print one. Reporting a problem must not itself become one.
@@ -94,7 +94,6 @@ def check_category(category: Category, report: Report) -> None:
         return
 
     first_seen: dict[str, int] = {}
-    readings: list[tuple[int, str, Value]] = []
     for line, row in category.records:
         # A line with no comma at all is missing one, not carrying a stray one;
         # the site says so in the same words. Only when there is no comma: a comma
@@ -132,12 +131,10 @@ def check_category(category: Category, report: Report) -> None:
             report.add(name, line, f"{label or 'row'}: {exc}")
 
         try:
-            reading = read_value(raw_value)
+            read_value(raw_value)
         except ValueError as exc:
             report.add(name, line, f"{label or 'row'}: {exc}")
             continue
-        if label:
-            readings.append((line, label, reading))
 
     # A file mixing a range and a negative used to be unreadable by the
     # notebook's own pandas-based parser (H3): a hyphen range typed the whole
