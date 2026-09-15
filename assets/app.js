@@ -101,7 +101,11 @@ function rowHtml(increment, counts) {
   const count = counts.get(keyOf(category.file, label)) ?? 0;
   const or = (text) => escapeHtml(text || "\u2014");
   const source = sourceOf(increment, view.references);
-  return `<tr class="${count ? "picked" : ""}">
+  // The row itself carries the file and label now, not only the name button
+  // inside it: a card is one button covering its whole area, and this is what
+  // lets any cell in the row add the same way, rather than only the name.
+  return `<tr class="${count ? "picked" : ""}"
+             data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}">
       <th scope="row"><button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
         >${asFormula(label)}</button>${count
           ? `<button class="tally" data-step-down
@@ -711,6 +715,16 @@ function addIncrement(file, label) {
   selection.add({ ...row, categoryFile: category.file, categoryTitle: category.title });
 }
 
+/**
+ * The button that stands for one increment: a card, or a table row's name.
+ *
+ * Not the count badges. In the table a badge is a real button and carries the
+ * same file and label as the group it belongs to, so without the exclusion it
+ * matched - and pressing + on one called addIncrement with the dataset of the
+ * control that takes one away, adding an increment from the remove button.
+ */
+const INCREMENT_BUTTON = "button[data-label]:not([data-step-down])";
+
 el("library").addEventListener("click", (event) => {
   // Taking one back, before adding one: on a card the badge is a span inside
   // the button, so both would match the add below. In the table it is a button
@@ -732,9 +746,31 @@ el("library").addEventListener("click", (event) => {
     return;
   }
 
-  const button = event.target.closest("button[data-label]");
-  if (!button) return;
-  addIncrement(button.dataset.file, button.dataset.label);
+  // A citation mark is a link to the references list, not a place to add
+  // from - and it sits inside a row that would otherwise match below, so this
+  // has to be checked first.
+  if (event.target.closest("a")) return;
+
+  // A drag across a cell is a reader selecting a value to copy, not a press on
+  // the row: the table is where values and provenance are read, and adding
+  // here would change the total without saying so, then re-render the
+  // selection away. A card holds no text anyone selects, so the grid never
+  // needed this, and a button - the name, or a card - is left to add as before.
+  if (!event.target.closest("button") && !getSelection()?.isCollapsed) return;
+
+  // A card is one button that covers its whole area, so clicking anywhere on
+  // it already matched here. A table row is not a button - rowHtml() puts the
+  // same file and label on the <tr> itself so any cell in it does the same
+  // job, without giving a DOM-free module an opinion about which shape it is.
+  const target = event.target.closest("button[data-label], tr[data-file]");
+  if (!target) return;
+  addIncrement(target.dataset.file, target.dataset.label);
+  // Most browsers focus a button when it is pressed (Safari does not), which
+  // is what lets + and - adjust a card straight after clicking it. A row is
+  // not a control and takes no focus, so the keyboard was left with nothing to
+  // act on; the row's name button stands for it, and render() carries the
+  // focus across the redraw from there.
+  if (target.tagName === "TR") target.querySelector(INCREMENT_BUTTON)?.focus({ preventScroll: true });
   render();
 });
 
@@ -799,11 +835,7 @@ el("copy").addEventListener("click", async (event) => {
  * job now, for every button it redraws rather than only for these two keys.
  */
 function focusableIncrements() {
-  // Not the count badges. In the table a badge is a real button and carries
-  // the same file and label as the group it belongs to, so it matched here -
-  // and pressing + on one called addIncrement with the dataset of the control
-  // that takes one away, adding an increment from the remove button.
-  return [...el("library").querySelectorAll("button[data-label]:not([data-step-down])")];
+  return [...el("library").querySelectorAll(INCREMENT_BUTTON)];
 }
 
 addEventListener("keydown", (event) => {
@@ -833,9 +865,9 @@ addEventListener("keydown", (event) => {
   }
 
   const current = document.activeElement;
-  // Tab reaches a badge even though the arrow keys no longer walk onto one,
-  // so the same exclusion has to be written here.
-  if (!current?.matches?.("#library button[data-label]:not([data-step-down])")) return;
+  // Tab reaches a badge even though the arrow keys do not walk onto one, so
+  // the same exclusion applies here.
+  if (!current?.matches?.(`#library ${INCREMENT_BUTTON}`)) return;
 
   const buttons = focusableIncrements();
   const here = buttons.indexOf(current);
