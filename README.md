@@ -58,8 +58,6 @@ Adding a category needs no code changes:
    the word, not a hyphen, because a hyphen also starts a negative number.
    Optional columns may follow - a per-row `Unit`, `Uncertainty`, `Source`,
    `Verified` and `Note`; see [.claude/rules/data.md](.claude/rules/data.md).
-   Keep a file to two columns for now, though: the notebook skips any file
-   that has more.
 3. Check the file, rebuild the artifact, and move the asset version (the
    artifact's own bytes are folded into it, so a data-only change bumps it
    too):
@@ -192,7 +190,7 @@ dist/increments.json    the generated artifact the site fetches; benson/build.py
                         derives it from CSV_data_files/, notation/,
                         data/references.csv and data/uncertainty.csv
 tools/                  data tooling and tests
-Benson Increments Calculator.ipynb   the original notebook (see below)
+Benson Increments Calculator.ipynb   the notebook - imports benson (see below)
 ```
 
 The seven files without any DOM access are the ones the unit tests cover,
@@ -240,16 +238,28 @@ for if it is forgotten.
 
 ## The notebook
 
-`Benson Increments Calculator.ipynb` is the original Jupyter version and remains
-the reference the web version is checked against. Run it with:
+`Benson Increments Calculator.ipynb` is for people who code, and who want to
+bring their own data and script against it — the website is the zero-install
+way to get a number; this is the way to do more. It installs
+[`benson`](benson/) — the same package `dist/increments.json` is built from —
+from GitHub, and runs in Colab with nothing cloned locally:
 
 ```bash
 pip install -r requirements.txt
 jupyter lab "Benson Increments Calculator.ipynb"
 ```
 
-It must be started from the repository folder, since it looks for
-`CSV_data_files/` relative to where Jupyter was launched.
+works the same way locally. It carries no CSV parser of its own: the curated
+data is fetched from the repository's `dist/increments.json`, and bringing
+your own data means calling `benson.build.build_artifact()` on your own CSV
+folder — documented in the notebook's own bring-your-own-data section — which
+returns exactly the shape the curated data does, because it is the same
+function.
+
+The earlier, self-contained notebook (its own parser, no package) is archived
+at
+[`Archives/gen2-Benson Increments Calculator.ipynb`](<Archives/gen2-Benson Increments Calculator.ipynb>),
+frozen with its own copy of the data it read.
 
 ## Contributing
 

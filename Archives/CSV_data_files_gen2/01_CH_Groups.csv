@@ -1,0 +1,45 @@
+CH Benson Group Increment,Delta_Hf kJ/mol
+C-(C)(H)3,-42
+C-(C)2(H)2,-20.9
+C-(C)3(H),-7
+C-(C)4,2
+Cd-(H)2,26.2
+Cd-(C)(H),35.8
+Cd-(C)2,42.6
+Cd-(Cd)(H),28.4
+Cd-(Cd)(C),36.7
+Cd-(Cd)2,53
+Cd-(Ct)(H),36
+Cd-(Ct)(C),40
+Cd-(CB)(H),28
+Cd-(CB)(C),36
+Cd-(CB)2,50
+Ct-(H),113
+Ct-(C),115
+Ct-(Cd),126
+Ct-(Ct),118
+Ct-(CB) + CB-(Ct),125
+CB-(H),13.8
+CB-(C),23
+CB-(Cd),27
+CB-(CB),21
+C(allene),141
+Cis- (one t-butyl),4
+Cis- (two t-butyl),17
+C-(Cd)(H)3,-42
+C-(Cd)(C)(H)2,-20.1
+C-(Cd)2(H)2,-18
+C-(Cd)(C)2(H),-7
+C-(Cd)2(C)(H),-7
+C-(Cd)(C)3,6
+C-(Ct)(C)(H)2,-20
+C-(Ct)(C)2(H),-6.5
+C-(Ct)(C)3,5.5
+C-(CB)(H)3,-42
+C-(CB)(C)(H)2,-20
+C-(CB)(C)2(H),-4
+C-(CB)(C)3,11
+C-(CB)2(H)2,-20
+C-(CB)3(H),-4
+C-(CB)4,31
+C-(Cd)(CB)(H)2,-18
