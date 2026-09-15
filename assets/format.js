@@ -79,6 +79,23 @@ export function rangeSpread(entries) {
 }
 
 /**
+ * The method's own uncertainty on a total, given the individual increments
+ * it is built from.
+ *
+ * `individualUncertainties` is accepted and deliberately not summed. Ten
+ * groups at ±3 kJ/mol would give ±9.5 in quadrature, nearly double Cohen's
+ * observed 5.5 kJ/mol mean absolute error - the group values were fitted to
+ * minimise whole-molecule residuals, so their errors are anticorrelated by
+ * construction, and naive propagation overestimates (D11). The empirical
+ * figure is what is displayed, supplied as `methodFigure` rather than
+ * computed here, because which figure that is stays a chemistry judgement
+ * this function does not make.
+ */
+export function combinedUncertainty(individualUncertainties, methodFigure) {
+  return methodFigure;
+}
+
+/**
  * What the running total is a total *of*.
  *
  * The categories do not all hold the same physical quantity: a Benson group

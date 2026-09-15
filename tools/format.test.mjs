@@ -19,6 +19,7 @@ import path from "node:path";
 import { loadArtifact } from "../assets/benson.js";
 import {
   MINUS,
+  combinedUncertainty,
   describeTotal,
   formatIncrement,
   formatKcal,
@@ -122,6 +123,20 @@ test("the spread is half a range's width, times how many were chosen", () => {
 
 test("increments that are not ranges contribute no spread", () => {
   assert.equal(rangeSpread([{ ...find("C-(C)(H)3"), count: 4 }]), 0);
+});
+
+/* -------------------------------------------------------------------------- */
+/* Method uncertainty (D11, D12 - a separate slot from the range spread above)  */
+/* -------------------------------------------------------------------------- */
+
+test("ten groups at +-3 report the method figure, not the quadrature sum", () => {
+  const tenAtThree = Array(10).fill(3);
+  assert.equal(combinedUncertainty(tenAtThree, 5.5), 5.5,
+    "quadrature would give about 9.5 here - D11 says display 5.5 instead");
+});
+
+test("nothing chosen is still the method figure, not zero", () => {
+  assert.equal(combinedUncertainty([], 5.5), 5.5);
 });
 
 /* -------------------------------------------------------------------------- */

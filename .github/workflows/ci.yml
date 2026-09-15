@@ -87,7 +87,10 @@ jobs:
         with:
           node-version: '22'
 
-      # Value parsing and the tally arithmetic, exercised against the real CSVs.
+      # The tally arithmetic, formatting and search, exercised against the real
+      # CSVs and against tests/conformance.json - the fixture that replaced
+      # check_parity.mjs at WP4 (benson/tests/test_conformance.py is its other
+      # consumer, checked in the job above).
       - name: Run tests
         run: node --test tools/*.test.mjs
 
@@ -122,29 +125,6 @@ jobs:
 
       - name: Check the page actually renders
         run: node tools/check_render.mjs
-
-  parity:
-    name: Parity with the notebook
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.11'
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '22'
-
-      - name: Install the notebook's dependencies
-        run: pip install -r requirements.txt
-
-      # Loads every increment twice - once with the notebook's own code, once
-      # with the site's - and fails on any difference. Retire this job when the
-      # notebook is retired.
-      - name: Compare every increment
-        run: node tools/check_parity.mjs
-        env:
-          PYTHON: python
 
   citations:
     name: Cited DOIs

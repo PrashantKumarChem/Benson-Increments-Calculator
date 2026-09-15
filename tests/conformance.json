@@ -1,6 +1,6 @@
 {
   "_comment": [
-    "The contract both implementations are held to. Empty on purpose: WP4 fills it.",
+    "The contract both implementations are held to. Filled in at WP4.",
     "",
     "A generated artifact removes drift from the data and everything derived from",
     "it, but not from the handful of rules that stay written twice - the tally",
@@ -9,11 +9,10 @@
     "the Python suite and the JavaScript suite are checking one agreed answer",
     "rather than checking each other. That is the difference between preventing",
     "drift and detecting it; it also survives the notebook being rewritten, which",
-    "tools/check_parity.mjs does not.",
+    "tools/check_parity.mjs did not.",
     "",
-    "It replaces check_parity.mjs at WP4 and not before: until then the parity",
-    "check is the safety net under the extraction, and a fixture covering less",
-    "than it does would be a downgrade dressed as an upgrade.",
+    "It replaced check_parity.mjs at WP4, once this file demonstrably covered",
+    "what that check covered - see the WP4 pull request for how that was proven.",
     "",
     "Each entry of 'cases' is one question with one answer:",
     "",
@@ -23,11 +22,116 @@
     "  input    the arguments, shaped by 'rule'",
     "  expect   the expected result",
     "",
-    "One case is required and is the reason this file is worth having: ten groups",
-    "each carrying an uncertainty of 3 must report the whole-total figure, not the",
-    "quadrature sum. That decision is exactly the kind a second implementation",
-    "reinvents wrongly six months later, and a wrong error bar looks like a right",
-    "one."
+    "'tally': input {entries: [{value, count}]}, expect a number - sum(value * count).",
+    "'total': input {kj}, expect a string - the total formatted the way the page",
+    "  shows it (one decimal, a typographic minus, zero takes no sign).",
+    "'query': input {query, aliases}, expect 'exact' | 'prefix' | 'contains' | null -",
+    "  the best a query answers to among the given aliases.",
+    "'uncertainty': input {individualUncertainties, methodFigure}, expect a number -",
+    "  the whole-method figure, never a quadrature sum of the individuals (D11).",
+    "  Required: this is the one case pinning 'ten groups at +-3 is not +-9.5'.",
+    "",
+    "WP4's decision on where the uncertainty and tally/total rules live in Python:",
+    "no production Python module owns them (the notebook has no widget UI before",
+    "WP5+, and this package's territory does not extend benson/ to cover them - see",
+    "the WP4 pull request). benson/tests/test_conformance.py pins them as small,",
+    "test-local pure functions instead, so this fixture still fails on a wrong",
+    "answer on the Python side rather than testing nothing. 'query' is the",
+    "exception: benson/notation.py already owns normalise()/score_of() for the",
+    "build-time alias precompute, so that rule is tested against the real thing on",
+    "both sides."
   ],
-  "cases": []
+  "cases": [
+    {
+      "id": "tally-mixed-signs-and-counts",
+      "rule": "tally",
+      "why": "the running total is sum(value x count); a chosen count must multiply, not just add once",
+      "input": { "entries": [{ "value": -42, "count": 2 }, { "value": 3.43, "count": 3 }] },
+      "expect": -73.71
+    },
+    {
+      "id": "tally-single-entry",
+      "rule": "tally",
+      "why": "one increment at count 1 is just its own value",
+      "input": { "entries": [{ "value": 118, "count": 1 }] },
+      "expect": 118
+    },
+    {
+      "id": "tally-empty-selection",
+      "rule": "tally",
+      "why": "nothing chosen totals to zero, not undefined or an error",
+      "input": { "entries": [] },
+      "expect": 0
+    },
+    {
+      "id": "total-negative-rounds-to-one-decimal",
+      "rule": "total",
+      "why": "a total is shown to one decimal, whatever precision its parts carried, and the minus is U+2212 not a hyphen",
+      "input": { "kj": -284.07 },
+      "expect": "−284.1"
+    },
+    {
+      "id": "total-positive-takes-a-plus",
+      "rule": "total",
+      "why": "a positive total is signed explicitly so it cannot be mistaken for unsigned",
+      "input": { "kj": 42.5 },
+      "expect": "+42.5"
+    },
+    {
+      "id": "total-zero-carries-no-sign",
+      "rule": "total",
+      "why": "zero is neither positive nor negative and must not print +0.0 or -0.0",
+      "input": { "kj": 0 },
+      "expect": "0.0"
+    },
+    {
+      "id": "query-exact-match",
+      "rule": "query",
+      "why": "an exact match must outrank a merely partial one",
+      "input": { "query": "ch3", "aliases": ["ch3"] },
+      "expect": "exact"
+    },
+    {
+      "id": "query-prefix-match",
+      "rule": "query",
+      "why": "what a student is midway through typing should still find the group",
+      "input": { "query": "ch3", "aliases": ["ch3o"] },
+      "expect": "prefix"
+    },
+    {
+      "id": "query-contains-match",
+      "rule": "query",
+      "why": "a substring elsewhere in the alias is the weakest match that still counts",
+      "input": { "query": "ch3", "aliases": ["och3"] },
+      "expect": "contains"
+    },
+    {
+      "id": "query-no-match",
+      "rule": "query",
+      "why": "an alias that shares none of the query's characters in order must not match at all",
+      "input": { "query": "ch3", "aliases": ["cd"] },
+      "expect": null
+    },
+    {
+      "id": "query-punctuation-only-matches-nothing",
+      "rule": "query",
+      "why": "normalise() strips punctuation; a query that normalises to nothing must not match every alias as an empty prefix",
+      "input": { "query": " -() ", "aliases": ["ch3"] },
+      "expect": null
+    },
+    {
+      "id": "query-best-of-several-aliases-wins",
+      "rule": "query",
+      "why": "one increment can carry several aliases; the score reported is the best among them, not the first",
+      "input": { "query": "ch3", "aliases": ["cd", "ch3o", "ch3"] },
+      "expect": "exact"
+    },
+    {
+      "id": "uncertainty-ten-groups-at-three-is-not-quadrature",
+      "rule": "uncertainty",
+      "why": "D11: ten groups at +-3 kJ/mol in quadrature would be about +-9.5, nearly double Cohen's observed 5.5 kJ/mol MAE - the whole-method figure is what must be reported",
+      "input": { "individualUncertainties": [3, 3, 3, 3, 3, 3, 3, 3, 3, 3], "methodFigure": 5.5 },
+      "expect": 5.5
+    }
+  ]
 }

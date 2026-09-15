@@ -5,19 +5,30 @@ paths:
 
 # Working with the notebook
 
-## It is the reference implementation
+## It is not a legacy artifact
 
-`Benson Increments Calculator.ipynb` is not a legacy artifact. It is the
-independent implementation that `tools/check_parity.mjs` holds the website to —
-every one of the 236 increments is read twice, once through the notebook's own
-code and once through the site's, and any difference fails CI.
+`Benson Increments Calculator.ipynb` still reads `CSV_data_files/` with its own
+code, unchanged since generation 2. It is not archived, and it is not wired to
+the website's rules in any way.
 
-That makes it the strongest correctness guarantee in the repository. **Changing
-how the notebook reads a value changes what parity means**, so run
-`check_parity.mjs` after any edit here, not just the unit tests.
+**There is no automated check left that the notebook's reading still agrees
+with the artifact's, value by value.** `tools/check_parity.mjs` used to be that
+check; WP4 retired it once the website had no parser left of its own to check
+against, and replaced it with `tests/conformance.json` — a fixture for the
+tally, formatting and search rules that stay written twice, not for the 236
+values themselves. Those stay unverified against each other by any script:
+what keeps them from drifting is that the source CSVs cannot express the one
+shape `parse_value` (below) cannot read — see the next section — plus a
+change here now needs a person to read the diff and think about what it
+changes, the same way a change to any unverified thing does.
+
+**If you edit `parse_value`, `load_increment_data` or `get_value_dicts`,
+compare its output against `dist/increments.json` by hand** —
+`tools/export_reference_values.py` still runs these functions read out of the
+notebook file and prints every value as JSON, even with its only caller gone:
 
 ```bash
-node tools/check_parity.mjs      # needs a PYTHON env var, interpreter with pandas
+python tools/export_reference_values.py > notebook-values.json
 ```
 
 ## The parser, and the trap it used to hold

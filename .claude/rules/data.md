@@ -61,8 +61,9 @@ last existing row. It fails loudly rather than silently, but it wastes a cycle.
 python tools/validate_data.py
 python tools/build_dist.py        # regenerates dist/increments.json, the built artifact
 python tools/build_version.py     # moves the asset version - the artifact's bytes are folded in
-node   tools/check_parity.mjs     # the site and the notebook must still agree
 ```
+
+The site no longer runs a second reading of the data to check against (WP3 moved it onto the artifact; WP4 retired `check_parity.mjs`, the check that used to compare them). The gen-2 notebook still reads these files with its own parser until WP7, and the "no ranges and negatives in one file" rule two sections up is what stands between a new row and that parser silently mishandling it — that is why the rule stays even though nothing here re-proves the notebook against new data automatically.
 
 `dist/increments.json` is generated. Never hand-edit it — a browser cannot
 list a directory, so `benson/build.py` derives the artifact from these files
