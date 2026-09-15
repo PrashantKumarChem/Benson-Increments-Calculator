@@ -101,7 +101,11 @@ function rowHtml(increment, counts) {
   const count = counts.get(keyOf(category.file, label)) ?? 0;
   const or = (text) => escapeHtml(text || "\u2014");
   const source = sourceOf(increment, view.references);
-  return `<tr class="${count ? "picked" : ""}">
+  // The row itself carries the file and label now, not only the name button
+  // inside it: a card is one button covering its whole area, and this is what
+  // lets any cell in the row add the same way, rather than only the name.
+  return `<tr class="${count ? "picked" : ""}"
+             data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}">
       <th scope="row"><button data-file="${escapeHtml(category.file)}" data-label="${escapeHtml(label)}"
         >${asFormula(label)}</button>${count
           ? `<button class="tally" data-step-down
@@ -732,9 +736,25 @@ el("library").addEventListener("click", (event) => {
     return;
   }
 
-  const button = event.target.closest("button[data-label]");
-  if (!button) return;
-  addIncrement(button.dataset.file, button.dataset.label);
+  // A citation mark is a link to the references list, not a place to add
+  // from - and it sits inside a row that would otherwise match below, so this
+  // has to be checked first.
+  if (event.target.closest("a")) return;
+
+  // A drag across a cell is a reader selecting a value to copy, not a press on
+  // the row: the table is where values and provenance are read, and adding
+  // here would change the total without saying so, then re-render the
+  // selection away. A card holds no text anyone selects, so the grid never
+  // needed this, and a button - the name, or a card - is left to add as before.
+  if (!event.target.closest("button") && !getSelection()?.isCollapsed) return;
+
+  // A card is one button that covers its whole area, so clicking anywhere on
+  // it already matched here. A table row is not a button - rowHtml() puts the
+  // same file and label on the <tr> itself so any cell in it does the same
+  // job, without giving a DOM-free module an opinion about which shape it is.
+  const target = event.target.closest("button[data-label], tr[data-file]");
+  if (!target) return;
+  addIncrement(target.dataset.file, target.dataset.label);
   render();
 });
 

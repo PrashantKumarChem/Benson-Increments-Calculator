@@ -508,15 +508,18 @@ input:focus-visible, button:focus-visible, a:focus-visible {
   font-size: .6875rem; font-weight: 600; letter-spacing: .3px; text-transform: uppercase;
 }
 .table tbody th { font-weight: 400; }
-.table tbody tr { border-bottom: 1px solid var(--line); }
+/* The whole row adds, the way the whole card does - not only the name inside
+   it - so it carries the pointer cursor a card's button gets for free. */
+.table tbody tr { border-bottom: 1px solid var(--line); cursor: pointer; }
 .table tbody tr:hover { background: var(--layer-accent); }
 .table tbody tr.picked { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
 .table .num {
   text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums;
 }
 .table .soft { color: var(--ink-soft); }
-/* The group name is how you add an increment in this view, so it is a target
-   before it is a label: at .85rem with no padding it came to about 21px, under
+/* The row is what adds now, but the name stays the one real, focusable
+   control in it - what Tab and the arrow keys land on - so it still needs a
+   target of its own: at .85rem with no padding it came to about 21px, under
    the 24px a pointer target needs. The height is given rather than the padding
    so the column does not widen and the row does not grow. */
 .table tbody th button {

@@ -409,6 +409,115 @@ async function main() {
       }
       await page.close();
     }
+
+    /* ---------------------------------------------------------------- */
+    /* The table adds by row, and the keyboard path still walks it       */
+    /* ---------------------------------------------------------------- */
+    // WP8: a card is one button covering its whole area, and the table has to
+    // add the same way - not only from the small name button inside a row -
+    // or the two views keep the mode split this package exists to close. This
+    // is the fault class no source-reading check can see: a row that looks
+    // clickable - it has a hover state and a pointer cursor - while a click on
+    // anything besides the name button does nothing.
+    {
+      const page = await browser.newPage({ viewport: { width: 1180, height: 900 } });
+      await page.goto(base, { waitUntil: "load" });
+      await page.waitForSelector(".grid button", { timeout: 15000 });
+      await page.locator('#views button[data-mode="table"]').click();
+      await page.waitForSelector(".table tbody tr", { timeout: 15000 });
+      await settle(page);
+
+      const rows = await page.locator(".table tbody tr").count();
+      if (rows < 200) {
+        fail("not all of the increments rendered as table rows", `${rows} rows, expected 236`);
+      }
+
+      const firstRow = page.locator(".table tbody tr").first();
+      const kjBefore = await page.textContent("#kj");
+
+      // A cell that carries no button of its own - clicking it must still add,
+      // which is the entire point of this package.
+      await firstRow.locator("td.num").first().click();
+      await page.waitForTimeout(120);
+      const kjAfterCellClick = await page.textContent("#kj");
+      const pickedAfterCellClick = (await firstRow.getAttribute("class")) ?? "";
+      if (kjAfterCellClick === kjBefore || !pickedAfterCellClick.includes("picked")) {
+        fail("clicking a table row's value cell does not add its increment",
+          `total read ${JSON.stringify(kjBefore)} before and ${JSON.stringify(kjAfterCellClick)} ` +
+          `after, row class ${JSON.stringify(pickedAfterCellClick)}`);
+      }
+
+      // A second cell, in the same row: this is a count stepper, not a
+      // one-shot toggle, so the same row clicked again adds a second one.
+      await firstRow.locator("td.soft").first().click();
+      await page.waitForTimeout(120);
+      const tallyAfterSecondClick = await firstRow.locator(".tally").textContent().catch(() => null);
+      if (tallyAfterSecondClick !== "×2") {
+        fail("clicking a table row a second time does not step its count",
+          `the count badge reads ${JSON.stringify(tallyAfterSecondClick)}, expected "×2"`);
+      }
+
+      // The count badge takes one back - clicking it must not also register as
+      // a click on the row, which would leave the count exactly where it
+      // started instead of falling to one.
+      await firstRow.locator(".tally").click();
+      await page.waitForTimeout(120);
+      const tallyAfterBadgeClick = await firstRow.locator(".tally").count();
+      const kjAfterBadgeClick = await page.textContent("#kj");
+      if (tallyAfterBadgeClick !== 1 || kjAfterBadgeClick !== kjAfterCellClick) {
+        fail("the table row's count badge does not take exactly one back",
+          `${tallyAfterBadgeClick} badge(s) remain and the total reads ` +
+          `${JSON.stringify(kjAfterBadgeClick)}, expected the pre-second-click total ` +
+          `${JSON.stringify(kjAfterCellClick)}`);
+      }
+
+      // The keyboard path: focus a row's name button directly (Tab would work
+      // too, but is slower and no more meaningful here), walk to the next row
+      // with an arrow key, and add with the same "+" the card grid answers to.
+      await page.locator(".table tbody tr").nth(2).locator("th button").focus();
+      const focusedBefore = await page.evaluate(() => document.activeElement?.textContent ?? null);
+      await page.keyboard.press("ArrowDown");
+      const moved = await page.evaluate(() => ({
+        text: document.activeElement?.textContent ?? null,
+        inLibrary: !!document.activeElement?.closest("#library"),
+      }));
+      if (!moved.inLibrary || moved.text === focusedBefore) {
+        fail("ArrowDown does not walk from one table row to the next",
+          `focus was on ${JSON.stringify(focusedBefore)}, and after ArrowDown reads ` +
+          `${JSON.stringify(moved.text)} (in #library: ${moved.inLibrary})`);
+      }
+
+      const kjBeforeKeyboardAdd = await page.textContent("#kj");
+      await page.keyboard.press("+");
+      await page.waitForTimeout(120);
+      const kjAfterKeyboardAdd = await page.textContent("#kj");
+      if (kjAfterKeyboardAdd === kjBeforeKeyboardAdd) {
+        fail("pressing + on a focused table row does not add it",
+          `total read ${JSON.stringify(kjBeforeKeyboardAdd)} before and unchanged after`);
+      }
+
+      // Making the whole row a target must not turn copying into adding. A drag
+      // across a cell ends in a click on it, so without a guard the reader who
+      // selects a value to paste elsewhere changes the total without being
+      // told, and the re-render that follows takes the selection away too.
+      const dragCell = page.locator(".table tbody tr").nth(5).locator("td.soft").nth(1);
+      const dragBox = await dragCell.boundingBox();
+      const kjBeforeDrag = await page.textContent("#kj");
+      await page.mouse.move(dragBox.x + 4, dragBox.y + dragBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(dragBox.x + dragBox.width - 4, dragBox.y + dragBox.height / 2, { steps: 8 });
+      await page.mouse.up();
+      await page.waitForTimeout(120);
+      const kjAfterDrag = await page.textContent("#kj");
+      const dragSelection = await page.evaluate(() => String(getSelection()));
+      if (kjAfterDrag !== kjBeforeDrag || !dragSelection) {
+        fail("selecting the text of a table cell adds its increment",
+          `total read ${JSON.stringify(kjBeforeDrag)} before the drag and ` +
+          `${JSON.stringify(kjAfterDrag)} after, and the selection is ${JSON.stringify(dragSelection)}`);
+      }
+
+      await page.close();
+    }
   } catch (error) {
     // A page too broken to measure throws instead of answering, and a stack
     // trace is a worse bug report than a sentence. It still exits non-zero.
@@ -432,7 +541,9 @@ function report() {
   console.log("OK - the page renders: the total is on screen at 390px and beside the " +
     "grid at 1180px, the sheet holds still, and nothing spills sideways at 320px. " +
     "The method's uncertainty reads under the total at 320, 390 and 1180px, and its " +
-    "mark leads to a note that is not covered at 390px.");
+    "mark leads to a note that is not covered at 390px. A table row adds and steps " +
+    "its count by clicking anywhere in it, selecting a cell's text does not add it, " +
+    "and the arrow keys and + still walk and add across rows.");
   return 0;
 }
 
