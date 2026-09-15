@@ -38,7 +38,7 @@ from benson.data import (
     work_of,
 )
 from benson.notation import NOTATION_FILES, load_notation
-from benson.values import Value, read_uncertainty, read_value, to_kj
+from benson.values import read_uncertainty, read_value, to_kj
 
 # A quantity symbol may be non-ASCII, and the default Windows console encoding
 # cannot print one. Reporting a problem must not itself become one.
@@ -94,7 +94,6 @@ def check_category(category: Category, report: Report) -> None:
         return
 
     first_seen: dict[str, int] = {}
-    readings: list[tuple[int, str, Value]] = []
     for line, row in category.records:
         # A line with no comma at all is missing one, not carrying a stray one;
         # the site says so in the same words. Only when there is no comma: a comma
@@ -132,40 +131,19 @@ def check_category(category: Category, report: Report) -> None:
             report.add(name, line, f"{label or 'row'}: {exc}")
 
         try:
-            reading = read_value(raw_value)
+            read_value(raw_value)
         except ValueError as exc:
             report.add(name, line, f"{label or 'row'}: {exc}")
             continue
-        if label:
-            readings.append((line, label, reading))
 
-    # While a range was written with a hyphen, this combination was unreadable.
-    # The notebook splits a string cell on the range separator, and pandas types
-    # a whole column as strings as soon as one cell is a range - so a negative
-    # sharing a file with a range arrived as "-42", split on its own minus sign,
-    # and became float(""). The separator is now the word "to", which cannot be
-    # a sign, and the notebook reads such a file correctly: checked by running
-    # its own parse_value over one, through pandas.
-    #
-    # The rule is kept until the notebook stops reading the data with a parser of
-    # its own. Two independent readings still exist, this is the one combination
-    # that has already driven them apart, and no category mixes them today - so
-    # holding the data inside what both are known to agree on costs nothing while
-    # the rules are being moved into one place.
-    #
-    # It asks the reading the value check above already made, rather than
-    # reading the cell a second way; a cell that could not be read has been
-    # reported, and is neither.
-    ranges = [(line, label) for line, label, reading in readings if reading.is_range]
-    negatives = [(line, label) for line, label, reading in readings
-                 if not reading.is_range and reading.source.startswith("-")]
-    if ranges and negatives:
-        report.add(name, ranges[0][0],
-                   f"{ranges[0][1]!r} is a range, and {negatives[0][1]!r} on line "
-                   f"{negatives[0][0]} is negative. Put them in separate category files. "
-                   "The parser this protected has since been fixed; the restriction is held "
-                   "only until the notebook stops reading the data with a parser of its own.")
-
+    # A file mixing a range and a negative used to be unreadable by the
+    # notebook's own pandas-based parser (H3): a hyphen range typed the whole
+    # column as strings, so a negative sharing the file split on its own minus
+    # sign and became float(""). WP1's "to" separator fixed the parser itself,
+    # and WP7 archived the notebook that ran it (Archives/), so nothing live
+    # reads this data any other way than benson.values.read_value does here -
+    # there is no second reading left to drive apart. The guard that held the
+    # data inside what both readers agreed on is retired with it.
 
 
 def check_metadata(categories: list[Category], report: Report) -> None:

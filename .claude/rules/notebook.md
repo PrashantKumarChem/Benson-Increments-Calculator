@@ -5,73 +5,70 @@ paths:
 
 # Working with the notebook
 
-## It is not a legacy artifact
+## It imports `benson`; it has no parser of its own
 
-`Benson Increments Calculator.ipynb` still reads `CSV_data_files/` with its own
-code, unchanged since generation 2. It is not archived, and it is not wired to
-the website's rules in any way.
+`Benson Increments Calculator.ipynb` is generation 4. It does not read
+`CSV_data_files/` or `notation/` with code of its own — it installs the
+`benson` package (`%pip install git+https://github.com/…`, D6) and either
+fetches the built artifact (`dist/increments.json`) over HTTPS for the
+curated data, or calls `benson.build.build_artifact()` directly on a user's
+own CSV folder for bring-your-own-data. Both paths return the same shape,
+because both are the same function. There is no second reading of the data
+in this file to drift from the artifact's, so **the guard that used to hold
+that in check is gone** — see the next section.
 
-**There is no automated check left that the notebook's reading still agrees
-with the artifact's, value by value.** `tools/check_parity.mjs` used to be that
-check; WP4 retired it once the website had no parser left of its own to check
-against, and replaced it with `tests/conformance.json` — a fixture for the
-tally, formatting and search rules that stay written twice, not for the 236
-values themselves. Those stay unverified against each other by any script:
-what keeps them from drifting is that the source CSVs cannot express the one
-shape `parse_value` (below) cannot read — see the next section — plus a
-change here now needs a person to read the diff and think about what it
-changes, the same way a change to any unverified thing does.
+If you are editing this notebook and find yourself parsing a CSV, converting
+a value, or decomposing a group name by hand: stop. That rule belongs in
+`benson/`, which this notebook consumes and does not change (see
+`AGENTS.md`'s territory notes, or ask). The one thing this notebook is
+allowed to carry a second copy of is the small residue that is not a
+generated-artifact field and not a `benson` function either — the running
+total's arithmetic, how it is formatted, and that the method's own
+uncertainty is never rebuilt from the chosen groups' own. The website carries
+the same handful of rules in `assets/format.js`; this notebook's copy is
+checked against `tests/conformance.json`, the same fixture the website's
+tests and `benson`'s own Python tests are held to — the notebook runs that
+check itself, in a cell, every time it runs.
 
-**If you edit `parse_value`, `load_increment_data` or `get_value_dicts`,
-compare its output against `dist/increments.json` by hand** —
-`tools/export_reference_values.py` still runs these functions read out of the
-notebook file and prints every value as JSON, even with its only caller gone:
+## The mixed-range/negative guard is retired (H3)
 
-```bash
-python tools/export_reference_values.py > notebook-values.json
-```
-
-## The parser, and the trap it used to hold
-
-The notebook's `parse_value` is a few readable lines, and that simplicity is a
-feature — students read it. It splits a string cell on the range separator:
-
-```python
-if ' to ' in v:
-    low, high = v.split(' to ')
-    return (float(low) + float(high)) / 2
-```
-
-While that separator was a hyphen, this was a trap. pandas types a whole column
-as strings as soon as one cell is a range, so in a file mixing ranges and
-negatives a negative value reached that branch as a string and split on its own
-minus sign:
-
-```
-'1.05-1.76'  -> 1.405
-'-42'        -> ValueError: could not convert string to float: ''
-```
-
-Writing ranges as `1.05 to 1.76` is what closed it — `to` cannot be a sign, so
-there is nothing left to tell apart. **That was the fix, and porting the
-website's regex in here was not**: the parser has to stay short enough to read.
-
-`tools/validate_data.py` still refuses a file holding both, and will until the
-notebook stops parsing on its own. It is a hold rather than a trap now.
+`tools/validate_data.py` used to refuse a category file holding both a
+published range and a negative value, because generation 2's own
+`pandas`-based `parse_value` mis-split such a file (a range typed its whole
+column as strings, so a negative value shared the type and split on its own
+sign — `'-42'` became `float('')`). That parser is archived along with the
+notebook that ran it (see below); nothing live reads this data any way but
+`benson.values.read_value` does, so there is no second reading left for the
+guard to protect against disagreeing. The rule was retired for that reason
+alone, not because the combination is now safe to misread — it never was, and
+`read_value` always read it correctly once WP1 wrote ranges as `1.05 to 1.76`
+rather than a bare hyphen.
 
 ## Running it
 
-It must be started from the repository root; it looks for `CSV_data_files/`
-relative to where Jupyter was launched.
+Works the same locally and in Colab — it fetches its data over HTTPS either
+way, so there is no `CSV_data_files/` to be relative to:
 
 ```bash
 pip install -r requirements.txt
 jupyter lab "Benson Increments Calculator.ipynb"
 ```
 
+If you are developing `benson` itself and want the notebook to see local
+changes rather than what is on GitHub, skip the install cell and make sure an
+editable install (`pip install -e .`, run from the repository root) is on the
+kernel's path before the import cell runs.
+
 ## Do not touch
 
-`Archives/` holds two previous generations of this notebook, each frozen
-alongside its own copy of the data — they read
-`Archives/increment_correction_table.csv`, not the live `CSV_data_files/`. They
-are a historical record. Leave them exactly as they are.
+`Archives/` holds three previous notebooks, each frozen alongside its own
+copy of the data — they never read the live `CSV_data_files/`:
+
+| File | Reads |
+|---|---|
+| `Archives/2_1-BIC.ipynb`, `Archives/Benson Increments Calculator.ipynb` (generation 1) | `Archives/increment_correction_table.csv` |
+| `Archives/gen2-Benson Increments Calculator.ipynb` (generation 2, archived at WP7, 2026-09-15) | `Archives/CSV_data_files_gen2/`, a snapshot of `CSV_data_files/` as it stood the day it was archived |
+
+They are a historical record, each naming its own generation in a leading
+markdown cell. Leave them exactly as they are — including the code inside
+them, which is deliberately not migrated to `benson` or updated in any way.
