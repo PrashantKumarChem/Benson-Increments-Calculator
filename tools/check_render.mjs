@@ -582,6 +582,12 @@ async function main() {
         fail("the tables do not scroll sideways at 390px, so this cannot be checked",
           `${scrolled.length} table(s), at ${scrolled.map((s) => s.left).join("px, ")}px - ` +
           "they may have stopped being wider than the screen, which would make this vacuous");
+      } else if (scrolled[0].left === scrolled[1].left) {
+        // Without this the check could quietly stop checking: equal offsets make
+        // the two keyings agree again, and everything below would still pass.
+        fail("the two tables are scrolled to the same place, so this cannot tell the keyings apart",
+          `both read ${scrolled[0].left}px - the offsets have to differ for narrowing to ` +
+          "discriminate between restoring by section and restoring by position");
       } else {
         // Narrowing to one category is what tells the two apart. The surviving
         // table was the second one; it now sits where the first one did, and it
