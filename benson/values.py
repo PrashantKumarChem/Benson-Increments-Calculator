@@ -27,6 +27,10 @@ NUMBER_RE = re.compile(r"^-?\d*\.?\d+$", re.ASCII)
 # "-42" needs to know that its dash is a sign, and every implementation that
 # has to work that out is one that can work it out differently. "to" cannot be
 # a sign, so the two forms stop overlapping and the rule stops needing care.
+# The spaces around it must be ASCII ones: re.ASCII narrows \s as well as \d,
+# so a non-breaking space pasted out of a PDF table is refused rather than read
+# as a separator - and the hyphen form below is narrowed the same way. Stricter
+# than before re.ASCII, and deliberate.
 RANGE_RE = re.compile(r"^(-?\d*\.?\d+)\s+to\s+(-?\d*\.?\d+)$", re.ASCII)
 # The form this replaced. Matched only so it can be refused by name: falling
 # through to "neither a number nor a range" would tell a contributor their row

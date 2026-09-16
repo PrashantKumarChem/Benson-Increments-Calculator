@@ -39,7 +39,8 @@ so the reasoning stays visible and the arithmetic stays honest.
 
 | | |
 |---|---|
-| `Ctrl`/`Cmd` + `K` | jump to the search box |
+| `/` | jump to the search box, unless you are already typing in a field |
+| `Ctrl`/`Cmd` + `K` | the same, and it works while typing too — where the browser allows it. Firefox claims this one before the page is sent it, which is why `/` is what the page promises |
 | arrow keys | move through the increments |
 | `Enter` | add the one in focus |
 | `+` / `-` | adjust its count |
