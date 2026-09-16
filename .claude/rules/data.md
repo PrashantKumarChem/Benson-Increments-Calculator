@@ -137,15 +137,18 @@ from, rather than making one.
   that exists.** Every column but `Unit` filled in; a `Symbol` that a category
   declares, and only once; one unsigned number; element symbols; a `Source`
   that is a key. The build refuses the same faults, asking the same function.
-A rule that used to be here is **gone**, and is worth knowing about because the
-reasoning reads oddly without it: **a file may now hold both a published range
-and a negative value.** It could not once. pandas types a whole column as
-strings as soon as one cell is a range, and the gen-2 notebook split those
-strings on the separator, so while that separator was a hyphen a negative
-sharing the file became `float("")` and raised. WP1's `to` separator fixed the
-parser, WP7 archived the notebook that ran it, and the guard retired with it —
-`tools/validate_data.py` keeps the reason where the rule stood. Nothing refuses
-the combination now.
+
+## A rule that used to be here is gone
+
+Nothing now refuses a file holding both a published range and a negative value.
+That guard existed for generation 2's own parser, and WP7 archived that notebook
+with a frozen copy of its data, so there is no second reading left to protect.
+
+[`notebook.md`](notebook.md) records why it went, and says the part that matters
+when you add a row: it was retired because nothing misreads the combination any
+more, **not** because the combination was ever safe to misread. `read_value` is
+the one reader left, and `tools/validate_data.py` keeps the reasoning where the
+rule stood.
 
 ## After changing anything here
 
