@@ -160,6 +160,15 @@ function renderLibrary() {
     return;
   }
 
+  // A table wider than the screen scrolls sideways inside its own box, and
+  // replacing the markup puts every one of them back at the first column. On a
+  // phone that meant a reader who had scrolled across to read the source lost
+  // their place on every add. Keyed by section rather than by position, because
+  // a search changes which sections exist and in what order.
+  const scrolledAcross = new Map(
+    [...el("library").querySelectorAll(".table-wrap[data-section]")]
+      .map((wrap) => [wrap.dataset.section, wrap.scrollLeft]));
+
   el("library").innerHTML = sections
     .map((section) => {
       // A search is ordered by relevance rather than by file, so it gets one
@@ -169,7 +178,7 @@ function renderLibrary() {
         : `${section.rows.length} ${section.rows.length === 1 ? "match" : "matches"}` +
           `<span class="n">best first</span>`;
       const body = view.mode === "table"
-        ? `<div class="table-wrap"><table class="table">
+        ? `<div class="table-wrap" data-section="${escapeHtml(section.key)}"><table class="table">
              <thead><tr>
                <th scope="col">Group</th>
                <th scope="col" class="num">Value</th>
@@ -184,6 +193,11 @@ function renderLibrary() {
       return `<h2 class="section-head">${heading}</h2>${body}`;
     })
     .join("");
+
+  for (const wrap of el("library").querySelectorAll(".table-wrap[data-section]")) {
+    const across = scrolledAcross.get(wrap.dataset.section);
+    if (across) wrap.scrollLeft = across;
+  }
 }
 
 function renderTally() {
