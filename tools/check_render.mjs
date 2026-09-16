@@ -567,42 +567,71 @@ async function main() {
       await page.waitForSelector(".table tbody tr", { timeout: 15000 });
       await settle(page);
 
-      const wrap = () => page.locator(".table-wrap").first();
-      await wrap().evaluate((box) => { box.scrollLeft = 120; });
+      // Two tables, scrolled to different places. Both are needed: while the
+      // sections stay where they are, restoring by position and restoring by
+      // section produce identical results, so one table proves nothing about
+      // which of the two renderLibrary() does.
+      const wraps = page.locator(".table-wrap");
+      await wraps.nth(0).evaluate((box) => { box.scrollLeft = 120; });
+      await wraps.nth(1).evaluate((box) => { box.scrollLeft = 60; });
       await settle(page);
-      const across = await wrap().evaluate((box) => box.scrollLeft);
+      const scrolled = await wraps.evaluateAll((boxes) =>
+        boxes.map((box) => ({ section: box.dataset.section, left: box.scrollLeft })));
 
-      if (across < 1) {
-        fail("the table does not scroll sideways at 390px, so this cannot be checked",
-          `scrollLeft reads ${across} after asking for 120 - the table may have stopped ` +
-          "being wider than the screen, which would make this check vacuous");
+      if (scrolled.length < 2 || scrolled[0].left < 1 || scrolled[1].left < 1) {
+        fail("the tables do not scroll sideways at 390px, so this cannot be checked",
+          `${scrolled.length} table(s), at ${scrolled.map((s) => s.left).join("px, ")}px - ` +
+          "they may have stopped being wider than the screen, which would make this vacuous");
       } else {
+        // Narrowing to one category is what tells the two apart. The surviving
+        // table was the second one; it now sits where the first one did, and it
+        // must keep its own 60px rather than inherit the first's 120px.
+        const second = scrolled[1];
+        await page.locator(`#chips button[data-file="${second.section}"]`).click();
+        await settle(page);
+        const narrowed = await wraps.evaluateAll((boxes) =>
+          boxes.map((box) => ({ section: box.dataset.section, left: box.scrollLeft })));
+
+        if (narrowed.length !== 1 || narrowed[0].section !== second.section) {
+          fail("narrowing to one category did not leave exactly that category's table",
+            `left ${JSON.stringify(narrowed)}, expected only ${JSON.stringify(second.section)}`);
+        } else if (Math.abs(narrowed[0].left - second.left) > 1) {
+          fail("a narrowed table is given another section's scroll position",
+            `${second.section} sat ${second.left}px across and reads ${narrowed[0].left}px ` +
+            `once it is the only table, where the first table sat ${scrolled[0].left}px`);
+        }
+
         // Clicked by coordinate, not through a locator: Playwright scrolls an
         // element into view before clicking it, which would move the very thing
-        // being measured. The third row, so the sheet at the foot cannot cover it.
-        const point = await wrap().evaluate((box) => {
+        // being measured. The third row, so the sheet at the foot cannot cover
+        // it - and never a link, because following a citation is deliberately
+        // not an add, so a point that landed on one would fail for that reason
+        // rather than for the scroll.
+        const point = await wraps.first().evaluate((box) => {
           const rect = box.getBoundingClientRect();
           const row = box.querySelector("tbody tr:nth-child(3)");
           const rowRect = row.getBoundingClientRect();
           const x = rect.left + rect.width / 2;
           const y = rowRect.top + rowRect.height / 2;
           const hit = document.elementFromPoint(x, y);
-          return { x, y, onCell: !!(hit && hit.closest("td")) };
+          return { x, y, onCell: !!(hit && hit.closest("td") && !hit.closest("a")) };
         });
 
         if (!point.onCell) {
           fail("could not find a table cell to click in the scrolled table at 390px",
-            `nothing that is a cell is painted at ${Math.round(point.x)},${Math.round(point.y)}`);
+            "nothing that is a cell, and not a link, is painted at " +
+            `${Math.round(point.x)},${Math.round(point.y)}`);
         } else {
+          const before = await wraps.first().evaluate((box) => box.scrollLeft);
           await page.mouse.click(point.x, point.y);
           await settle(page);
-          const after = await wrap().evaluate((box) => ({
+          const after = await wraps.first().evaluate((box) => ({
             left: box.scrollLeft,
             picked: !!box.querySelector("tbody tr.picked"),
           }));
-          if (!after.picked || Math.abs(after.left - across) > 1) {
+          if (!after.picked || Math.abs(after.left - before) > 1) {
             fail("adding from a sideways-scrolled table row loses the reader's place",
-              `the table sat ${across}px across and reads ${after.left}px after the add, ` +
+              `the table sat ${before}px across and reads ${after.left}px after the add, ` +
               `and a row ${after.picked ? "was" : "was NOT"} added`);
           }
         }
