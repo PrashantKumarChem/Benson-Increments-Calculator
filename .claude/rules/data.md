@@ -59,12 +59,11 @@ left out altogether. A row may stop before its trailing optional cells.
 A column with any other title is refused, so a misspelt `Sources` cannot drop
 what it holds without a word.
 
-**Widening a file in this repository breaks the gen-2 notebook until WP7
-retires it.** Its `get_value_dicts` skips any file that does not have exactly
-two columns, printing a warning and nothing more, so the whole category
-disappears from the notebook — and no check here notices, since
-`check_parity.mjs` is gone. Widening one before then is a decision to take
-deliberately, not a side effect of adding a `Source`.
+**Widening a file is safe now.** It used to break the gen-2 notebook, whose
+`get_value_dicts` skipped any file without exactly two columns — the category
+disappeared from it with only a warning, and no check here noticed. WP7 archived
+that notebook with a frozen copy of its data (`Archives/`), so the live files
+have no second reader left to lose a category.
 
 **The files have no trailing newline.** Appending a row with `>>` corrupts the
 last existing row. It fails loudly rather than silently, but it wastes a cycle.
@@ -138,15 +137,15 @@ from, rather than making one.
   that exists.** Every column but `Unit` filled in; a `Symbol` that a category
   declares, and only once; one unsigned number; element symbols; a `Source`
   that is a key. The build refuses the same faults, asking the same function.
-- **No file may contain both a published range and a negative value.** This was
-  once unreadable: pandas types a whole column as strings as soon as one cell is
-  a range, and the notebook split those strings on the range separator, so while
-  that separator was a hyphen a negative value became `float("")` and raised.
-  Writing ranges with `to` fixed it, and the notebook now reads such a file
-  correctly. The rule is kept anyway until the notebook stops reading the data
-  with a parser of its own — two independent readings still exist, and this is
-  the combination that has already driven them apart. Put them in separate
-  category files.
+A rule that used to be here is **gone**, and is worth knowing about because the
+reasoning reads oddly without it: **a file may now hold both a published range
+and a negative value.** It could not once. pandas types a whole column as
+strings as soon as one cell is a range, and the gen-2 notebook split those
+strings on the separator, so while that separator was a hyphen a negative
+sharing the file became `float("")` and raised. WP1's `to` separator fixed the
+parser, WP7 archived the notebook that ran it, and the guard retired with it —
+`tools/validate_data.py` keeps the reason where the rule stood. Nothing refuses
+the combination now.
 
 ## After changing anything here
 
@@ -156,7 +155,7 @@ python tools/build_dist.py        # regenerates dist/increments.json, the built 
 python tools/build_version.py     # moves the asset version - the artifact's bytes are folded in
 ```
 
-The site no longer runs a second reading of the data to check against (WP3 moved it onto the artifact; WP4 retired `check_parity.mjs`, the check that used to compare them). The gen-2 notebook still reads these files with its own parser until WP7, and the "no ranges and negatives in one file" rule above is what stands between a new row and that parser silently mishandling it — that is why the rule stays even though nothing here re-proves the notebook against new data automatically.
+The site no longer runs a second reading of the data to check against (WP3 moved it onto the artifact; WP4 retired `check_parity.mjs`, the check that used to compare them), and since WP7 the gen-2 notebook reads a frozen copy in `Archives/` rather than these files. `benson/` is the only thing that reads them now, which is what let the range/negative guard retire: there is no second reading left to drive apart.
 
 `dist/increments.json` is generated. Never hand-edit it — a browser cannot
 list a directory, so `benson/build.py` derives the artifact from these files

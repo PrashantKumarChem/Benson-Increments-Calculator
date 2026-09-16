@@ -87,6 +87,14 @@ and nothing more. Say so beside the assertion. Do not describe it as catching a
 wrong DOI — it cannot, and a guard that claims more than it checks is worse than
 no guard, because it is trusted.
 
+**What does catch one is the DOI lock.** `tools/build_doi_lock.mjs` asks doi.org
+what every cited DOI actually resolves to and writes `tools/doi_lock.json`;
+`node --test tools/doi_lock.test.mjs` compares the citations against that file
+with no network, and CI's *Cited DOIs* job regenerates it and fails on a diff.
+So a DOI that is well-formed and points at the wrong paper is caught there, not
+by the format check. The lock is generated: regenerate it, never hand-edit it,
+and remember it is only as true as its last run against the resolver.
+
 ## Short-form references collide, and the collision is silent
 
 Author-year strings are not identifiers. Two examples from this repository's own
@@ -127,6 +135,7 @@ a figure known to ±10 kJ/mol cannot adjudicate a method whose error is 5.5.
 - [ ] Each source row's comment was read, and every work it names is cited
 - [ ] Every DOI was verified by exact lookup - title, year, type, authors - not by search
 - [ ] Every link was followed and resolves
+- [ ] `tools/doi_lock.json` was regenerated (not hand-edited) if a citation changed
 - [ ] Any format-only check says it is format-only
 - [ ] The rule used to choose between competing values is written down
 - [ ] Dropped values are listed, with the reason
