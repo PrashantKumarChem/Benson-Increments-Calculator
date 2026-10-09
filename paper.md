@@ -26,98 +26,94 @@ bibliography: paper.bib
 # Summary
 
 Benson group additivity estimates the standard enthalpy of formation of an
-organic molecule by adding up contributions from the groups it is made of
-[@benson1976; @cohen1993]. We teach it because it makes the link between
-structure and energy explicit. A student who can break a molecule into groups
-has understood something the final number does not convey on its own.
+organic molecule by adding up contributions from the groups the molecule
+contains [@benson1976; @cohen1993]. The Benson Increments Calculator is a
+browser tool that does the adding. The student does the harder part: deciding
+which groups a molecule has.
 
-The Benson Increments Calculator supports that exercise without performing it.
-All 236 published increments and corrections appear as searchable, clickable
-values, and the student decides which ones a molecule needs. The tool keeps a
-running total in kJ/mol and kcal/mol, shows each contribution beside it, and
-will hand back the whole calculation as plain text to paste into a report.
+All 236 increments and corrections are listed, searchable and clickable. The
+student picks the ones a molecule needs. The tool keeps a running total in
+kJ/mol and kcal/mol, shows each contribution beside it, and gives the full
+calculation as plain text that can be pasted into a report.
 
-It runs in any browser with nothing to install, on a laptop or a phone. There
-is no build step, no framework and no external dependency; even the typeface
-ships with the repository, so the page keeps working in a teaching lab after
-the network drops.
+The tool runs in any web browser, on a laptop or a phone, and needs no
+installation. The code and the increment data are open source. The increments
+are a hand-curated data file, starting from the tables in Anslyn and Dougherty's
+textbook [@anslyn2006], and they are stored as plain CSV files, so the same
+kind of calculator can be built from other tables.
 
 # Statement of need
 
-Software for Benson group additivity already exists, and it assigns the groups
-for you. RMG-Py's thermochemistry estimator [@rmgpy] and pGrAdd [@pgradd] both
-take a SMILES or InChI string and return an estimate. For generating kinetic
-mechanisms across thousands of species that is the correct design. For a course
-it defeats the purpose, because the assignment is the thing being learned. Both
-also need a Python environment, which is friction in a teaching lab and simply
-impossible on a phone.
+Programs for Benson group additivity already exist, and most of them assign the
+groups automatically. RMG-Py's thermochemistry estimator [@rmgpy] and pGrAdd
+[@pgradd] take a SMILES or InChI string and return an estimate. That design
+suits generating kinetic mechanisms for thousands of species. In a course, it
+removes the step the student is meant to learn. Both programs also need a
+Python environment, which is a barrier in a teaching lab and hard to run on a
+phone.
 
 The usual alternative is a printed table. Cohen and Benson's values are spread
-over several tables in notation that is opaque on first sight: `C-(C)2(H)2`,
-`Cd-(CB)(H)`. A look-up error then disappears into the arithmetic, so a wrong
-total and a misunderstood method look identical on the page. Neither the
-student nor the marker can tell them apart.
+over several tables, written in shorthand such as `C-(C)2(H)2` and `Cd-(CB)(H)`.
+A lookup error then hides inside the arithmetic, so a wrong total and a
+misunderstood method look the same on the page.
 
-This tool sits between the two. The student keeps the decomposition. The
-calculator takes the arithmetic, the unit conversion and the bookkeeping. The
-aim is to build chemical intuition and an understanding of what sits behind
-such a calculation, which we consider a prerequisite before a student relies on
-AI-based or other more complex computational methods for numerical values.
+This tool sits between the two. The student still chooses the groups. The
+calculator does the addition, the unit conversion and the bookkeeping. The aim
+is to build an understanding of what sits behind a group-additivity estimate.
+We consider that understanding a prerequisite before a student relies on
+AI-based or other more complex methods for numerical values.
 
-The calculator declines three things on purpose, and each choice comes from
-teaching.
+Three design choices come from teaching.
 
-First, it will not add quantities that are not the same quantity.
-Cyclohexane A-values are conformational free energies, not enthalpies of
-formation, and a running total that quietly added one to the other would be
-arithmetically sound and physically meaningless. Every category declares what
-it holds. The total heads itself $\Delta H_f^\circ$ only while every value in
-it is an enthalpy, and otherwise says plainly what it has been mixed with. This
-is the behaviour we most wanted, because the mistake it prevents is one
-students make without noticing.
+First, the calculator will not add quantities of different kinds. Cyclohexane
+A-values are free energies of conformational change, not enthalpies of
+formation. A running total that added one to the other would be arithmetically
+correct and physically meaningless. The total is labelled as an enthalpy only
+while every value in it is one, and otherwise says what it has been mixed with.
+This prevents a mistake students often make without noticing.
 
-Second, it shows what the source actually published. Fifteen of the twenty-nine
-A-values are published as ranges; the calculator sums the midpoint, displays
-the range beside it, and reports how far the total could move if every range
-were read at its bounds. Values appear at the precision their source claims, so
-an integer increment never acquires two invented decimal places.
+Second, the calculator shows what the source actually published. Fifteen of the
+twenty-nine A-values are given as ranges. The calculator uses the midpoint,
+shows the range beside it, and reports how far the total could move if every
+value were taken at the end of its range. Values keep the precision of their
+source, so an integer increment does not gain decimal places.
 
-Third, it states what it does not know. Four notation entries whose meaning we
-could not confirm against a source are marked unconfirmed on the reference
-page, and a discrepancy found in the atom accounting is documented instead of
-quietly patched. Hiding that uncertainty would teach students that the values
+Third, the calculator states what it does not know. Four notation entries whose
+meaning we could not confirm against a source are marked as unconfirmed on the
+reference page. A discrepancy found in the atom count is documented rather than
+silently fixed. Hiding that uncertainty would make students think the values
 are more settled than they are.
 
-The reference page covers the method, the notation, a glossary, three worked
-examples checked against measured values from the NIST Chemistry WebBook
-[@nist], and the sources. It is generated from Markdown and CSV files a chemist
-can edit without touching any code.
+The reference page gives the method, the notation, a glossary, three worked
+examples with values from the NIST Chemistry WebBook [@nist], and the sources.
+It is generated from Markdown and CSV files that a chemist can edit without
+touching any code.
 
-# Story of the project
+# Use in teaching
 
-The calculator began as a Jupyter notebook written for Advanced Organic
-Chemistry (C450/C540) at Indiana University Bloomington. That notebook is still
-in the repository and still serves as the reference implementation. Using it in
-class exposed the practical problem: a notebook needs a Python environment, and
-the time spent getting one running was time taken from chemistry.
+The calculator was written for Advanced Organic Chemistry (C450/C540) at Indiana
+University Bloomington, and it has been used in class for three years. It
+began as a Jupyter notebook, which is still in the repository and still serves
+as the reference version. A notebook needs a Python installation, and setting
+one up took time away from the chemistry, so the web version was made to remove
+that step.
 
-The increments themselves are a hand-curated data file, starting from the
-increment tables in Anslyn and Dougherty's textbook [@anslyn2006]. The code and
-the data are open source and publicly available for additions. Because the
-data sit in plain CSV files, any CSV file of the same shape can drive a similar
-calculator, so the tool is a template for other instructors as well as a
-calculator for this course.
+Using the tool in class has taught two things at once. Students learn the
+increments, which is the chemistry. They also learn the workflow that links a
+notebook to Python and to GitHub: they run Python from Jupyter, and they look at
+how a code repository is organised and written. The web page adds a third
+benefit. Students can calculate on a phone at any time, and the page makes them
+decide which group contributions a molecule needs.
 
-We wrote the web version to remove that friction and keep the pedagogy. Its
-values are checked against the notebook's own parsing rules on every commit, so
-the two cannot disagree, and a test reads the notebook itself to keep that
-comparison honest.
+The routine addition, which used to take class time, is now done by the
+calculator. Class time goes to choosing the groups and discussing the results,
+and the work is more enjoyable for students.
 
 # Acknowledgements
 
-Developed for students of Chemistry C450/C540 at Indiana University
-Bloomington. Generative AI assistance was used in developing this software and
-its documentation; the nature and extent of that assistance is recorded in
-`AI_USE.md` in the repository.
+Developed for students of Advanced Organic Chemistry (C450/C540) at Indiana
+University Bloomington. Generative AI assistance was used in developing the
+software and its documentation. The nature and extent of that assistance is
+recorded in `AI_USE.md` in the repository.
 
 # References
