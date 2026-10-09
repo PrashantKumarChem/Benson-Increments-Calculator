@@ -63,31 +63,11 @@ is to build an understanding of what sits behind a group-additivity estimate.
 We consider that understanding a prerequisite before a student relies on
 AI-based or other more complex methods for numerical values.
 
-Three design choices come from teaching.
-
-First, the calculator will not add quantities of different kinds. Cyclohexane
-A-values are free energies of conformational change, not enthalpies of
-formation. A running total that added one to the other would be arithmetically
-correct and physically meaningless. The total is labelled as an enthalpy only
-while every value in it is one, and otherwise says what it has been mixed with.
-This prevents a mistake students often make without noticing.
-
-Second, the calculator shows what the source actually published. Fifteen of the
+The calculator also shows what the source actually published. Fifteen of the
 twenty-nine A-values are given as ranges. The calculator uses the midpoint,
 shows the range beside it, and reports how far the total could move if every
 value were taken at the end of its range. Values keep the precision of their
 source, so an integer increment does not gain decimal places.
-
-Third, the calculator states what it does not know. Four notation entries whose
-meaning we could not confirm against a source are marked as unconfirmed on the
-reference page. A discrepancy found in the atom count is documented rather than
-silently fixed. Hiding that uncertainty would make students think the values
-are more settled than they are.
-
-The reference page gives the method, the notation, a glossary, three worked
-examples with values from the NIST Chemistry WebBook [@nist], and the sources.
-It is generated from Markdown and CSV files that a chemist can edit without
-touching any code.
 
 # Use in teaching
 
@@ -117,3 +97,24 @@ software and its documentation. The nature and extent of that assistance is
 recorded in `AI_USE.md` in the repository.
 
 # References
+
+<!--
+  Material held back for later. Not part of the paper text. Each line is a
+  pointer to incorporate once the item is checked.
+
+  - Dealing with mixed kinds of quantity: the calculator will not add
+    quantities of different kinds. Cyclohexane A-values are free energies of
+    conformational change, not enthalpies of formation. The total is labelled
+    as an enthalpy only while every value in it is one. Possible section:
+    Statement of need, after the ranges point.
+
+  - Stating what it does not know: four notation entries whose meaning could
+    not be confirmed are marked unconfirmed on the reference page, and a
+    discrepancy in the atom count is documented rather than silently fixed.
+    Confirm the four entries and the discrepancy wording before using.
+
+  - Reference page contents: the method, the notation, a glossary, three
+    worked examples with values from the NIST Chemistry WebBook [@nist], and
+    the sources. Generated from Markdown and CSV files a chemist can edit.
+    The NIST comparison is not yet verified; check before stating it.
+-->
