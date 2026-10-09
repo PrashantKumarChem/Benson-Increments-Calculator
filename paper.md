@@ -64,10 +64,10 @@ aim is to build chemical intuition and an understanding of what sits behind
 such a calculation, which we consider a prerequisite before a student relies on
 AI-based or other more complex computational methods for numerical values.
 
-What distinguishes it is a set of refusals, and they come from teaching rather
-than from software design.
+The calculator declines three things on purpose, and each choice comes from
+teaching.
 
-The first is that it will not add quantities that are not the same quantity.
+First, it will not add quantities that are not the same quantity.
 Cyclohexane A-values are conformational free energies, not enthalpies of
 formation, and a running total that quietly added one to the other would be
 arithmetically sound and physically meaningless. Every category declares what
@@ -76,17 +76,17 @@ it is an enthalpy, and otherwise says plainly what it has been mixed with. This
 is the behaviour we most wanted, because the mistake it prevents is one
 students make without noticing.
 
-It also shows what the source actually published. Fifteen of the twenty-nine
+Second, it shows what the source actually published. Fifteen of the twenty-nine
 A-values are published as ranges; the calculator sums the midpoint, displays
 the range beside it, and reports how far the total could move if every range
 were read at its bounds. Values appear at the precision their source claims, so
 an integer increment never acquires two invented decimal places.
 
-Last, it says what it does not know. Four notation entries whose meaning we
+Third, it states what it does not know. Four notation entries whose meaning we
 could not confirm against a source are marked unconfirmed on the reference
 page, and a discrepancy found in the atom accounting is documented instead of
-quietly patched. A teaching tool that conceals its uncertainty teaches the
-wrong lesson about how chemistry is known.
+quietly patched. Hiding that uncertainty would teach students that the values
+are more settled than they are.
 
 The reference page covers the method, the notation, a glossary, three worked
 examples checked against measured values from the NIST Chemistry WebBook
