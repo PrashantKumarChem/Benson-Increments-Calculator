@@ -59,7 +59,10 @@ total and a misunderstood method look identical on the page. Neither the
 student nor the marker can tell them apart.
 
 This tool sits between the two. The student keeps the decomposition. The
-calculator takes the arithmetic, the unit conversion and the bookkeeping.
+calculator takes the arithmetic, the unit conversion and the bookkeeping. The
+aim is to build chemical intuition and an understanding of what sits behind
+such a calculation, which we consider a prerequisite before a student relies on
+AI-based or other more complex computational methods for numerical values.
 
 What distinguishes it is a set of refusals, and they come from teaching rather
 than from software design.
@@ -92,11 +95,18 @@ can edit without touching any code.
 
 # Story of the project
 
-The calculator began as a Jupyter notebook written for Chemistry C450/C540 at
-Indiana University Bloomington. That notebook is still in the repository and
-still serves as the reference implementation. Using it in class exposed the
-practical problem: a notebook needs a Python environment, and the time spent
-getting one running was time taken from chemistry.
+The calculator began as a Jupyter notebook written for Advanced Organic
+Chemistry (C450/C540) at Indiana University Bloomington. That notebook is still
+in the repository and still serves as the reference implementation. Using it in
+class exposed the practical problem: a notebook needs a Python environment, and
+the time spent getting one running was time taken from chemistry.
+
+The increments themselves are a hand-curated data file, starting from the
+increment tables in Anslyn and Dougherty's textbook [@anslyn2006]. The code and
+the data are open source and publicly available for additions. Because the
+data sit in plain CSV files, any CSV file of the same shape can drive a similar
+calculator, so the tool is a template for other instructors as well as a
+calculator for this course.
 
 We wrote the web version to remove that friction and keep the pedagogy. Its
 values are checked against the notebook's own parsing rules on every commit, so
