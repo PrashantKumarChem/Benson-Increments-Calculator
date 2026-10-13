@@ -72,9 +72,7 @@ Students use the calculator in three ways. In class, they find the increments of
 
 Beyond teaching thermochemistry, the project offered an opportunity to discuss how chemists can build their own software. As documented in the repository (AI_USE.md), the calculator was developed by pairing domain chemical knowledge with AI coding assistants to produce clean, dependency-free web code. Sharing this workflow with students showed them that software development is no longer restricted to computer scientists: with modern AI tools, bench chemists can automate repetitive laboratory calculations and build tailored computational utilities for their own research.
 
-<!-- Placeholder for future instructional materials:
-     [Instructor Guide and Sample Reaction Coordinate Diagram Worksheet:
-     repository link / supplementary materials placeholder] -->
+Archival lecture presentation slides, student onboarding exercises, and legacy Jupyter notebooks from earlier course offerings are maintained in the repository under [`teaching_materials/`](teaching_materials/).
 
 
 # Design and Implementation
