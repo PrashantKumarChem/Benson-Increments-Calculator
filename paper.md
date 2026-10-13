@@ -25,9 +25,9 @@ bibliography: paper.bib
 
 # Summary
 
-Benson group additivity estimates the standard enthalpy of formation ($\Delta H_f^\circ$) of an organic molecule by adding contributions from the groups it contains, plus corrections for ring strain and steric effects [@benson1976; @cohen1993]. The Benson Increments Calculator is a browser tool for teaching the method. It does the addition, unit conversion and bookkeeping. The student does the chemically meaningful part: deciding which groups and corrections a molecule needs.
+Benson group additivity estimates the standard enthalpy of formation ($\Delta H_f^\circ$) of an organic molecule by adding contributions from the groups it contains, plus corrections for ring strain and steric effects [@benson1976; @cohen1993]. The Benson Increments Calculator is a browser-based tool designed for teaching the method. It handles arithmetic, unit conversion, and bookkeeping, while students perform the central chemical task: identifying constituent groups and required corrections.
 
-The calculator offers 236 searchable, clickable increments and corrections. It keeps a running total in kJ/mol and kcal/mol with each contribution beside it, and it gives the full calculation as plain text that can be pasted into a report. It runs in any web browser, on a laptop or a phone, with nothing to install. The code and the increment data are open source.
+The calculator provides 236 searchable group increments and corrections compiled from published literature. It maintains a running tally in both kJ/mol and kcal/mol alongside an explicit ledger of each selected contribution, and exports calculations as structured text for course assignments. Implemented as a static, dependency-free web application, the tool requires no local installation or account setup, running across modern desktop and mobile browsers. Both the source code and increment datasets are open source.
 
 
 # Statement of Need
@@ -68,7 +68,9 @@ The tool was originally introduced as a Jupyter notebook using `ipywidgets`. Bec
 
 The standalone browser version, introduced in the Fall 2026 semester, eliminated technical setup entirely. By distributing the GitHub Pages URL at the start of class, students were able to launch the tool in seconds across laptops, tablets, and smartphones. Routine introductory exercises—such as decomposing and calculating $\Delta H_f^\circ$ for small molecules like ethanol or isopropanol—were completed in under five minutes, shifting instructional time almost entirely to chemical analysis.
 
-Students use the calculator in three ways. In class, they find the increments of molecules while learning the method. In group projects, they analyze peer-reviewed papers using physical organic concepts from the course. And they estimate approximate enthalpy levels of reactants, intermediates, and products to construct reaction coordinate diagrams that explain mechanisms. Because addition and bookkeeping are automated, class time is devoted to group assignments and mechanistic discussion.
+Students use the calculator in three primary contexts: learning group decomposition on simple molecules during introductory lectures, analyzing literature thermochemistry during group projects, and estimating ground-state enthalpy levels to construct reaction coordinate diagrams. 
+
+Because arithmetic and bookkeeping are automated, instructional time is focused on structural reasoning and mechanistic interpretation. The explicit ledger display also provides immediate diagnostic feedback: during in-class exercises, instructors can quickly pinpoint conceptual errors—such as assigning a carbonyl ligand (`CO`) as a saturated alkyl carbon (`C`), or omitting steric corrections on ortho-substituted aromatics—before mathematical mistakes obscure the underlying misunderstanding.
 
 Beyond teaching thermochemistry, the project offered an opportunity to discuss how chemists can build their own software. As documented in the repository (AI_USE.md), the calculator was developed by pairing domain chemical knowledge with AI coding assistants to produce clean, dependency-free web code. Sharing this workflow with students showed them that software development is no longer restricted to computer scientists: with modern AI tools, bench chemists can automate repetitive laboratory calculations and build tailored computational utilities for their own research.
 
@@ -85,15 +87,15 @@ The Benson Increments Calculator is built with a two-tier architecture designed 
 A Jupyter notebook reference implementation remains in the repository, allowing students interested in scripting to run identical calculations and query the underlying datasets programmatically.
 
 
-# Software Features
+# Interface and Pedagogical Features
 
-### Responsive Search and Punctuation Tolerance
-Standard Benson notation is dense with punctuation (`O-(CB)(CO)`, `C-(C)2(H)2`). Exact text entry on mobile devices is cumbersome and error-prone. The search engine normalizes queries by stripping punctuation, parentheses, and hyphens while ignoring case; for example, entering `ocbco` simultaneously surfaces `O-(CB)(CO)` and `CO-(CB)(CO)` (\autoref{fig:search}). The search algorithm also indexes common colloquial chemical names (such as `methylene` or `methyl`) and empirical shorthand (e.g., `CH3` for `C-(C)(H)3`).
+### Search Normalization and Chemical Shorthand
+Standard Benson notation is dense with punctuation (`O-(CB)(CO)`, `C-(C)2(H)2`), which makes exact character entry on mobile keyboards slow and error-prone. To reduce typographic friction, the search engine normalizes queries by stripping punctuation, parentheses, and hyphens while ignoring case. For example, entering `ocbco` surfaces both `O-(CB)(CO)` and `CO-(CB)(CO)` (\autoref{fig:search}). The search algorithm also indexes common colloquial names (such as `methylene` or `methyl`) and empirical shorthand (e.g., `CH3` for `C-(C)(H)3`).
 
 ![Searching for `ocbco` returns matching increments with category hit counts.\label{fig:search}](assets/Figures/Search_Feature.png)
 
 ### Preserving Source Precision and Thermodynamic Boundaries
-The calculator strictly distinguishes thermodynamic state functions. While the primary database tabulates standard enthalpies of formation ($\Delta H_f^\circ$), it also includes cyclohexane $A$-values (conformational Gibbs free energies, $\Delta G^\circ$). If a student selects an $A$-value, the interface immediately re-labels the total to indicate that mixed thermodynamic quantities are present. Furthermore, where source literature reports experimental ranges rather than single values (true for 15 of the 29 tabulated $A$-values), the tool uses the midpoint, displays the published range alongside it, and propagates the maximum potential deviation. Numerical values preserve the precision of their original published sources rather than imposing false decimal precision.
+The calculator enforces clear distinctions between thermodynamic state functions. While the primary database tabulates standard enthalpies of formation ($\Delta H_f^\circ$), it also includes cyclohexane $A$-values (conformational Gibbs free energies, $\Delta G^\circ$), which students frequently encounter alongside group additivity in physical organic courses. If a student selects an $A$-value, the interface immediately re-labels the total to warn that mixed thermodynamic quantities are present. Furthermore, where source literature reports experimental ranges rather than single values (true for 15 of the 29 tabulated $A$-values), the tool uses the midpoint, displays the published range alongside it, and propagates the maximum potential deviation. Numerical values preserve the precision of their original published sources rather than imposing false decimal precision.
 
 
 # Worked Example: Aspirin
@@ -117,7 +119,7 @@ Aspirin (\autoref{fig:aspirin}) requires nine increments spanning three categori
 
 The calculated gas-phase estimate is $-656.3\text{ kJ}\cdot\text{mol}^{-1}$ ($-156.86\text{ kcal}\cdot\text{mol}^{-1}$). Experimental combustion calorimetry yields a crystalline formation enthalpy of $\Delta_f H^\circ(\text{cr}) = -758.19 \pm 0.52\text{ kJ}\cdot\text{mol}^{-1}$ [@kirklin2000]. Using differential scanning calorimetry for the enthalpy of fusion and group additivity for the enthalpy of vaporization, Kirklin derived an estimated gas-phase value of $\Delta_f H^\circ(\text{g}) = -632.5 \pm 2.1\text{ kJ}\cdot\text{mol}^{-1}$ [@kirklin2000; @nist]. 
 
-The resulting residual ($\approx 23.8\text{ kJ}\cdot\text{mol}^{-1}$) serves as an instructive classroom case study. Because the Benson estimate is significantly more negative than the experimental value, the calculation predicts real gaseous aspirin to be more stable than it actually is; that is, the real molecule experiences destabilization relative to an idealized additivity baseline. This discrepancy illustrates two key stereoelectronic phenomena: (1) the $+2.5\text{ kJ}\cdot\text{mol}^{-1}$ generic ortho correction (parameterized on ortho-xylene) severely underestimates the steric repulsion between bulky, polar carboxyl and acetoxy groups; and (2) this steric crowding forces both substituents out of coplanarity with the aromatic ring, attenuating resonance stabilization and preventing the stabilizing intramolecular hydrogen bonding characteristic of planar precursors such as salicylic acid. Comparing the estimate against calorimetric benchmarks reinforces that group additivity provides an idealized baseline, where deviations illuminate higher-order stereoelectronic interactions.
+The resulting residual ($\approx 23.8\text{ kJ}\cdot\text{mol}^{-1}$) serves as an instructive classroom case study. Because the Benson estimate is significantly more negative than the experimental value, the calculation predicts real gaseous aspirin to be more stable than it actually is; that is, the real molecule experiences destabilization relative to an idealized additivity baseline. This discrepancy illustrates two key stereoelectronic phenomena: (1) the $+2.5\text{ kJ}\cdot\text{mol}^{-1}$ generic ortho correction (parameterized on ortho-xylene) severely underestimates the steric repulsion between bulky, polar carboxyl and acetoxy groups [@cohen1993; @glaser2001]; and (2) this steric crowding forces both substituents out of coplanarity with the aromatic ring [@cabezas2012], attenuating resonance stabilization and preventing the stabilizing intramolecular hydrogen bonding characteristic of planar precursors such as salicylic acid [@macario2024]. Comparing the estimate against calorimetric benchmarks reinforces that group additivity provides an idealized baseline, where deviations illuminate higher-order stereoelectronic interactions.
 
 
 # Scope and Limitations
@@ -175,4 +177,14 @@ Developed for students of Advanced Organic Chemistry (C450/C540) at Indiana Univ
   8. Linstrom, P. J., & Mallard, W. G. (Eds.). NIST Chemistry WebBook, NIST
      Standard Reference Database Number 69. National Institute of Standards and
      Technology. https://doi.org/10.18434/T4D303
+  9. Glaser, R. (2001). Aspirin. An ab Initio Quantum-Mechanical Study of
+     Conformational Preferences and of Neighboring Group Interactions. The Journal
+     of Organic Chemistry, 66(3), 771–779. https://doi.org/10.1021/jo001241s
+  10. Cabezas, C., Alonso, J. L., López, J. C., & Mata, S. (2012). Unveiling the
+      Shape of Aspirin in the Gas Phase. Angewandte Chemie International Edition,
+      51(6), 1375–1378. https://doi.org/10.1002/anie.201106621
+  11. Macario, A., López, J. C., & Blanco, S. (2024). Molecular Structure of
+      Salicylic Acid and Its Hydrates: A Rotational Spectroscopy Study.
+      International Journal of Molecular Sciences, 25(7), 4074.
+      https://doi.org/10.3390/ijms25074074
 -->
