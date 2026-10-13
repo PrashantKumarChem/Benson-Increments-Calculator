@@ -27,10 +27,10 @@ keywords:
 authors:
   - family-names: "Kumar"
     given-names: "Prashant"
-    orcid: "https://orcid.org/0000-0000-0000-0000"  # PLACEHOLDER - see note above
+    orcid: "https://orcid.org/0000-0002-6096-9759"
   - family-names: "Pohl"
     given-names: "Nicola L. B."
-    orcid: "https://orcid.org/0000-0000-0000-0000"  # PLACEHOLDER - see note above
+    orcid: "https://orcid.org/0000-0001-7747-8983"
 repository-code: "https://github.com/PrashantKumarChem/Benson-Increments-Calculator"
 url: "https://prashantkumarchem.github.io/Benson-Increments-Calculator/"
 license: GPL-3.0
