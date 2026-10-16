@@ -62,7 +62,7 @@ The tool was developed for upper-level undergraduate and first-year graduate stu
 
 # Use in Teaching
 
-The calculator has been used in Advanced Organic Chemistry (C450/C540) for three years (22 students in Year 1, 17 in Year 2, and 12 in Year 3; average 17). 
+The calculator has been used in Advanced Organic Chemistry (C450/C540) for three years (22 students in Year 1, 17 in Year 2, and 12 in Year 3; average 17). This class focuses on physical organic chemistry based on the textbook _Modern Physical Organic Chemistry_ [@anslyn2006]. The curriculum starts with models of molecular bonding and continues to a discussion of thermodynamics and the use of Benson increments to estimate the heats of formation of molecules.
 
 The tool was originally introduced as a Jupyter notebook using `ipywidgets`. Because the majority of enrolled chemistry students had minimal prior programming experience, environment configuration, package installation, and troubleshooting consumed 20–30 minutes (roughly 30–50% of introductory class periods), causing substantial technical friction before chemical discussion could begin. Migrating to Google Colab in Year 2 eliminated local installation dependencies, but browser authentication hurdles and notebook interface overhead continued to demand disproportionate classroom support.
 
